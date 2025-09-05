@@ -147,8 +147,8 @@ export function Hero() {
 
             <Card className="text-center">
               <CardHeader>
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-8 h-8 text-green-600" />
                 </div>
                 <CardTitle>FRC & Officials</CardTitle>
                 <CardDescription>Comprehensive tools for verification and processing</CardDescription>
@@ -167,8 +167,8 @@ export function Hero() {
 
             <Card className="text-center">
               <CardHeader>
-                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-8 h-8 text-accent" />
+                <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-8 h-8 text-green-600" />
                 </div>
                 <CardTitle>SDLC & DLC</CardTitle>
                 <CardDescription>Advanced dashboards for decision making and monitoring</CardDescription>
