@@ -97,11 +97,13 @@ export function Hero() {
             {/* The track that will be animated */}
             <div className="flex min-w-full animate-[scroll_40s_linear_infinite] hover:[animation-play-state:paused]">
               {/* Render the cards twice for a seamless loop */}
-              {[...features, ...features].map((feature, index) => (
-                <Card key={index} className="w-[350px] flex-shrink-0 mx-4 border-border hover:shadow-md transition-shadow">
+              {[...features, ...features].map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                <Card key={index} className="w-[350px] flex-shrink-0 mx-4 border-border shadow-lg hover:shadow-xl transition-shadow">
                   <CardContent className="flex items-start gap-4 p-6">
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-6 h-6 text-primary" />
+                      <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-2">{feature.title}</h4>
@@ -109,7 +111,7 @@ export function Hero() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )})}
             </div>
           </div>
         </section>
@@ -125,7 +127,7 @@ export function Hero() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center">
+            <Card className="text-center shadow-lg">
               <CardHeader>
                 <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-green-600" />
@@ -145,7 +147,7 @@ export function Hero() {
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center shadow-lg">
               <CardHeader>
                 <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-8 h-8 text-green-600" />
@@ -165,7 +167,7 @@ export function Hero() {
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center shadow-xl">
               <CardHeader>
                 <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-green-600" />
