@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { MapContainer } from "./map-container"
+import  MapComponent  from "./map-container"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -58,7 +58,7 @@ const sampleClaims: Claim[] = [
   },
 ]
 
-export function AtlasView() {
+export default function AtlasView() {
   const [q, setQ] = useState("")
   const [status, setStatus] = useState<string>("all")
   const [year, setYear] = useState<string>("all")
@@ -159,8 +159,7 @@ export function AtlasView() {
           </ul>
         </Card>
       </aside>
-
-      <MapContainer />
+      <MapComponent />
     </div>
   )
 }
