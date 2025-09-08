@@ -8,7 +8,6 @@ import { useState, useRef, useEffect } from "react"
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/login", label: "FRA Claims" },
   { href: "/atlas", label: "FRA Atlas" },
   { href: "/dashboards", label: "IoT Dashboard" },
 ]
@@ -118,14 +117,14 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
         >
           <div className="py-1">
             <Link 
-              href="/login?role=citizen" 
+              href="/claims" 
               className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
               onClick={() => setIsDropdownOpen(false)}
             >
               Citizen
             </Link>
             <Link 
-              href="/login?role=govt" 
+              href="/verification" 
               className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
               onClick={() => setIsDropdownOpen(false)}
             >

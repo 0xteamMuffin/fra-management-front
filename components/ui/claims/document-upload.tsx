@@ -133,7 +133,7 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
   return (
     <div className="space-y-6">
       {/* Document Types Checklist */}
-      <Card className="border-border">
+      <Card className="border-border ">
         <CardHeader>
           <CardTitle className="text-lg">Required Documents</CardTitle>
           <CardDescription>Ensure you have all required documents before uploading</CardDescription>

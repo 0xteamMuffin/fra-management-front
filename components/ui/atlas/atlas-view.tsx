@@ -163,9 +163,9 @@ export default function AtlasView() {
         </Card>
       </aside>
       
-      <div className="rounded-2xl shadow-lg overflow-hidden z-0">
+      <div className="rounded-2xl shadow-lg overflow-hidden h-[85vh] z-0">
          <MapComponent />
       </div>
     </div>
   )
-} 
+}
