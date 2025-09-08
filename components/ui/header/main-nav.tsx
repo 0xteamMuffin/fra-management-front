@@ -38,7 +38,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
 
   return (
     <div className={cn(
-      "flex items-center justify-between w-full",
+      "flex items-center justify-center w-full",
       variant === "desktop" ? "gap-8" : "flex-col gap-4"
     )}>
       {/* Left side navigation */}
