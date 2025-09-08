@@ -4,7 +4,13 @@ import { MapContainer, Marker, Popup, TileLayer, WMSTileLayer,GeoJSON  } from "r
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useEffect, useState } from "react";
+import L from "leaflet"
 
+
+
+const corner1 = L.latLng(-90, -180);
+const corner2 = L.latLng(90, 180);
+const worldBounds = L.latLngBounds(corner1, corner2);
 
 export default function MapComponent() {
   //   const markers = [
@@ -36,6 +42,9 @@ export default function MapComponent() {
       center={[16.496925, 80.500488]}
       zoom={17}
       style={{ height: "100%", width: "100%" }}
+      minZoom={3} // Prevents zooming out too far
+      maxBounds={worldBounds} // Restricts panning to the world boundaries
+      maxBoundsViscosity={1.0}
     >
       {/* Base map */}
       <TileLayer

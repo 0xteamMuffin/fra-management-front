@@ -58,6 +58,8 @@ const sampleClaims: Claim[] = [
   },
 ]
 
+
+
 export default function AtlasView() {
   const [q, setQ] = useState("")
   const [status, setStatus] = useState<string>("all")
@@ -76,7 +78,8 @@ export default function AtlasView() {
   }, [q, status, year])
 
   return (
-    <div className="mt-8 ml-8 relative grid grid-cols-1 md:grid-cols-[320px_1fr]">
+    // Change is on this line: added mr-8 for right margin
+    <div className="mt-8 ml-8 mr-4 relative grid grid-cols-1 md:grid-cols-[320px_1fr] md:gap-6">
       <aside className="border-r rounded-2xl gradient-green-subtle p-4 space-y-6 shadow-md">
         {/* Layers */}
         <div>
@@ -159,7 +162,10 @@ export default function AtlasView() {
           </ul>
         </Card>
       </aside>
-      <MapComponent />
+      
+      <div className="rounded-2xl shadow-lg overflow-hidden z-0">
+         <MapComponent />
+      </div>
     </div>
   )
-}
+} 
