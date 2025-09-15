@@ -1,13 +1,19 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import  MapComponent  from "./map-container"
+import MapComponent from "./map-container"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-type Claim = {
+export type Claim = {
   id: string
   applicant: string
   areaHa: number
@@ -58,8 +64,6 @@ const sampleClaims: Claim[] = [
   },
 ]
 
-
-
 export default function AtlasView() {
   const [q, setQ] = useState("")
   const [status, setStatus] = useState<string>("all")
@@ -78,25 +82,46 @@ export default function AtlasView() {
   }, [q, status, year])
 
   return (
-    // Change is on this line: added mr-8 for right margin
     <div className="mt-8 ml-8 mr-4 relative grid grid-cols-1 md:grid-cols-[320px_1fr] md:gap-6">
       <aside className="border-r rounded-2xl gradient-green-subtle p-4 space-y-6 shadow-md">
         {/* Layers */}
         <div>
           <h2 className="font-semibold text-emerald-900">Layers</h2>
-          <p className="text-xs text-emerald-800/70">Toggle contextual overlays</p>
+          <p className="text-xs text-emerald-800/70">
+            Toggle contextual overlays
+          </p>
           <ul className="mt-3 space-y-2 text-sm text-emerald-900">
             <li>
-              <input type="checkbox" defaultChecked className="mr-2 accent-emerald-700" /> State Boundaries
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mr-2 accent-emerald-700"
+              />{" "}
+              State Boundaries
             </li>
             <li>
-              <input type="checkbox" defaultChecked className="mr-2 accent-emerald-700" /> District Boundaries
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mr-2 accent-emerald-700"
+              />{" "}
+              District Boundaries
             </li>
             <li>
-              <input type="checkbox" defaultChecked className="mr-2 accent-emerald-700" /> Forest Areas
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mr-2 accent-emerald-700"
+              />{" "}
+              Forest Areas
             </li>
             <li>
-              <input type="checkbox" defaultChecked className="mr-2 accent-emerald-700" /> Claimant Territories
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mr-2 accent-emerald-700"
+              />{" "}
+              Claimant Territories
             </li>
           </ul>
         </div>
@@ -105,7 +130,9 @@ export default function AtlasView() {
         <div className="space-y-3">
           <h2 className="font-semibold text-emerald-900">Filters</h2>
           <div className="space-y-1.5">
-            <Label htmlFor="atlas-search" className="text-emerald-950">Search</Label>
+            <Label htmlFor="atlas-search" className="text-emerald-950">
+              Search
+            </Label>
             <Input
               id="atlas-search"
               placeholder="Find by claim ID or name..."
@@ -151,20 +178,23 @@ export default function AtlasView() {
           <h3 className="font-semibold text-emerald-900 mb-2">Legend</h3>
           <ul className="space-y-2 text-sm text-emerald-900">
             <li>
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-600 mr-2" /> Approved
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-600 mr-2" />{" "}
+              Approved
             </li>
             <li>
-              <span className="inline-block h-2 w-2 rounded-full bg-amber-500 mr-2" /> Pending
+              <span className="inline-block h-2 w-2 rounded-full bg-amber-500 mr-2" />{" "}
+              Pending
             </li>
             <li>
-              <span className="inline-block h-2 w-2 rounded-full bg-red-500 mr-2" /> Rejected
+              <span className="inline-block h-2 w-2 rounded-full bg-red-500 mr-2" />{" "}
+              Rejected
             </li>
           </ul>
         </Card>
       </aside>
-      
+
       <div className="rounded-2xl shadow-lg overflow-hidden h-[85vh] z-0">
-         <MapComponent />
+        <MapComponent claims={filtered} />
       </div>
     </div>
   )
