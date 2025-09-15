@@ -132,7 +132,7 @@ export function FRAClaimForm() {
                         isCompleted ? "bg-green-600" : ""
                       )}
                     >
-                      {isCompleted ? <CheckCircle2 size={20} /> : <step.icon size={18} />}
+                      {isCompleted ? <CheckCircle2 size={20} className="text-slate-100" /> : <step.icon size={18} />}
                     </div>
                     <div>
                       <p className={cn("text-sm font-medium", isActive ? "text-primary" : "text-foreground")}>
