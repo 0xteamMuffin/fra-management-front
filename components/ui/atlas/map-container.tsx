@@ -18,7 +18,7 @@ interface MapComponentProps {
 
 export default function MapComponent({ claims }: MapComponentProps) {
   const [geoData, setGeoData] = useState(null)
-  const [districtData, setDistrictData] = useState(null)
+  const [villageData, setDistrictData] = useState(null)
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
   const [isSatelliteView, setIsSatelliteView] = useState(false)
   const [isLoading, setIsLoading] = useState(false) 
@@ -40,6 +40,7 @@ export default function MapComponent({ claims }: MapComponentProps) {
     fetch("data/data1.geojson")
       .then((response) => response.json())
       .then((data) => {
+        console.log("GeoJSON CRS:", data.crs); 
         const filteredFeatures = {
           ...data,
           features: data.features.filter(
@@ -162,14 +163,14 @@ export default function MapComponent({ claims }: MapComponentProps) {
         ) : (
           <TileLayer url="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAokB9pSgZf0AAAAASUVORK5CYII=" />
         )}
-
+{/* 
         <WMSTileLayer
           url="http://localhost:8080/geoserver/wms"
           layers="bhuvan:BAND3"
           format="image/png"
           transparent={true}
           version="1.0.0"
-        />
+        /> */}
 
         {/* Main State GeoJSON Layer */}
         {geoData && (
@@ -186,11 +187,11 @@ export default function MapComponent({ claims }: MapComponentProps) {
           />
         )}
 
-        {/* District Boundary Layer */}
-        {districtData && (
+        {/* Village Boundary Layer */}
+        {villageData && (
           <GeoJSON
             key={selectedDistrict} 
-            data={districtData}
+            data={villageData}
             style={districtStyle}
             onEachFeature={(feature: any, layer: Layer) => {
               if (feature.properties?.NAME) {
