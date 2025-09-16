@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useRef } from "react"
 import domtoimage from "dom-to-image-more"
+import axios from "axios"
 import MapComponent from "./map-container"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -15,6 +16,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import LegendCard from "./legend"
+
+// 1. --- NEW: Helper to convert Blob to Base64 ---
+// This function creates a permanent, self-contained data URL from a blob.
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 
 const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
   <div className="border-b border-green-200/60">
@@ -61,13 +74,6 @@ export type Claim = {
   status: "Approved" | "Pending" | "Rejected"
   year: number
   polygon: [number, number][]
-}
-
-// NEW: Type definition for our simulated analysis data
-type AnalysisData = {
-  forest: number
-  water: number
-  land: number
 }
 
 const sampleClaims: Claim[] = [
@@ -117,10 +123,12 @@ export default function AtlasView() {
   const [status, setStatus] = useState<string>("all")
   const [year, setYear] = useState<string>("all")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisImage, setAnalysisImage] = useState<string | null>(null)
   const [openSections, setOpenSections] = useState<string[]>(["", ""])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
+  
+  const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [segmentedImage, setSegmentedImage] = useState<string | null>(null)
 
   const mapContainerRef = useRef<HTMLDivElement>(null)
 
@@ -136,31 +144,43 @@ export default function AtlasView() {
     })
   }, [q, status, year])
 
+  // 2. --- UPDATED: Convert blobs to Base64 ---
   const handleAnalyze = useCallback(async () => {
-    if (!mapContainerRef.current) {
-      console.error("Map container ref is not available.")
-      return
-    }
+    if (!mapContainerRef.current) return;
+    
     setIsAnalyzing(true)
-    setAnalysisImage(null)
-    setAnalysisData(null) 
-    try {
-      const blob = await domtoimage.toBlob(mapContainerRef.current)
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      const localImageUrl = URL.createObjectURL(blob)
-      setAnalysisImage(localImageUrl)
+    setCapturedImage(null)
+    setSegmentedImage(null)
+    setAnalysisError(null)
 
-      const forest =  30 
-      const water =  5
-      const land = 100 - forest - water
-      setAnalysisData({ forest, water, land })
+    try {
+      const originalImageBlob = await domtoimage.toBlob(mapContainerRef.current)
+      const originalImageBase64 = await blobToBase64(originalImageBlob);
+      setCapturedImage(originalImageBase64) // Set original image for preview
+
+      const formData = new FormData()
+      formData.append("file", originalImageBlob, "map-capture.png")
+
+      const response = await axios.post(
+        "http://109.230.237.112:3000/api/v1/segment/segment",
+        formData,
+        { responseType: 'blob' }
+      )
+      
+      const segmentedImageBlob = response.data;
+      const segmentedImageBase64 = await blobToBase64(segmentedImageBlob);
+      setSegmentedImage(segmentedImageBase64) // Set the returned image
 
     } catch (error) {
-      console.error("Failed to capture map image:", error)
+      console.error("Failed to analyze map image:", error)
+      setAnalysisError("Failed to get analysis. Please try again.")
     } finally {
       setIsAnalyzing(false)
     }
-  }, [filtered])
+  }, [])
+
+  // 3. --- REMOVED: Cleanup effect is no longer needed ---
+  // We don't need to revoke Base64 URLs, so the useEffect hook is gone.
 
   const toggleSection = (sectionId: string) => {
     setOpenSections((prev) =>
@@ -172,43 +192,30 @@ export default function AtlasView() {
 
   return (
     <>
-      {/*Analysis Details Popup */}
-      {isPopupOpen && analysisImage && analysisData && (
+      {isPopupOpen && capturedImage && segmentedImage && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center"
           onClick={() => setIsPopupOpen(false)}
         >
           <Card
-            className="w-full max-w-md mx-4 animate-in fade-in-50"
-            onClick={(e) => e.stopPropagation()} 
+            className="w-full max-w-lg mx-4 animate-in fade-in-50 p-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="pr-4 pl-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
-                  X
-                </Button>
-              </div>
-              <div className="mb-4 border rounded-lg overflow-hidden">
-                <img src={analysisImage} alt="Analysis Result" className="w-full" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-green-800 mb-2">Land Cover Breakdown</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-900">🌲 Forest Area</span>
-                    <span className="font-mono font-semibold bg-green-100 px-2 py-1 rounded">{analysisData.forest}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-blue-900">💧 Water Bodies</span>
-                    <span className="font-mono font-semibold bg-blue-100 px-2 py-1 rounded">{analysisData.water}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-yellow-900">🟫 Other Land</span>
-                    <span className="font-mono font-semibold bg-yellow-100 px-2 py-1 rounded">{analysisData.land}%</span>
-                  </div>
-                </div>
-              </div>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
+                X
+              </Button>
+            </div>
+
+            <h4 className="font-semibold text-green-800 mb-2">Original View</h4>
+            <div className="mb-4 border rounded-lg overflow-hidden">
+              <img src={capturedImage} alt="Original View" className="w-full" />
+            </div>
+
+            <h4 className="font-semibold text-green-800 mb-2 mt-4">Segmented Analysis</h4>
+            <div className="mb-4 border rounded-lg overflow-hidden">
+              <img src={segmentedImage} alt="Segmented Analysis" className="w-full" />
             </div>
           </Card>
         </div>
@@ -254,7 +261,7 @@ export default function AtlasView() {
                     <Label className="text-green-950 text-xs">Year</Label>
                     <Select value={year} onValueChange={setYear}>
                       <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"><SelectValue placeholder="All" /></SelectTrigger>
-                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="2021">2021</SelectItem><SelectItem value="2022">2022</SelectItem><SelectItem value="2023">2023</SelectItem></SelectContent>
+                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="2021">2021</SelectItem><SelectItem value="222">2022</SelectItem><SelectItem value="2023">2023</SelectItem></SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -270,15 +277,17 @@ export default function AtlasView() {
             </Button>
             <div className="w-full min-h-[150px] bg-white/90 border border-dashed border-green-300 rounded-lg flex items-center justify-center p-2">
               {isAnalyzing && (<p className="text-green-800 text-xs animate-pulse">Capturing and processing...</p>)}
-              {!isAnalyzing && analysisImage && (
+              {!isAnalyzing && capturedImage && !analysisError && (
                 <button
                   className="w-full h-full transition-opacity hover:opacity-80"
                   onClick={() => setIsPopupOpen(true)}
+                  disabled={!segmentedImage} 
                 >
-                  <img src={analysisImage} alt="Analysis Result" className="rounded-md object-cover shadow-md max-h-full w-full hover:cursor-pointer"/>
+                  <img src={capturedImage} alt="Analysis Result" className="rounded-md object-cover shadow-md max-h-full w-full hover:cursor-pointer"/>
                 </button>
               )}
-              {!isAnalyzing && !analysisImage && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
+               {!isAnalyzing && analysisError && (<p className="text-red-800 text-xs text-center">{analysisError}</p>)}
+              {!isAnalyzing && !capturedImage && !analysisError && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
             </div>
           </div>
           

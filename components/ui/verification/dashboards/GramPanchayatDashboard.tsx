@@ -24,7 +24,6 @@ export function GramPanchayatDashboard({ claims, onForward, onViewDocuments, onE
           <h1 className="text-3xl font-bold text-green-800">Gram Panchayat Dashboard</h1>
           <p className="text-slate-600">Manage and verify local forest rights claims.</p>
         </div>
-        <Button className="bg-green-700 hover:bg-green-800"><FilePlus size={16} className="mr-2" />Initiate New Claim</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
