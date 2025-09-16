@@ -1,5 +1,7 @@
 export type ClaimRow = {
   id: string
+  district: string
+  village: string
   gramPanchayat: string
   applicant: string
   claimType: "Individual" | "Community"

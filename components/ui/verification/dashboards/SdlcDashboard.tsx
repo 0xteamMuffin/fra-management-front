@@ -1,3 +1,5 @@
+// @/components/ui/verification/dashboards/SdlcDashboard.tsx
+
 "use client"
 import { Button } from "@/components/ui/button"
 import { Send } from "lucide-react"
@@ -24,6 +26,7 @@ export function SdlcDashboard({ claims, onForward }: Props) {
       </div>
        <ClaimsTable
         claims={claims}
+        filterHierarchy={['Village']}
         renderActions={(claim) => (
           claim.status === 'Under SDLC Review' && (
             <Button variant="outline" size="sm" onClick={() => onForward(claim.id, 'Under DLC Review')}><Send size={14} className="mr-1" /> Forward to DLC</Button>

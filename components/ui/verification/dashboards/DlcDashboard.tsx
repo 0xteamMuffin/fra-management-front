@@ -1,3 +1,5 @@
+// @/components/ui/verification/dashboards/DlcDashboard.tsx
+
 "use client"
 import { Button } from "@/components/ui/button"
 import { Check, X } from "lucide-react"
@@ -27,6 +29,7 @@ export function DlcDashboard({ claims, onApprove, onReject }: Props) {
       </div>
        <ClaimsTable
         claims={claims}
+        filterHierarchy={['District', 'Village']}
         renderActions={(claim) => (
           claim.status === 'Under DLC Review' && (
             <>
