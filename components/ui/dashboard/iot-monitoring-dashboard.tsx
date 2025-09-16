@@ -133,8 +133,8 @@ export function IoTMonitoringDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-        <div className="container mx-auto px-6 py-8">
+      <div className="bg-white">
+        <div className="container mx-auto px-6 pt-8 border-b pb-6">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">IoT Environmental Monitoring</h1>
             <p className="text-muted-foreground text-balance">
@@ -207,20 +207,20 @@ export function IoTMonitoringDashboard() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Sensors</CardTitle>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Activity className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent >
               <div className="text-3xl font-bold text-foreground mb-1">{statusCounts.total}</div>
               <p className="text-sm text-muted-foreground">Active monitoring devices</p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Online</CardTitle>
               <div className="p-2 bg-green-500/10 rounded-lg">
@@ -240,7 +240,7 @@ export function IoTMonitoringDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Warning</CardTitle>
               <div className="p-2 bg-yellow-500/10 rounded-lg">
@@ -260,7 +260,7 @@ export function IoTMonitoringDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Offline</CardTitle>
               <div className="p-2 bg-red-500/10 rounded-lg">

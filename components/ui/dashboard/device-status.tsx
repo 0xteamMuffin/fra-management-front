@@ -75,7 +75,7 @@ export function DeviceStatus({ sensors }: DeviceStatusProps) {
       {/* Device Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {sensors.map((sensor) => (
-          <Card key={sensor.id} className="border-border">
+          <Card key={sensor.id} className="border-border bg-white">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
