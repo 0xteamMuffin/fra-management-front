@@ -10,6 +10,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/atlas", label: "FRA Atlas" },
   { href: "/dashboards", label: "IoT Dashboard" },
+  { href: "/dss", label: "DSS Engine" },
 ]
 
 interface MainNavProps {
