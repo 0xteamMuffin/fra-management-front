@@ -172,13 +172,7 @@ export function Hero() {
                             <div className="flex items-center space-x-4 mb-6">
                                 <div className="px-4 py-2 bg-primary text-primary-foreground rounded-full font-semibold">
                                     Core Features
-                                </div>
-                                <div className="px-4 py-2 text-muted-foreground font-semibold">
-                                    For Officials
-                                </div>
-                                <div className="px-4 py-2 text-muted-foreground font-semibold">
-                                    Analytics
-                                </div>
+                                </div>              
                             </div>
                             <div className="space-y-4">
                                 {features.map((feature, index) => {
@@ -210,9 +204,7 @@ export function Hero() {
                         <p className="text-muted-foreground mt-4 max-w-xl">
                            Our tools empower decision-makers to verify claims accurately, map community resources, and layer developmental schemes effectively, ensuring that benefits reach the intended forest-dwelling communities.
                         </p>
-                        <Button className="mt-8">
-                            Explore the Atlas <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
+                        
                     </AnimatedSection>
                 </div>
             </div>
