@@ -272,8 +272,6 @@ export function IoTMonitoringDashboard() {
           <AlertsPanel sensors={getFilteredSensors()} />
         </TabsContent>
       </Tabs>
-
-      <div className="h-[50vh]"></div>
     </div>
   )
 }

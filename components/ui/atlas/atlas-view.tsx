@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback, useRef } from "react"
+import domtoimage from "dom-to-image-more"
 import MapComponent from "./map-container"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -12,6 +14,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import LegendCard from "./legend"
+
+const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
+  <div className="border-b border-green-200/60">
+    <h2>
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex items-center justify-between w-full py-2 font-semibold text-green-900 text-sm hover:bg-green-200/30 rounded-md px-1"
+      >
+        <span>{title}</span>
+        <svg
+          className={`w-3 h-3 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 5 5 1 1 5"
+          />
+        </svg>
+      </button>
+    </h2>
+    <div
+      className={`grid transition-all duration-300 ease-in-out ${
+        isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      }`}
+    >
+      <div className="overflow-hidden">
+        <div className="pt-2 pb-3">{children}</div>
+      </div>
+    </div>
+  </div>
+)
 
 export type Claim = {
   id: string
@@ -20,6 +61,13 @@ export type Claim = {
   status: "Approved" | "Pending" | "Rejected"
   year: number
   polygon: [number, number][]
+}
+
+// NEW: Type definition for our simulated analysis data
+type AnalysisData = {
+  forest: number
+  water: number
+  land: number
 }
 
 const sampleClaims: Claim[] = [
@@ -68,6 +116,13 @@ export default function AtlasView() {
   const [q, setQ] = useState("")
   const [status, setStatus] = useState<string>("all")
   const [year, setYear] = useState<string>("all")
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisImage, setAnalysisImage] = useState<string | null>(null)
+  const [openSections, setOpenSections] = useState<string[]>(["", ""])
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
+
+  const mapContainerRef = useRef<HTMLDivElement>(null)
 
   const filtered = useMemo(() => {
     return sampleClaims.filter((c) => {
@@ -81,181 +136,160 @@ export default function AtlasView() {
     })
   }, [q, status, year])
 
+  const handleAnalyze = useCallback(async () => {
+    if (!mapContainerRef.current) {
+      console.error("Map container ref is not available.")
+      return
+    }
+    setIsAnalyzing(true)
+    setAnalysisImage(null)
+    setAnalysisData(null) 
+    try {
+      const blob = await domtoimage.toBlob(mapContainerRef.current)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const localImageUrl = URL.createObjectURL(blob)
+      setAnalysisImage(localImageUrl)
+
+      const forest =  30 
+      const water =  5
+      const land = 100 - forest - water
+      setAnalysisData({ forest, water, land })
+
+    } catch (error) {
+      console.error("Failed to capture map image:", error)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }, [filtered])
+
+  const toggleSection = (sectionId: string) => {
+    setOpenSections((prev) =>
+      prev.includes(sectionId)
+        ? prev.filter((id) => id !== sectionId)
+        : [...prev, sectionId],
+    )
+  }
+
   return (
-    <div className="mt-6 ml-6 mr-4 relative grid grid-cols-1 md:grid-cols-[300px_1fr] md:gap-6">
-      {/* Sidebar */}
-      <aside className="border-r rounded-2xl bg-gradient-to-b from-green-50 to-green-100 p-4 space-y-5 shadow-lg flex flex-col max-h-[85vh] overflow-y-auto">
-        {/* Layers */}
-        <div>
-          <h2 className="font-semibold text-green-900 text-sm">Layers</h2>
-          <p className="text-xs text-green-800/70">Toggle contextual overlays</p>
-          <ul className="mt-2 space-y-1 text-xs text-green-900">
-            <li>
-              <input
-                type="checkbox"
-                defaultChecked
-                className="mr-1 accent-green-600"
-              />{" "}
-              Forest Areas
-            </li>
-            <li>
-              <input
-                type="checkbox"
-                defaultChecked
-                className="mr-1 accent-green-600"
-              />{" "}
-              Claimant Territories
-            </li>
-          </ul>
-        </div>
-
-        {/* Filters */}
-        <div className="space-y-2">
-          <h2 className="font-semibold text-green-900 text-sm">Filters</h2>
-          <div className="space-y-1">
-            <Label htmlFor="atlas-search" className="text-green-950 text-xs">
-              Search
-            </Label>
-            <Input
-              id="atlas-search"
-              placeholder="Find by claim ID or name..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <Label className="text-green-950 text-xs">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="Approved">Approved</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-green-950 text-xs">Year</Label>
-              <Select value={year} onValueChange={setYear}>
-                <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="2021">2021</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex-1 overflow-auto">
-          <Card className="bg-white/90 border-green-300 p-3 shadow-sm rounded-lg">
-            <h3 className="font-semibold text-green-900 text-center text-sm border-b pb-1">
-              LEGEND
-            </h3>
-
-            <div className="grid grid-cols-2 gap-2 text-xs text-green-900 mt-2">
-              {/* Same Colors */}
-              <div className="flex items-center">
-                <div className="w-5 h-0.5 border-t border-dotted border-red-500 mr-2"></div>
-                <span>District Boundary</span>
+    <>
+      {/*Analysis Details Popup */}
+      {isPopupOpen && analysisImage && analysisData && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center"
+          onClick={() => setIsPopupOpen(false)}
+        >
+          <Card
+            className="w-full max-w-md mx-4 animate-in fade-in-50"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
+                  X
+                </Button>
               </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-green-200 mr-2"></div>
-                <span>Coast</span>
+              <div className="mb-4 border rounded-lg overflow-hidden">
+                <img src={analysisImage} alt="Analysis Result" className="w-full" />
               </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-green-700 mr-2"></div>
-                <span>Forest</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-amber-50 mr-2"></div>
-                <span>Island</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-sky-300 mr-2"></div>
-                <span>Lake</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-lime-300 mr-2"></div>
-                <span>Muhana</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-yellow-300 mr-2"></div>
-                <span>Non-Potential</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-green-100 mr-2"></div>
-                <span>Potential</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-blue-400 mr-2"></div>
-                <span>Reservoir</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-blue-700 mr-2"></div>
-                <span>River</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-white border mr-2"></div>
-                <span>Sand</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-red-800 mr-2"></div>
-                <span>ULB</span>
-              </div>
-              <div className="flex items-center">
-                <div className="h-3 w-3 bg-rose-400 mr-2"></div>
-                <span>Uninhabited</span>
-              </div>
-              <div className="flex items-center">
-                <div
-                  className="w-3 h-3 bg-purple-100 mr-2"
-                  style={{
-                    backgroundImage:
-                      'url("data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M6 0H0V6\' stroke=\'%23a78bfa\' stroke-width=\'0.5\' fill=\'none\'/%3E%3C/svg%3E")',
-                    backgroundRepeat: "repeat",
-                  }}
-                ></div>
-                <span>Waterlogged</span>
-              </div>
-            </div>
-
-            {/* Claim Status */}
-            <h4 className="font-medium text-green-800 text-center text-xs mt-3">
-              CLAIM STATUS
-            </h4>
-            <div className="grid grid-cols-3 gap-1 text-xs mt-1">
-              <div className="flex items-center">
-                <span className="h-2 w-2 rounded-full bg-emerald-600 mr-1"></span>
-                Approved
-              </div>
-              <div className="flex items-center">
-                <span className="h-2 w-2 rounded-full bg-amber-500 mr-1"></span>
-                Pending
-              </div>
-              <div className="flex items-center">
-                <span className="h-2 w-2 rounded-full bg-red-500 mr-1"></span>
-                Rejected
+              <div>
+                <h4 className="font-semibold text-green-800 mb-2">Land Cover Breakdown</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-green-900">🌲 Forest Area</span>
+                    <span className="font-mono font-semibold bg-green-100 px-2 py-1 rounded">{analysisData.forest}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-900">💧 Water Bodies</span>
+                    <span className="font-mono font-semibold bg-blue-100 px-2 py-1 rounded">{analysisData.water}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-yellow-900">🟫 Other Land</span>
+                    <span className="font-mono font-semibold bg-yellow-100 px-2 py-1 rounded">{analysisData.land}%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </Card>
         </div>
-      </aside>
+      )}
 
-      {/* Map */}
-      <div className="rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0">
-        <MapComponent claims={filtered} />
+      <div className="mt-6 ml-6 mr-4 relative grid grid-cols-1 md:grid-cols-[300px_1fr] md:gap-6">
+        {/* Sidebar */}
+        <aside className="border-r rounded-2xl bg-gradient-to-b from-green-50 to-green-100 p-4 space-y-5 shadow-lg flex flex-col max-h-[85vh] overflow-y-auto">
+          {/* Accordion Sections */}
+          <div className="space-y-1">
+            <CustomAccordion
+              title="Layers"
+              isOpen={openSections.includes("layers")}
+              onToggle={() => toggleSection("layers")}
+            >
+              <p className="text-xs text-green-800/70 mb-2">
+                Toggle contextual overlays
+              </p>
+              <ul className="space-y-1 text-xs text-green-900">
+                <li><input type="checkbox" defaultChecked className="mr-1 accent-green-600"/> Forest Areas</li>
+                <li><input type="checkbox" defaultChecked className="mr-1 accent-green-600"/> Claimant Territories</li>
+              </ul>
+            </CustomAccordion>
+            <CustomAccordion
+              title="Filters"
+              isOpen={openSections.includes("filters")}
+              onToggle={() => toggleSection("filters")}
+            >
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <Label htmlFor="atlas-search" className="text-green-950 text-xs">Search</Label>
+                  <Input id="atlas-search" placeholder="Find by claim ID or name..." value={q} onChange={(e) => setQ(e.target.value)} className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"/>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-green-950 text-xs">Status</Label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"><SelectValue placeholder="All" /></SelectTrigger>
+                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="Approved">Approved</SelectItem><SelectItem value="Pending">Pending</SelectItem><SelectItem value="Rejected">Rejected</SelectItem></SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-green-950 text-xs">Year</Label>
+                    <Select value={year} onValueChange={setYear}>
+                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"><SelectValue placeholder="All" /></SelectTrigger>
+                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="2021">2021</SelectItem><SelectItem value="2022">2022</SelectItem><SelectItem value="2023">2023</SelectItem></SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </CustomAccordion>
+          </div>
+
+          {/* Analysis Section */}
+          <div className="space-y-3">
+            <h2 className="font-semibold text-green-900 text-sm">Analysis</h2>
+            <Button onClick={handleAnalyze} disabled={isAnalyzing} className="w-full bg-green-600 hover:bg-green-700 text-white text-xs h-8">
+              {isAnalyzing ? "Analyzing..." : "Analyze Current View"}
+            </Button>
+            <div className="w-full min-h-[150px] bg-white/90 border border-dashed border-green-300 rounded-lg flex items-center justify-center p-2">
+              {isAnalyzing && (<p className="text-green-800 text-xs animate-pulse">Capturing and processing...</p>)}
+              {!isAnalyzing && analysisImage && (
+                <button
+                  className="w-full h-full transition-opacity hover:opacity-80"
+                  onClick={() => setIsPopupOpen(true)}
+                >
+                  <img src={analysisImage} alt="Analysis Result" className="rounded-md object-cover shadow-md max-h-full w-full"/>
+                </button>
+              )}
+              {!isAnalyzing && !analysisImage && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
+            </div>
+          </div>
+          
+          <LegendCard/>
+        </aside>
+
+        {/* Map */}
+        <div ref={mapContainerRef} className="rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0">
+          <MapComponent claims={filtered} />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
