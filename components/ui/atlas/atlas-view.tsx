@@ -182,7 +182,7 @@ export default function AtlasView() {
             className="w-full max-w-md mx-4 animate-in fade-in-50"
             onClick={(e) => e.stopPropagation()} 
           >
-            <div className="p-4">
+            <div className="pr-4 pl-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
@@ -275,7 +275,7 @@ export default function AtlasView() {
                   className="w-full h-full transition-opacity hover:opacity-80"
                   onClick={() => setIsPopupOpen(true)}
                 >
-                  <img src={analysisImage} alt="Analysis Result" className="rounded-md object-cover shadow-md max-h-full w-full"/>
+                  <img src={analysisImage} alt="Analysis Result" className="rounded-md object-cover shadow-md max-h-full w-full hover:cursor-pointer"/>
                 </button>
               )}
               {!isAnalyzing && !analysisImage && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}

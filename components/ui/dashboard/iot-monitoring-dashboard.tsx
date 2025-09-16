@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { SensorMetrics } from "./sensor-metrics"
 import { EnvironmentalCharts } from "./environmental-charts"
 import { SensorMap } from "./sensor-map"
 import { AlertsPanel } from "./alerts-panel"
 import { DeviceStatus } from "./device-status"
-import { RefreshCw, Download, Settings, Activity } from "lucide-react"
+import { RefreshCw, Download, Settings, Activity, MapPin, Thermometer, Droplets, Battery } from 'lucide-react'
 
 interface SensorData {
   id: string
@@ -93,13 +94,11 @@ export function IoTMonitoringDashboard() {
     setLastRefresh(new Date())
   }, [])
 
-
   const handleRefresh = async () => {
     setIsRefreshing(true)
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    // Update sensor data with slight variations
     setSensorData((prev) =>
       prev.map((sensor) => ({
         ...sensor,
@@ -133,145 +132,195 @@ export function IoTMonitoringDashboard() {
   const statusCounts = getStatusCounts()
 
   return (
-    <div className="space-y-6 m-8">
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">Village Filter</label>
-            <Select value={selectedVillage} onValueChange={setSelectedVillage}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Select village" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Villages</SelectItem>
-                <SelectItem value="Kondagaon">Kondagaon</SelectItem>
-                <SelectItem value="Bastar">Bastar</SelectItem>
-                <SelectItem value="Dantewada">Dantewada</SelectItem>
-                <SelectItem value="Sukma">Sukma</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">Time Range</label>
-            <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Select range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1h">1 Hour</SelectItem>
-                <SelectItem value="24h">24 Hours</SelectItem>
-                <SelectItem value="7d">7 Days</SelectItem>
-                <SelectItem value="30d">30 Days</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Last updated: {lastRefresh?.toLocaleTimeString()}</span>
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            variant="outline"
-            size="sm"
-            className="bg-transparent"
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-          <Button variant="outline" size="sm" className="bg-transparent">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" className="bg-transparent">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sensors</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{statusCounts.total}</div>
-            <p className="text-xs text-muted-foreground">Active monitoring devices</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Online</CardTitle>
-            <div className="w-3 h-3 bg-green-500 rounded-full" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{statusCounts.online}</div>
-            <p className="text-xs text-muted-foreground">
-              {statusCounts.total > 0 ? Math.round((statusCounts.online / statusCounts.total) * 100) : 0}% operational
+    <div className="min-h-screen bg-background">
+      <div className="bg-white">
+        <div className="container mx-auto px-6 pt-8 border-b pb-6">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">IoT Environmental Monitoring</h1>
+            <p className="text-muted-foreground text-balance">
+              Real-time monitoring of environmental sensors across rural villages
             </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Warning</CardTitle>
-            <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{statusCounts.warning}</div>
-            <p className="text-xs text-muted-foreground">Require attention</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Offline</CardTitle>
-            <div className="w-3 h-3 bg-red-500 rounded-full" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{statusCounts.offline}</div>
-            <p className="text-xs text-muted-foreground">Need maintenance</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sensors">Sensor Data</TabsTrigger>
-          <TabsTrigger value="map">GPS Mapping</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <EnvironmentalCharts sensors={getFilteredSensors()} timeRange={selectedTimeRange} />
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Village Filter</label>
+              <Select value={selectedVillage} onValueChange={setSelectedVillage}>
+                <SelectTrigger className="w-48">
+                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Select village" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Villages</SelectItem>
+                  <SelectItem value="Kondagaon">Kondagaon</SelectItem>
+                  <SelectItem value="Bastar">Bastar</SelectItem>
+                  <SelectItem value="Dantewada">Dantewada</SelectItem>
+                  <SelectItem value="Sukma">Sukma</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
-              <SensorMetrics sensors={getFilteredSensors()} />
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Time Range</label>
+              <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Select range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">1 Hour</SelectItem>
+                  <SelectItem value="24h">24 Hours</SelectItem>
+                  <SelectItem value="7d">7 Days</SelectItem>
+                  <SelectItem value="30d">30 Days</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </TabsContent>
 
-        <TabsContent value="sensors" className="space-y-4">
-          <DeviceStatus sensors={getFilteredSensors()} />
-        </TabsContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              Last updated: {lastRefresh?.toLocaleTimeString()}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+              <Button variant="outline" size="sm">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
 
-        <TabsContent value="map" className="space-y-4">
-          <SensorMap sensors={getFilteredSensors()} />
-        </TabsContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="relative overflow-hidden bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Sensors</CardTitle>
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Activity className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent >
+              <div className="text-3xl font-bold text-foreground mb-1">{statusCounts.total}</div>
+              <p className="text-sm text-muted-foreground">Active monitoring devices</p>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="alerts" className="space-y-4">
-          <AlertsPanel sensors={getFilteredSensors()} />
-        </TabsContent>
-      </Tabs>
+          <Card className="relative overflow-hidden bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Online</CardTitle>
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <div className="w-4 h-4 bg-green-500 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600 mb-1">{statusCounts.online}</div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  {statusCounts.total > 0 ? Math.round((statusCounts.online / statusCounts.total) * 100) : 0}% operational
+                </p>
+                <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-200">
+                  Healthy
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="relative overflow-hidden bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Warning</CardTitle>
+              <div className="p-2 bg-yellow-500/10 rounded-lg">
+                <div className="w-4 h-4 bg-yellow-500 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600 mb-1">{statusCounts.warning}</div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">Require attention</p>
+                {statusCounts.warning > 0 && (
+                  <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
+                    Alert
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="relative overflow-hidden bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Offline</CardTitle>
+              <div className="p-2 bg-red-500/10 rounded-lg">
+                <div className="w-4 h-4 bg-red-500 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-red-600 mb-1">{statusCounts.offline}</div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">Need maintenance</p>
+                {statusCounts.offline > 0 && (
+                  <Badge variant="destructive" className="bg-red-500/10 text-red-700 border-red-200">
+                    Critical
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted/50">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="sensors" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Sensor Data
+            </TabsTrigger>
+            <TabsTrigger value="map" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              GPS Mapping
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Alerts
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
+                <EnvironmentalCharts sensors={getFilteredSensors()} timeRange={selectedTimeRange} />
+              </div>
+              <div>
+                <SensorMetrics sensors={getFilteredSensors()} />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sensors" className="space-y-6">
+            <DeviceStatus sensors={getFilteredSensors()} />
+          </TabsContent>
+
+          <TabsContent value="map" className="space-y-6">
+            <SensorMap sensors={getFilteredSensors()} />
+          </TabsContent>
+
+          <TabsContent value="alerts" className="space-y-6">
+            <AlertsPanel sensors={getFilteredSensors()} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }

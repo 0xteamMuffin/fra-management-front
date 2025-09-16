@@ -53,7 +53,7 @@ export function SensorMap({ sensors }: SensorMapProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Map Visualization */}
       <div className="lg:col-span-2">
-        <Card className="border-border">
+        <Card className="border-border bg-white">
           <CardHeader>
             <CardTitle className="text-lg">GPS Sensor Locations</CardTitle>
             <CardDescription>Real-time positioning and status of IoT monitoring devices</CardDescription>
@@ -119,7 +119,7 @@ export function SensorMap({ sensors }: SensorMapProps) {
 
       {/* Sensor Details */}
       <div className="space-y-4">
-        <Card className="border-border">
+        <Card className="border-border bg-white">
           <CardHeader>
             <CardTitle className="text-base">Sensor Details</CardTitle>
           </CardHeader>

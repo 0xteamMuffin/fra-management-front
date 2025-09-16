@@ -147,7 +147,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
     <div className="space-y-4">
       {/* Alert Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-border">
+        <Card className="border-border bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
             <AlertCircle className="h-4 w-4 text-red-500" />
@@ -158,7 +158,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-border">
+        <Card className="border-border bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Warning Alerts</CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
@@ -169,7 +169,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-border">
+        <Card className="border-border bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
@@ -182,7 +182,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
       </div>
 
       {/* Alerts List */}
-      <Card className="border-border">
+      <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-lg">Active Alerts</CardTitle>
           <CardDescription>Real-time notifications from monitoring devices</CardDescription>

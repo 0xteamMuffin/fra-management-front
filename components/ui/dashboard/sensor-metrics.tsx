@@ -46,7 +46,7 @@ export function SensorMetrics({ sensors }: SensorMetricsProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-border">
+      <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-lg">Environmental Metrics</CardTitle>
           <CardDescription>Average readings from active sensors</CardDescription>
@@ -119,7 +119,7 @@ export function SensorMetrics({ sensors }: SensorMetricsProps) {
       </Card>
 
       {/* Battery Status */}
-      <Card className="border-border">
+      <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-base">Device Health</CardTitle>
         </CardHeader>

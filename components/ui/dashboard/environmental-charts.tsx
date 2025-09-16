@@ -27,10 +27,11 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
       const time = new Date(Date.now() - (hours * 60 - i * interval) * 60 * 1000)
       return {
         time: time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        soilMoisture: 35 + Math.sin(i * 0.1) * 10 + Math.random() * 5,
-        groundwater: 12 + Math.cos(i * 0.05) * 3 + Math.random() * 2,
-        temperature: 28 + Math.sin(i * 0.08) * 4 + Math.random() * 2,
-        humidity: 65 + Math.cos(i * 0.12) * 15 + Math.random() * 5,
+        soilMoisture: Number((35 + Math.sin(i * 0.1) * 10 + Math.random() * 5).toFixed(2)),
+        groundwater: Number((12 + Math.cos(i * 0.05) * 3 + Math.random() * 2).toFixed(2)),
+        temperature: Number((28 + Math.sin(i * 0.08) * 4 + Math.random() * 2).toFixed(2)),
+        humidity: Number((65 + Math.cos(i * 0.12) * 15 + Math.random() * 5).toFixed(2)),
+
       }
     })
   }
@@ -39,7 +40,8 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
 
   return (
     <div className="space-y-4">
-      <Card className="border-border">
+      {/* Soil Moisture */}
+      <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-lg">Soil Moisture Trends</CardTitle>
           <CardDescription>Real-time soil moisture levels across monitoring sites</CardDescription>
@@ -61,9 +63,9 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
                 <Area
                   type="monotone"
                   dataKey="soilMoisture"
-                  stroke="hsl(var(--primary))"
-                  fill="hsl(var(--primary))"
-                  fillOpacity={0.2}
+                  stroke="#22c55e"
+                  fill="#22c55e"
+                  fillOpacity={0.25}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -72,7 +74,8 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-border">
+        {/* Groundwater */}
+        <Card className="border-border bg-white">
           <CardHeader>
             <CardTitle className="text-base">Groundwater Levels</CardTitle>
           </CardHeader>
@@ -90,14 +93,21 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
                       borderRadius: "6px",
                     }}
                   />
-                  <Line type="monotone" dataKey="groundwater" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="groundwater"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border">
+        {/* Temperature & Humidity */}
+        <Card className="border-border bg-white">
           <CardHeader>
             <CardTitle className="text-base">Temperature & Humidity</CardTitle>
           </CardHeader>
@@ -115,8 +125,20 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
                       borderRadius: "6px",
                     }}
                   />
-                  <Line type="monotone" dataKey="temperature" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="humidity" stroke="#06b6d4" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="temperature"
+                    stroke="#f97316"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="humidity"
+                    stroke="#06b6d4"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
