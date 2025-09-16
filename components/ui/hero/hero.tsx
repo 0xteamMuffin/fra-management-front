@@ -1,16 +1,13 @@
 "use client"
 import type React from "react"
-// Animation imports
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// Icons for the features
 import { Users, BarChart3, FileCheck, Shield, Map, Layers, Database, MapPin, ArrowRight } from "lucide-react"
 import SpotlightCard from "@/components/react-bits/SpotlightCard"
 
-// The features array from the previous version
+
 const features = [
   {
     icon: FileCheck,
@@ -39,7 +36,7 @@ const features = [
   },
 ]
 
-// Stats for the section header
+
 const stats = [
     {
         icon: Database,
@@ -63,12 +60,10 @@ const stats = [
     }
 ]
 
-// Helper component for animations to keep the code clean
-// It will handle the viewport detection and apply the animation variants
 const AnimatedSection = ({ children, variants, className }: { children: React.ReactNode, variants: any, className?: string }) => {
   const { ref, inView } = useInView({
-    triggerOnce: true, // Animation triggers only once
-    threshold: 0.1,    // Trigger animation when 10% of the element is visible
+    triggerOnce: true, 
+    threshold: 0.1,    
   });
 
   return (
@@ -87,7 +82,7 @@ const AnimatedSection = ({ children, variants, className }: { children: React.Re
 
 export function Hero() {
 
-  // Animation variants for different directions
+  
   const slideInFromTop = {
     hidden: { y: -50, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.6 } },
@@ -108,12 +103,12 @@ export function Hero() {
     visible: { x: 0, opacity: 1, transition: { duration: 0.6 } },
   };
 
-  // Stagger container for list items
+  
   const staggerContainer = {
     hidden: {},
     visible: {
         transition: {
-            staggerChildren: 0.2, // Delay between each child animation
+            staggerChildren: 0.2, 
         },
     },
   };
@@ -131,7 +126,6 @@ export function Hero() {
           >
             <div className="flex justify-center items-center gap-4">
               <p className="font-black text-6xl text-white">Welcome to</p>
-              {/* The text-orange-400 class uses the vibrant color from the original theme */}
               <p className="font-black text-6xl text-orange-400"> VanFRA </p>
             </div>
             <div>
@@ -240,7 +234,6 @@ export function Hero() {
 
                 <AnimatedSection variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <motion.div variants={slideInFromBottom}>
-                      {/* MODIFICATION: Added h-full flex flex-col to make cards equal height */}
                       <SpotlightCard spotlightColor="rgba(0, 128, 0, 0.2)" className="text-center shadow-lg bg-white/60 backdrop-blur-sm h-full flex flex-col">
                           <CardHeader>
                               <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -262,7 +255,6 @@ export function Hero() {
                     </motion.div>
 
                     <motion.div variants={slideInFromBottom}>
-                      {/* MODIFICATION: Added h-full flex flex-col to make cards equal height */}
                       <SpotlightCard spotlightColor="rgba(0, 128, 0, 0.2)" className="text-center shadow-lg bg-white/60 backdrop-blur-sm h-full flex flex-col">
                           <CardHeader>
                               <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -284,7 +276,6 @@ export function Hero() {
                     </motion.div>
 
                     <motion.div variants={slideInFromBottom}>
-                      {/* MODIFICATION: Added h-full flex flex-col to make cards equal height */}
                       <SpotlightCard spotlightColor="rgba(0, 128, 0, 0.2)" className="text-center shadow-xl bg-white/60 backdrop-blur-sm h-full flex flex-col">
                           <CardHeader>
                               <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
