@@ -5,6 +5,7 @@ import {
   TileLayer,
   WMSTileLayer,
   GeoJSON,
+  ScaleControl,
 } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState, useRef } from "react"
@@ -155,6 +156,7 @@ export default function MapComponent({ claims }: MapComponentProps) {
         zoom={7.3}
         style={{ height: "100%", width: "100%" }}
       >
+         <ScaleControl position="bottomleft" imperial={false} />
         {isSatelliteView ? (
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
