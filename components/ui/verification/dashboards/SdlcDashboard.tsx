@@ -34,6 +34,7 @@ export function SdlcDashboard({ claims, onForward }: Props) {
       </div>
        <ClaimsTable
         claims={claims}
+        filterHierarchy={['Village']}
         renderActions={(claim) => (
           claim.status === 'Under SDLC Review' && (
             <div className="flex items-center gap-2">

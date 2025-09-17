@@ -38,6 +38,7 @@ export function DlcDashboard({ claims, onApprove, onReject }: Props) {
        </div>
        <ClaimsTable
         claims={claims}
+        filterHierarchy={['District', 'Village']}
         renderActions={(claim) => (
           claim.status === 'Under DLC Review' && (
             <div className="flex items-center gap-2">

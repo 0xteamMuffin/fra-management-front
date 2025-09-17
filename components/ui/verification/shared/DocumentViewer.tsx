@@ -18,7 +18,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 // In a real app, you would fetch these URLs based on the claimId.
 const DUMMY_DOCS = [
   "https://i.imgur.com/v1z4n1h.png", // Sample filled form
-  "https://vitcert.onrender.com/c/Pranjal%20Kumar.png", // Sample map document
+  "https://i.imgur.com/2vsdfj23.png", // Sample map document
   "https://i.imgur.com/mANEV26.png", // Sample ancestry proof
 ];
 
