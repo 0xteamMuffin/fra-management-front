@@ -64,7 +64,7 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
       results = results.filter(c =>
-        c.applicant.toLowerCase().includes(lower) ||
+        c.applicantName.toLowerCase().includes(lower) ||
         c.gramPanchayat.toLowerCase().includes(lower) ||
         c.village.toLowerCase().includes(lower) ||
         c.district.toLowerCase().includes(lower) ||
@@ -138,7 +138,7 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
                   <td className="p-3">{claim.district}</td>
                   <td className="p-3">{claim.village}</td>
                   <td className="p-3">{claim.gramPanchayat}</td>
-                  <td className="p-3">{claim.applicant}</td>
+                  <td className="p-3">{claim.applicantName}</td>
                   <td className="p-3"><StatusBadge status={claim.status} /></td>
                   <td className="p-3">
                     <div className="flex gap-2 justify-center">{renderActions(claim)}</div>

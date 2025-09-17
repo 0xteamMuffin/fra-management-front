@@ -1,12 +1,13 @@
-// @/components/ui/verification/dashboards/SdlcDashboard.tsx
-
+// @/app/verification/dashboards/SdlcDashboard.tsx
 "use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Send } from "lucide-react"
-import { AlertCircle, CheckSquare } from "lucide-react"
-import { ClaimsTable } from "@/components/ui/verification/shared/ClaimsTable"
-import { StatCard } from "@/components/ui/verification/shared/StatCards"
-import type { ClaimRow } from "@/components/ui/verification/shared/types"
+import { Send, FileText, AlertCircle, CheckSquare } from "lucide-react"
+import { ClaimsTable } from "../shared/ClaimsTable"
+import { StatCard } from "../shared/StatCards"
+import type { ClaimRow } from "../shared/types"
+import { DocumentViewer } from "../shared/DocumentViewer"
 
 interface Props {
   claims: ClaimRow[];
@@ -16,6 +17,13 @@ interface Props {
 export function SdlcDashboard({ claims, onForward }: Props) {
   const claimsToReview = claims.filter(c => c.status === 'Under SDLC Review').length;
   const claimsForwarded = claims.filter(c => c.status === 'Under DLC Review').length;
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState<ClaimRow | null>(null);
+
+  const handleViewDocuments = (claim: ClaimRow) => {
+    setSelectedClaim(claim);
+    setIsViewerOpen(true);
+  };
   
   return (
     <div className="space-y-6">
@@ -26,13 +34,22 @@ export function SdlcDashboard({ claims, onForward }: Props) {
       </div>
        <ClaimsTable
         claims={claims}
-        filterHierarchy={['Village']}
         renderActions={(claim) => (
           claim.status === 'Under SDLC Review' && (
-            <Button variant="outline" size="sm" onClick={() => onForward(claim.id, 'Under DLC Review')}><Send size={14} className="mr-1" /> Forward to DLC</Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => handleViewDocuments(claim)}><FileText size={14} className="mr-1" /> View Docs</Button>
+              <Button variant="outline" size="sm" onClick={() => onForward(claim.id, 'Under DLC Review')}><Send size={14} className="mr-1" /> Forward to DLC</Button>
+            </div>
           )
         )}
       />
+      <DocumentViewer
+              isOpen={isViewerOpen}
+              onOpenChange={setIsViewerOpen}
+              claimId={selectedClaim?.id ?? null}
+              // CHANGED: Use 'applicantName' to match the new data structure
+              claimantName={selectedClaim?.applicantName ?? null}
+            />
     </div>
   )
 }
