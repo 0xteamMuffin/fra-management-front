@@ -1,3 +1,4 @@
+// @/app/verification/page.tsx
 "use client"
 
 import { useState } from "react";
@@ -6,24 +7,32 @@ import { SdlcDashboard } from "./dashboards/SdlcDashboard";
 import { DlcDashboard } from "./dashboards/DlcDashboard";
 import type { ClaimRow } from "./shared/types";
 import { Button } from "@/components/ui/button";
-import { initialClaimsData } from "@/components/ui/verification/shared/sample-claims"; // Using the updated data source
+import { initialClaimsData } from "@/components/ui/verification/shared/sample-claims";
+import { toast } from "sonner"; // 1. Import the toast function
 
-export function VerificationPortal() {
+export default function VerificationPortal() {
   const [claims, setClaims] = useState<ClaimRow[]>(initialClaimsData);
   const [currentUserRole, setCurrentUserRole] = useState<'GP' | 'SDLC' | 'DLC'>('GP');
 
   /**
-   * Updates the status of a specific claim.
-   * Used for forwarding, approving, or rejecting claims.
+   * Updates the status of a specific claim and shows a toast notification.
    */
   const handleStatusUpdate = (claimId: string, newStatus: ClaimRow['status']) => {
     setClaims(prev => prev.map(c => c.id === claimId ? { ...c, status: newStatus } : c));
-    alert(`Claim ${claimId} status updated to ${newStatus}`);
+
+    // 2. Trigger a specific toast based on the action from the DLC Dashboard
+    if (newStatus === 'Approved') {
+      toast.success(`Claim ${claimId} has been approved!`);
+    } else if (newStatus === 'Rejected') {
+      toast.error(`Claim ${claimId} has been rejected.`);
+    } else {
+      // A default toast for other status changes (like forwarding)
+      toast.info(`Claim ${claimId} status updated to ${newStatus}.`);
+    }
   };
 
   /**
-   * Updates the entire record of a claim with new data.
-   * Used when saving changes from the edit form.
+   * Updates the entire record of a claim and shows a toast notification.
    */
   const handleUpdateClaim = (updatedClaim: ClaimRow) => {
     setClaims(prevClaims => 
@@ -31,7 +40,8 @@ export function VerificationPortal() {
         claim.id === updatedClaim.id ? updatedClaim : claim
       )
     );
-    alert(`Claim ${updatedClaim.id} has been saved.`);
+    // You can add a toast here too!
+    toast.success(`Claim ${updatedClaim.id} has been saved successfully.`);
   };
 
   return (
