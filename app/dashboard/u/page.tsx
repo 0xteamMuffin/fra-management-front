@@ -197,7 +197,7 @@ const ClaimDetailsView = ({ claim }: { claim: Claim }) => {
       </Card>
 
       {/* Personal Information */}
-      <Card className="bg-white border-border shadow-sm border-t-4 border-blue-500">
+      <Card className="bg-white shadow-sm border-t-4 border-blue-500">
         <CardHeader className="flex flex-row items-center space-x-4">
           <div className="bg-blue-100 p-3 rounded-full"><User className="w-6 h-6 text-blue-600" /></div>
           <CardTitle className="mb-0">Personal Information</CardTitle>
@@ -211,7 +211,7 @@ const ClaimDetailsView = ({ claim }: { claim: Claim }) => {
       </Card>
 
       {/* Land & Location Details */}
-      <Card className="bg-white border-border shadow-sm border-t-4 border-teal-500">
+      <Card className="bg-white shadow-sm border-t-4 border-teal-500">
         <CardHeader className="flex flex-row items-center space-x-4">
           <div className="bg-teal-100 p-3 rounded-full"><Map className="w-6 h-6 text-teal-600" /></div>
           <CardTitle className="mb-0">Land & Location Details</CardTitle>
@@ -226,7 +226,7 @@ const ClaimDetailsView = ({ claim }: { claim: Claim }) => {
       </Card>
       
        {/* Witness Information */}
-      <Card className="bg-white border-border shadow-sm border-t-4 border-purple-500">
+      <Card className="bg-white shadow-sm border-t-4 border-purple-500">
         <CardHeader className="flex flex-row items-center space-x-4">
           <div className="bg-purple-100 p-3 rounded-full"><Eye className="w-6 h-6 text-purple-600" /></div>
           <CardTitle className="mb-0">Witness Information</CardTitle>
