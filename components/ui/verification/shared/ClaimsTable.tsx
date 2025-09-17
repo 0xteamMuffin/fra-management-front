@@ -3,6 +3,8 @@
 "use client"
 import { useState, useMemo, useEffect } from "react"
 import type { ClaimRow } from "./types"
+// 1. Imports for the styled Select component are added
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const StatusBadge = ({ status }: { status: ClaimRow['status'] }) => {
   const styles: Record<ClaimRow['status'], string> = {
@@ -64,7 +66,7 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
       results = results.filter(c =>
-        c.applicant.toLowerCase().includes(lower) ||
+        c.applicantName.toLowerCase().includes(lower) ||
         c.gramPanchayat.toLowerCase().includes(lower) ||
         c.village.toLowerCase().includes(lower) ||
         c.district.toLowerCase().includes(lower) ||
@@ -77,7 +79,7 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4 items-center">
-        {/* Search */}
+        {/* Search (Unchanged) */}
         <div className="relative flex-grow max-w-[400px]">
           <input
             type="text"
@@ -88,32 +90,30 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
           />
         </div>
 
-        {/* Primary Filter */}
+        {/* 2. Primary Filter dropdown updated to use the styled Select component */}
         {primaryFilterType && (
-          <select
-            value={primaryFilterValue}
-            onChange={(e) => setPrimaryFilterValue(e.target.value)}
-            className="border rounded px-2 py-2 text-sm"
-          >
-            <option value="All">All {primaryFilterType}s</option>
-            {primaryOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <Select value={primaryFilterValue} onValueChange={setPrimaryFilterValue}>
+            <SelectTrigger className="w-full border-slate-200 sm:w-[200px]">
+              <SelectValue placeholder={`Filter by ${primaryFilterType}...`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All {primaryFilterType}s</SelectItem>
+              {primaryOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+            </SelectContent>
+          </Select>
         )}
 
-        {/* Secondary Filter */}
+        {/* 3. Secondary Filter dropdown updated to use the styled Select component */}
         {secondaryFilterType && primaryFilterValue !== 'All' && (
-          <select
-            value={secondaryFilterValue}
-            onChange={(e) => setSecondaryFilterValue(e.target.value)}
-            className="border rounded px-2 py-2 text-sm"
-          >
-            <option value="All">All {secondaryFilterType}s</option>
-            {secondaryOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+           <Select value={secondaryFilterValue} onValueChange={setSecondaryFilterValue}>
+            <SelectTrigger className="w-full border-slate-200 sm:w-[200px]">
+              <SelectValue placeholder={`Filter by ${secondaryFilterType}...`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All {secondaryFilterType}s</SelectItem>
+              {secondaryOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+            </SelectContent>
+          </Select>
         )}
       </div>
 
@@ -138,7 +138,7 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
                   <td className="p-3">{claim.district}</td>
                   <td className="p-3">{claim.village}</td>
                   <td className="p-3">{claim.gramPanchayat}</td>
-                  <td className="p-3">{claim.applicant}</td>
+                  <td className="p-3">{claim.applicantName}</td>
                   <td className="p-3"><StatusBadge status={claim.status} /></td>
                   <td className="p-3">
                     <div className="flex gap-2 justify-center">{renderActions(claim)}</div>

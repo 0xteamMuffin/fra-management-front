@@ -6,6 +6,7 @@ import "./globals.css"
 import { SiteHeader } from "@/components/ui/header/site-header"
 import { SiteFooter } from "@/components/ui/footer/SiteFooter"
 import { Suspense } from "react"
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "DIGI FRA ATLAS",
@@ -28,6 +29,7 @@ export default function RootLayout({
           </div>
         </Suspense>
         <SiteFooter />
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   )
