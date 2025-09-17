@@ -62,7 +62,6 @@ export function VerificationPortal() {
         <GramPanchayatDashboard
           claims={claims}
           onForward={handleStatusUpdate}
-          onViewDocuments={handleViewDocuments}
           onEdit={handleEditClaim}
         />
       )}
