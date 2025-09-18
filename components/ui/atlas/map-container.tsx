@@ -16,9 +16,10 @@ import { Map, Satellite, Loader2 } from "lucide-react"
 
 interface MapComponentProps {
   claims: Claim[]
+  isVillageBoundriesNeeded: boolean;
 }
 
-export default function MapComponent({ claims }: MapComponentProps) {
+export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapComponentProps) {
   const [geoData, setGeoData] = useState(null)
   const [villageData, setDistrictData] = useState(null)
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
@@ -97,26 +98,26 @@ export default function MapComponent({ claims }: MapComponentProps) {
   }
 
   const getVillageStyle = (feature: any) => {
-  const rand = Math.random()
-  let randomColor: string
+    const rand = Math.random()
+    let randomColor: string
 
-  if (rand < 0.07) {
-    randomColor = "darkgreen"   
-  } else if (rand < 0.14) {
-    randomColor = "red"    
-  } else if (rand < 0.57) {
-    randomColor = "lightblue"  
-  } else {
-    randomColor = "orange"     
-  }
+    if (rand < 0.07) {
+      randomColor = "darkgreen"
+    } else if (rand < 0.14) {
+      randomColor = "red"
+    } else if (rand < 0.57) {
+      randomColor = "lightblue"
+    } else {
+      randomColor = "orange"
+    }
 
-  return {
-    color: "black",
-    weight: 0.5,
-    fillColor: randomColor,
-    fillOpacity: 0.5,
+    return {
+      color: "black",
+      weight: 0.5,
+      fillColor: randomColor,
+      fillOpacity: 0.5,
+    }
   }
-}
 
 
   const districtStyle = {
@@ -223,27 +224,29 @@ export default function MapComponent({ claims }: MapComponentProps) {
         )}
 
         {/* Village Boundary Layer */}
-{villageData && (
-  <GeoJSON
-    key={selectedDistrict}
-    data={villageData}
-    style={getVillageStyle}   // <-- use random style function
-    onEachFeature={(feature: any, layer: Layer) => {
-      if (feature.properties?.NAME) {
-        layer.bindPopup(`
-            <h3 class="font-bold">${feature.properties.NAME}</h3>
+        {isVillageBoundriesNeeded && villageData && (
+          <GeoJSON
+            key={selectedDistrict}
+            data={villageData}
+            style={getVillageStyle}   // <-- random style function
+            onEachFeature={(feature: any, layer: Layer) => {
+              if (feature.properties?.NAME) {
+                layer.bindPopup(`
+          <h3 class="font-bold">${feature.properties.NAME}</h3>
         `)
-        layer.on("click", (e: any) => {
-          const map = e.target._map
-          map.fitBounds((layer as FeatureGroup).getBounds())
-        })
-      }
-    }}
-  />
-)}
+                layer.on("click", (e: any) => {
+                  const map = e.target._map
+                  map.fitBounds((layer as FeatureGroup).getBounds())
+                })
+              }
+            }}
+          />
+        )}
 
 
-        <Polygon pathOptions={{color:"green"}} positions={house} />
+
+
+        <Polygon pathOptions={{ color: "green" }} positions={house} />
       </MapContainer>
     </div>
   )

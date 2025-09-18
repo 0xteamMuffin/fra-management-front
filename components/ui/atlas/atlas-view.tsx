@@ -270,7 +270,7 @@ export default function AtlasView() {
           </div>
 
           {/* Analysis Section */}
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <h2 className="font-semibold text-green-900 text-sm">Analysis</h2>
             <Button onClick={handleAnalyze} disabled={isAnalyzing} className="w-full bg-green-600 hover:bg-green-700 text-white text-xs h-8">
               {isAnalyzing ? "Analyzing..." : "Analyze Current View"}
@@ -289,14 +289,14 @@ export default function AtlasView() {
                {!isAnalyzing && analysisError && (<p className="text-red-800 text-xs text-center">{analysisError}</p>)}
               {!isAnalyzing && !capturedImage && !analysisError && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
             </div>
-          </div>
+          </div> */}
           
           <LegendCard/>
         </aside>
 
         {/* Map */}
         <div ref={mapContainerRef} className="rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0">
-          <MapComponent claims={filtered} />
+          <MapComponent claims={filtered} isVillageBoundriesNeeded={true}/>
         </div>
       </div>
     </>
