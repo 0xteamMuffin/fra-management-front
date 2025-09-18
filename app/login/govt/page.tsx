@@ -3,18 +3,43 @@
 import React, { useState } from 'react';
 import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
+import { LoadingSpinner } from '@/components/ui/loading';
+import { ApiError } from '@/components/ui/error-boundary';
 
 const GovernmentLoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    
+    const { login, isLoading, isAuthenticated } = useAuth();
+    const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Redirect if already authenticated
+    React.useEffect(() => {
+        if (isAuthenticated) {
+            router.push('/dashboard/gp');
+        }
+    }, [isAuthenticated, router]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError(null);
 
+        if (!email || !password) {
+            setError('Please fill in all fields');
+            return;
+        }
+
+        const success = await login({ email, password });
+        if (success) {
+            router.push('/dashboard/gp');
+        }
     };
 
     const handleSignUpClick = () => {
-
+        router.push('/signup/govt');
     };
 
     return (
@@ -50,6 +75,9 @@ const GovernmentLoginPage = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Error Display */}
+                            <ApiError error={error} onRetry={() => setError(null)} />
+
                             {/* Email Input */}
                             <div className="space-y-2">
                                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -64,7 +92,8 @@ const GovernmentLoginPage = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="w-full pl-10 pr-3 py-2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                                        disabled={isLoading}
+                                        className="w-full pl-10 pr-3 py-2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                 </div>
                             </div>
@@ -88,21 +117,25 @@ const GovernmentLoginPage = () => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="w-full pl-10 pr-3 py-2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                                        disabled={isLoading}
+                                        className="w-full pl-10 pr-3 py-2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                 </div>
                             </div>
 
                             {/* Submit Button */}
-                            <Link href={'/dashboard/gp'}>
-                                <button
-                                    type="submit"
-                                    className="w-full flex items-center justify-center py-3 px-4 rounded-md shadow-sm text-sm font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
-                                >
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full flex items-center justify-center py-3 px-4 rounded-md shadow-sm text-sm font-bold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <LoadingSpinner size="sm" className="mr-2" />
+                                ) : (
                                     <LogIn className="mr-2 h-4 w-4" />
-                                    Login
-                                </button>
-                            </Link>
+                                )}
+                                {isLoading ? 'Signing In...' : 'Login'}
+                            </button>
                         </form>
 
                         {/* Sign Up Option */}

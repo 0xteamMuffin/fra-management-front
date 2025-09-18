@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { ProtectedRoute } from "@/components/protected-route"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -246,8 +247,9 @@ const UserDashboardPage = () => {
   const selectedClaim = mockClaims.find((c) => c.applicationId === selectedClaimId)
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <ProtectedRoute>
+      <div className="bg-slate-50 min-h-screen">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Welcome back, {mockClaims[0]?.applicantName.split(" ")[0]}!</h1>
           <p className="text-muted-foreground mt-1">Here is a summary of your submitted FRA claims.</p>
@@ -306,9 +308,10 @@ const UserDashboardPage = () => {
               </div>
             )}
           </main>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }
 

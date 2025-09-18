@@ -6,10 +6,13 @@ import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload, File, X, CheckCircle, AlertCircle } from "lucide-react"
+import { s3Service } from "@/lib/api"
+import { LoadingSpinner } from "@/components/ui/loading"
+import { toast } from "sonner"
 
 interface DocumentUploadProps {
-  onDocumentsChange: (documents: string[]) => void
-  uploadedDocuments: string[]
+  onDocumentsChange: (documents: { [key: string]: string }) => void // Changed to object with document type as key and S3 key as value
+  uploadedDocuments: { [key: string]: string }
 }
 
 interface DocumentType {
@@ -18,10 +21,12 @@ interface DocumentType {
   description: string
   required: boolean
   uploaded: boolean
+  s3Key?: string
+  uploading?: boolean
 }
 
 export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: DocumentUploadProps) {
-  const [documentTypes] = useState<DocumentType[]>([
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([
     {
       id: "identity-proof",
       name: "Identity Proof",
@@ -69,6 +74,17 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
   const [dragActive, setDragActive] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
 
+  // Update document types with uploaded status
+  React.useEffect(() => {
+    setDocumentTypes(prev => 
+      prev.map(doc => ({
+        ...doc,
+        uploaded: !!uploadedDocuments[doc.id],
+        s3Key: uploadedDocuments[doc.id],
+      }))
+    );
+  }, [uploadedDocuments]);
+
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -89,45 +105,127 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
     }
   }, [])
 
-  const handleFiles = (files: FileList) => {
-    Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size should not exceed 5MB")
-        return
+  const handleFiles = async (files: FileList, documentType?: string) => {
+    for (const file of Array.from(files)) {
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        continue;
       }
 
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"]
+      // Validate file type
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        alert("Only PDF, JPG, and PNG files are allowed")
-        return
+        toast.error("Only PDF, JPG, and PNG files are allowed");
+        continue;
       }
 
-      // Simulate upload progress
-      const fileId = `${Date.now()}-${file.name}`
-      setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }))
+      // Determine document type (use first available if not specified)
+      const docType = documentType || documentTypes.find(doc => !doc.uploaded)?.id || 'general-document';
+      
+      try {
+        // Set uploading state
+        setDocumentTypes(prev => 
+          prev.map(doc => 
+            doc.id === docType ? { ...doc, uploading: true } : doc
+          )
+        );
 
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const currentProgress = prev[fileId] || 0
-          if (currentProgress >= 100) {
-            clearInterval(interval)
-            onDocumentsChange([...uploadedDocuments, fileId])
-            return prev
-          }
-          return { ...prev, [fileId]: currentProgress + 10 }
-        })
-      }, 200)
-    })
+        // Start progress tracking
+        const fileId = `${Date.now()}-${file.name}`;
+        setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
+
+        // Simulate progress for UI feedback
+        const progressInterval = setInterval(() => {
+          setUploadProgress(prev => {
+            const currentProgress = prev[fileId] || 0;
+            const newProgress = Math.min(currentProgress + Math.random() * 20, 90);
+            return { ...prev, [fileId]: newProgress };
+          });
+        }, 200);
+
+        // Upload to S3
+        const s3Key = await s3Service.uploadFileComplete(file);
+        
+        // Clear progress interval
+        clearInterval(progressInterval);
+        
+        if (s3Key) {
+          // Complete progress
+          setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
+          
+          // Update uploaded documents - now using object format
+          const newDocuments = { ...uploadedDocuments, [docType]: s3Key };
+          onDocumentsChange(newDocuments);
+          
+          // Update document types
+          setDocumentTypes(prev => 
+            prev.map(doc => 
+              doc.id === docType 
+                ? { ...doc, uploaded: true, s3Key, uploading: false }
+                : doc
+            )
+          );
+          
+          toast.success(`${file.name} uploaded successfully`);
+          
+          // Remove from progress tracking after a delay
+          setTimeout(() => {
+            setUploadProgress(prev => {
+              const newProgress = { ...prev };
+              delete newProgress[fileId];
+              return newProgress;
+            });
+          }, 2000);
+        } else {
+          throw new Error('Upload failed');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error(`Failed to upload ${file.name}`);
+        
+        // Reset uploading state
+        setDocumentTypes(prev => 
+          prev.map(doc => 
+            doc.id === docType ? { ...doc, uploading: false } : doc
+          )
+        );
+        
+        // Remove from progress tracking
+        setUploadProgress(prev => {
+          const newProgress = { ...prev };
+          delete newProgress[`${Date.now()}-${file.name}`];
+          return newProgress;
+        });
+      }
+    }
   }
 
-  const removeDocument = (documentId: string) => {
-    const updatedDocuments = uploadedDocuments.filter((id) => id !== documentId)
-    onDocumentsChange(updatedDocuments)
-    setUploadProgress((prev) => {
-      const newProgress = { ...prev }
-      delete newProgress[documentId]
-      return newProgress
-    })
+  const removeDocument = (documentType: string) => {
+    // Remove from uploaded documents object
+    const newDocuments = { ...uploadedDocuments };
+    delete newDocuments[documentType];
+    onDocumentsChange(newDocuments);
+    
+    // Update document types
+    setDocumentTypes(prev => 
+      prev.map(doc => 
+        doc.id === documentType 
+          ? { ...doc, uploaded: false, s3Key: undefined, uploading: false }
+          : doc
+      )
+    );
+    
+    // Clear any progress tracking
+    setUploadProgress(prev => {
+      const newProgress = { ...prev };
+      Object.keys(newProgress).forEach(key => {
+        if (key.includes(documentType)) {
+          delete newProgress[key];
+        }
+      });
+      return newProgress;
+    });
   }
 
   return (

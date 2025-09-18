@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { SiteHeader } from "@/components/ui/header/site-header"
 import { SiteFooter } from "@/components/ui/footer/SiteFooter"
+import { AuthProvider } from "@/contexts/auth-context"
 import { Suspense } from "react"
 import { Toaster } from "sonner";
 
@@ -22,14 +23,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
-        <Suspense fallback={<div>Loading...</div>}>
-          <div>
-            <SiteHeader />
-            {children}
-          </div>
-        </Suspense>
-        <SiteFooter />
-        <Toaster richColors position="top-center" />
+        <AuthProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <div>
+              <SiteHeader />
+              {children}
+            </div>
+          </Suspense>
+          <SiteFooter />
+          <Toaster richColors position="top-center" />
+        </AuthProvider>
       </body>
     </html>
   )
