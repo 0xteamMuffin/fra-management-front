@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Loader2,
   XCircle,
+  ChevronLeft,
 } from "lucide-react"
 import { useClaims } from "@/lib/hooks/useClaims"
 import { FRAClaim } from "@/lib/types/api"
@@ -33,6 +34,7 @@ import { Button } from "@/components/ui/button"
 import { s3Service } from "@/lib/api"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 
 const statusConfig = {
   Approved: { className: "bg-green-100 text-green-800 border-green-300" },
@@ -75,10 +77,16 @@ const ClaimDetailsPage = () => {
   const uiStatus = mapBackendStatusToUI(claim.status)
   const currentStatus = statusConfig[uiStatus]
 
+  const breadcrumbItems = [
+    { label: "Dashboard", href: "/dashboard/u" },
+    { label: "Claim Details" },
+  ]
+
   return (
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        <div className="flex justify-between items-start">
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="flex justify-between items-start pt-4">
           <div>
             <h1 className="text-3xl font-bold">Claim Details</h1>
             <p className="text-muted-foreground">ID: {generateClaimDisplayId(claim)}</p>

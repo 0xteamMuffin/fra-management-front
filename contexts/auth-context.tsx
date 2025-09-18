@@ -91,11 +91,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Logout function
   const logout = () => {
+    const redirectPath = user?.role === UserRole.VillagePerson ? '/login/citizen' : '/login/govt';
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
     setUser(null);
     toast.info('Logged out successfully');
-    window.location.href = '/';
+    window.location.href = redirectPath;
   };
 
   // Refresh user data

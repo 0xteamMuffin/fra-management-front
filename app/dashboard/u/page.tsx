@@ -10,6 +10,7 @@ import {
   Loader2,
   XCircle,
   Eye,
+  PlusCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -56,9 +57,15 @@ const UserDashboardPage = () => {
     <ProtectedRoute>
       <div className="bg-slate-50 min-h-screen">
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name.split(" ")[0]}!</h1>
-          <p className="text-muted-foreground mt-1">Here is a summary of your submitted FRA claims.</p>
+        <header className="mb-8 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Welcome back, {user?.name.split(" ")[0]}!</h1>
+              <p className="text-muted-foreground mt-1">Here is a summary of your submitted FRA claims.</p>
+            </div>
+            <Button onClick={() => window.location.href = '/claims/new'}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Submit a New Claim
+            </Button>
         </header>
 
           <Card>
