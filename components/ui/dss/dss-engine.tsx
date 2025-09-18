@@ -416,7 +416,7 @@ export function DSSEnginePage() {
 
           {/* Map */}
           <div ref={mapContainerRef} className="lg:col-span-3 rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0">
-            <MapComponent claims={filtered} />
+            <MapComponent claims={filtered} isVillageBoundriesNeeded={false}/>
           </div>
         </div>
         
