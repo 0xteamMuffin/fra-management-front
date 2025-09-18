@@ -5,8 +5,8 @@ export interface ApplicantDetails {
   fullName: string;
   fatherName: string;
   age: number;
-  gender: 'Male' | 'Female' | 'Other';
-  casteCategory: 'ST' | 'OBC' | 'SC' | 'General';
+  gender: "Male" | "Female" | "Other";
+  casteCategory: "ST" | "OBC" | "SC" | "General";
   aadharNumber: string;
   phoneNumber: string;
   fullAddress: string;
@@ -19,10 +19,15 @@ export interface ClaimRow {
   village: string;
   gramPanchayat: string;
   applicantName: string; // This is what shows in the table
-  claimType: 'Individual' | 'Community';
+  claimType: "Individual" | "Community";
   dateFiled: string; // Format: "YYYY-MM-DD"
   landArea: number; // in acres
-  status: 'Awaiting FRC Verification' | 'Under SDLC Review' | 'Under DLC Review' | 'Approved' | 'Rejected';
+  status:
+    | "Awaiting FRC Verification"
+    | "Under SDLC Review"
+    | "Under DLC Review"
+    | "Approved"
+    | "Rejected";
   // NEW: The complete, detailed information for the applicant
-  applicantDetails: ApplicantDetails; 
+  applicantDetails: ApplicantDetails;
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   MapContainer,
@@ -7,26 +7,29 @@ import {
   GeoJSON,
   ScaleControl,
   Polygon,
-} from "react-leaflet"
-import "leaflet/dist/leaflet.css"
-import { useEffect, useState, useRef } from "react"
-import L, { Layer, LeafletEvent, FeatureGroup } from "leaflet"
-import { Claim } from "./atlas-view"
-import { Map, Satellite, Loader2 } from "lucide-react"
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useState, useRef } from "react";
+import L, { Layer, LeafletEvent, FeatureGroup } from "leaflet";
+import { Claim } from "./atlas-view";
+import { Map, Satellite, Loader2 } from "lucide-react";
 
 interface MapComponentProps {
-  claims: Claim[]
+  claims: Claim[];
   isVillageBoundriesNeeded: boolean;
 }
 
-export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapComponentProps) {
-  const [geoData, setGeoData] = useState(null)
-  const [villageData, setDistrictData] = useState(null)
-  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
-  const [isSatelliteView, setIsSatelliteView] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+export default function MapComponent({
+  claims,
+  isVillageBoundriesNeeded,
+}: MapComponentProps) {
+  const [geoData, setGeoData] = useState(null);
+  const [villageData, setDistrictData] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const [isSatelliteView, setIsSatelliteView] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const geoJsonRef = useRef<L.GeoJSON | null>(null)
+  const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   const house: [number, number][][] = [
     [
@@ -35,19 +38,19 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
       [21.860660467261486, 86.36456209295017],
       [21.86093385547088, 86.3647176402236],
     ],
-  ]
+  ];
 
   useEffect(() => {
     fetch("data/odisha.geojson")
       .then((response) => response.json())
-      .then((data) => setGeoData(data))
-  }, [])
+      .then((data) => setGeoData(data));
+  }, []);
 
   const fetchDistrictBoundaries = (districtName: string) => {
     if (districtName === selectedDistrict) return;
 
-    setIsLoading(true)
-    setDistrictData(null)
+    setIsLoading(true);
+    setDistrictData(null);
 
     fetch("data/data1.geojson")
       .then((response) => response.json())
@@ -56,25 +59,25 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
         const filteredFeatures = {
           ...data,
           features: data.features.filter(
-            (feature: any) => feature.properties?.DISTRICT === districtName
+            (feature: any) => feature.properties?.DISTRICT === districtName,
           ),
-        }
+        };
 
         if (filteredFeatures.features.length > 0) {
-          setDistrictData(filteredFeatures)
-          setSelectedDistrict(districtName)
+          setDistrictData(filteredFeatures);
+          setSelectedDistrict(districtName);
         } else {
-          setSelectedDistrict(null)
+          setSelectedDistrict(null);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Failed to fetch district boundaries:", error);
         setSelectedDistrict(null);
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }
+        setIsLoading(false);
+      });
+  };
 
   const defaultStyle = {
     color: "red",
@@ -82,33 +85,33 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
     dashArray: "5 5",
     fillColor: "gray",
     fillOpacity: 0.6,
-  }
+  };
 
   const activeStyle = {
     ...defaultStyle,
     fillColor: "white",
     fillOpacity: 1,
-  }
+  };
 
   const satelliteBoundaryStyle = {
     color: "red",
     weight: 2,
     dashArray: "5 5",
     fillOpacity: 0,
-  }
+  };
 
   const getVillageStyle = (feature: any) => {
-    const rand = Math.random()
-    let randomColor: string
+    const rand = Math.random();
+    let randomColor: string;
 
     if (rand < 0.07) {
-      randomColor = "darkgreen"
+      randomColor = "darkgreen";
     } else if (rand < 0.14) {
-      randomColor = "red"
+      randomColor = "red";
     } else if (rand < 0.57) {
-      randomColor = "lightblue"
+      randomColor = "lightblue";
     } else {
-      randomColor = "orange"
+      randomColor = "orange";
     }
 
     return {
@@ -116,43 +119,41 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
       weight: 0.5,
       fillColor: randomColor,
       fillOpacity: 0.5,
-    }
-  }
-
+    };
+  };
 
   const districtStyle = {
     color: "blue",
     weight: 2,
     fillColor: "lightblue",
     fillOpacity: 0,
-  }
+  };
 
   const styleGeoJson = (feature: any) => {
     if (isSatelliteView) {
-      return satelliteBoundaryStyle
+      return satelliteBoundaryStyle;
     }
     if (feature.properties.district === selectedDistrict) {
-      return activeStyle
+      return activeStyle;
     }
-    return defaultStyle
-  }
-
+    return defaultStyle;
+  };
 
   const handleFeatureClick = (e: LeafletEvent) => {
     if (isLoading) {
-      return
+      return;
     }
 
-    const layer = e.target
-    const districtName = layer.feature?.properties?.district
+    const layer = e.target;
+    const districtName = layer.feature?.properties?.district;
 
     if (districtName) {
-      fetchDistrictBoundaries(districtName)
+      fetchDistrictBoundaries(districtName);
     }
 
-    const map = layer._map
-    map.fitBounds((layer as FeatureGroup).getBounds())
-  }
+    const map = layer._map;
+    map.fitBounds((layer as FeatureGroup).getBounds());
+  };
 
   return (
     <div className="relative h-full w-full">
@@ -161,11 +162,12 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
         <div className="absolute inset-0 z-[2000] flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-lg bg-white p-4 shadow-xl">
             <Loader2 className="h-6 w-6 animate-spin text-gray-700" />
-            <span className="font-semibold text-gray-700">Fetching Data...</span>
+            <span className="font-semibold text-gray-700">
+              Fetching Data...
+            </span>
           </div>
         </div>
       )}
-
 
       {/* View Toggle Button */}
       <button
@@ -187,7 +189,7 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
 
       {/* Map Container */}
       <MapContainer
-        center={[20.2376, 84.2700]}
+        center={[20.2376, 84.27]}
         zoom={7.3}
         style={{ height: "100%", width: "100%" }}
       >
@@ -219,7 +221,7 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
             onEachFeature={(feature: any, layer: Layer) => {
               layer.on({
                 click: handleFeatureClick,
-              })
+              });
             }}
           />
         )}
@@ -229,26 +231,23 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
           <GeoJSON
             key={selectedDistrict}
             data={villageData}
-            style={getVillageStyle}   // <-- random style function
+            style={getVillageStyle} // <-- random style function
             onEachFeature={(feature: any, layer: Layer) => {
               if (feature.properties?.NAME) {
                 layer.bindPopup(`
           <h3 class="font-bold">${feature.properties.NAME}</h3>
-        `)
+        `);
                 layer.on("click", (e: any) => {
-                  const map = e.target._map
-                  map.fitBounds((layer as FeatureGroup).getBounds())
-                })
+                  const map = e.target._map;
+                  map.fitBounds((layer as FeatureGroup).getBounds());
+                });
               }
             }}
           />
         )}
 
-
-
-
         <Polygon pathOptions={{ color: "green" }} positions={house} />
       </MapContainer>
     </div>
-  )
+  );
 }

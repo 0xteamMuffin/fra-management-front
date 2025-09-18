@@ -1,5 +1,5 @@
-import { api, endpoints } from '@/lib/api-client';
-import { State, District, Village } from '@/lib/types/api';
+import { api, endpoints } from "@/lib/api-client";
+import { State, District, Village } from "@/lib/types/api";
 
 export interface CreateStateRequest {
   name: string;
@@ -38,8 +38,14 @@ export const geographicService = {
       return response.data;
     },
 
-    async update(id: string, stateData: Partial<CreateStateRequest>): Promise<State> {
-      const response = await api.put<State>(`${endpoints.states}/${id}`, stateData);
+    async update(
+      id: string,
+      stateData: Partial<CreateStateRequest>,
+    ): Promise<State> {
+      const response = await api.put<State>(
+        `${endpoints.states}/${id}`,
+        stateData,
+      );
       return response.data;
     },
 
@@ -61,17 +67,28 @@ export const geographicService = {
     },
 
     async getByState(stateId: string): Promise<District[]> {
-      const response = await api.get<District[]>(`${endpoints.districts}?stateId=${stateId}`);
+      const response = await api.get<District[]>(
+        `${endpoints.districts}?stateId=${stateId}`,
+      );
       return response.data;
     },
 
     async create(districtData: CreateDistrictRequest): Promise<District> {
-      const response = await api.post<District>(endpoints.districts, districtData);
+      const response = await api.post<District>(
+        endpoints.districts,
+        districtData,
+      );
       return response.data;
     },
 
-    async update(id: string, districtData: Partial<CreateDistrictRequest>): Promise<District> {
-      const response = await api.put<District>(`${endpoints.districts}/${id}`, districtData);
+    async update(
+      id: string,
+      districtData: Partial<CreateDistrictRequest>,
+    ): Promise<District> {
+      const response = await api.put<District>(
+        `${endpoints.districts}/${id}`,
+        districtData,
+      );
       return response.data;
     },
 
@@ -92,8 +109,13 @@ export const geographicService = {
       return response.data;
     },
 
-    async getByDistrict(districtId: string, search?: string): Promise<Village[]> {
-      const response = await api.get<Village[]>(`${endpoints.villages}?districtId=${districtId}${search ? `&search=${search}` : ''}`);
+    async getByDistrict(
+      districtId: string,
+      search?: string,
+    ): Promise<Village[]> {
+      const response = await api.get<Village[]>(
+        `${endpoints.villages}?districtId=${districtId}${search ? `&search=${search}` : ""}`,
+      );
       return response.data;
     },
 
@@ -102,8 +124,14 @@ export const geographicService = {
       return response.data;
     },
 
-    async update(id: string, villageData: Partial<CreateVillageRequest>): Promise<Village> {
-      const response = await api.put<Village>(`${endpoints.villages}/${id}`, villageData);
+    async update(
+      id: string,
+      villageData: Partial<CreateVillageRequest>,
+    ): Promise<Village> {
+      const response = await api.put<Village>(
+        `${endpoints.villages}/${id}`,
+        villageData,
+      );
       return response.data;
     },
 

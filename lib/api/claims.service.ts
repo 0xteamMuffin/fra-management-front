@@ -1,9 +1,9 @@
-import { api, endpoints } from '@/lib/api-client';
-import { FRAClaim, ClaimStatus } from '@/lib/types/api';
+import { api, endpoints } from "@/lib/api-client";
+import { FRAClaim, ClaimStatus } from "@/lib/types/api";
 
 export interface CreateClaimRequest {
   // Section 1: Basic Information (exactly matching Prisma schema)
-  type: 'IFR' | 'CR' | 'CFR';
+  type: "IFR" | "CR" | "CFR";
   claimantName: string;
   spouseName?: string;
   fatherOrMotherName?: string;
@@ -58,8 +58,14 @@ export const claimsService = {
   },
 
   // Update claim
-  async updateClaim(id: string, claimData: Partial<CreateClaimRequest>): Promise<FRAClaim> {
-    const response = await api.put<FRAClaim>(`${endpoints.claims}/${id}`, claimData);
+  async updateClaim(
+    id: string,
+    claimData: Partial<CreateClaimRequest>,
+  ): Promise<FRAClaim> {
+    const response = await api.put<FRAClaim>(
+      `${endpoints.claims}/${id}`,
+      claimData,
+    );
     return response.data;
   },
 
@@ -76,7 +82,9 @@ export const claimsService = {
 
   // Forward claim to the next stage
   async forwardClaim(id: string, remarks: string): Promise<FRAClaim> {
-    const response = await api.post<FRAClaim>(endpoints.fra.forward(id), { remarks });
+    const response = await api.post<FRAClaim>(endpoints.fra.forward(id), {
+      remarks,
+    });
     return response.data;
   },
 
@@ -94,19 +102,25 @@ export const claimsService = {
 
   // Reject claim (for DistrictCommittee)
   async rejectClaim(id: string, reason: string): Promise<FRAClaim> {
-    const response = await api.post<FRAClaim>(endpoints.fra.reject(id), { reason });
+    const response = await api.post<FRAClaim>(endpoints.fra.reject(id), {
+      reason,
+    });
     return response.data;
   },
 
   // Get claims by status
   async getClaimsByStatus(status: ClaimStatus): Promise<FRAClaim[]> {
-    const response = await api.get<FRAClaim[]>(`${endpoints.claims}?status=${status}`);
+    const response = await api.get<FRAClaim[]>(
+      `${endpoints.claims}?status=${status}`,
+    );
     return response.data;
   },
 
   // Get claims by village
   async getClaimsByVillage(villageId: string): Promise<FRAClaim[]> {
-    const response = await api.get<FRAClaim[]>(`${endpoints.claims}?villageId=${villageId}`);
+    const response = await api.get<FRAClaim[]>(
+      `${endpoints.claims}?villageId=${villageId}`,
+    );
     return response.data;
   },
 };

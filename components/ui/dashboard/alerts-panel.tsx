@@ -1,39 +1,51 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, AlertCircle, Info, CheckCircle, Clock } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  CheckCircle,
+  Clock,
+} from "lucide-react";
 
 interface SensorData {
-  id: string
-  name: string
-  village: string
-  soilMoisture: number
-  groundwaterLevel: number
-  batteryLevel: number
-  status: "online" | "offline" | "warning"
+  id: string;
+  name: string;
+  village: string;
+  soilMoisture: number;
+  groundwaterLevel: number;
+  batteryLevel: number;
+  status: "online" | "offline" | "warning";
 }
 
 interface AlertsPanelProps {
-  sensors: SensorData[]
+  sensors: SensorData[];
 }
 
 interface Alert {
-  id: string
-  type: "critical" | "warning" | "info"
-  title: string
-  description: string
-  sensorId: string
-  sensorName: string
-  timestamp: string
-  acknowledged: boolean
+  id: string;
+  type: "critical" | "warning" | "info";
+  title: string;
+  description: string;
+  sensorId: string;
+  sensorName: string;
+  timestamp: string;
+  acknowledged: boolean;
 }
 
 export function AlertsPanel({ sensors }: AlertsPanelProps) {
   // Generate alerts based on sensor data
   const generateAlerts = (): Alert[] => {
-    const alerts: Alert[] = []
+    const alerts: Alert[] = [];
 
     sensors.forEach((sensor) => {
       // Low battery alerts
@@ -47,7 +59,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           sensorName: sensor.name,
           timestamp: new Date().toISOString(),
           acknowledged: false,
-        })
+        });
       }
 
       // Soil moisture alerts
@@ -61,7 +73,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           sensorName: sensor.name,
           timestamp: new Date().toISOString(),
           acknowledged: false,
-        })
+        });
       }
 
       // Groundwater alerts
@@ -75,7 +87,7 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           sensorName: sensor.name,
           timestamp: new Date().toISOString(),
           acknowledged: false,
-        })
+        });
       }
 
       // Offline sensor alerts
@@ -84,32 +96,36 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           id: `offline-${sensor.id}`,
           type: "warning",
           title: "Sensor Offline",
-          description: "Device is not responding. Check connectivity and power supply.",
+          description:
+            "Device is not responding. Check connectivity and power supply.",
           sensorId: sensor.id,
           sensorName: sensor.name,
           timestamp: new Date().toISOString(),
           acknowledged: false,
-        })
+        });
       }
-    })
+    });
 
-    return alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-  }
+    return alerts.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
+  };
 
-  const alerts = generateAlerts()
+  const alerts = generateAlerts();
 
   const getAlertIcon = (type: string) => {
     switch (type) {
       case "critical":
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
       case "warning":
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
       case "info":
-        return <Info className="h-4 w-4 text-blue-500" />
+        return <Info className="h-4 w-4 text-blue-500" />;
       default:
-        return <Info className="h-4 w-4 text-muted-foreground" />
+        return <Info className="h-4 w-4 text-muted-foreground" />;
     }
-  }
+  };
 
   const getAlertBadge = (type: string) => {
     switch (type) {
@@ -118,30 +134,33 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
           <Badge variant="destructive" className="text-xs">
             Critical
           </Badge>
-        )
+        );
       case "warning":
         return (
-          <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800">
+          <Badge
+            variant="secondary"
+            className="text-xs bg-yellow-100 text-yellow-800"
+          >
             Warning
           </Badge>
-        )
+        );
       case "info":
         return (
           <Badge variant="outline" className="text-xs">
             Info
           </Badge>
-        )
+        );
       default:
         return (
           <Badge variant="outline" className="text-xs">
             Unknown
           </Badge>
-        )
+        );
     }
-  }
+  };
 
-  const criticalAlerts = alerts.filter((a) => a.type === "critical").length
-  const warningAlerts = alerts.filter((a) => a.type === "warning").length
+  const criticalAlerts = alerts.filter((a) => a.type === "critical").length;
+  const warningAlerts = alerts.filter((a) => a.type === "warning").length;
 
   return (
     <div className="space-y-4">
@@ -149,22 +168,32 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-border bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Critical Alerts
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{criticalAlerts}</div>
-            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+            <div className="text-2xl font-bold text-red-600">
+              {criticalAlerts}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Require immediate attention
+            </p>
           </CardContent>
         </Card>
 
         <Card className="border-border bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Warning Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Warning Alerts
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{warningAlerts}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {warningAlerts}
+            </div>
             <p className="text-xs text-muted-foreground">Need monitoring</p>
           </CardContent>
         </Card>
@@ -175,8 +204,12 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{alerts.length}</div>
-            <p className="text-xs text-muted-foreground">Active notifications</p>
+            <div className="text-2xl font-bold text-foreground">
+              {alerts.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Active notifications
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -185,13 +218,17 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
       <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-lg">Active Alerts</CardTitle>
-          <CardDescription>Real-time notifications from monitoring devices</CardDescription>
+          <CardDescription>
+            Real-time notifications from monitoring devices
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {alerts.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-sm">No active alerts. All systems operating normally.</p>
+              <p className="text-sm">
+                No active alerts. All systems operating normally.
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -214,15 +251,24 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
                           <h4 className="font-medium text-sm">{alert.title}</h4>
                           {getAlertBadge(alert.type)}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{alert.description}</p>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {alert.description}
+                        </p>
                         <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                           <span>Sensor: {alert.sensorName}</span>
-                          <span>Time: {new Date(alert.timestamp).toLocaleTimeString()}</span>
+                          <span>
+                            Time:{" "}
+                            {new Date(alert.timestamp).toLocaleTimeString()}
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="text-xs bg-transparent">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs bg-transparent"
+                      >
                         View
                       </Button>
                       <Button variant="ghost" size="sm" className="text-xs">
@@ -237,5 +283,5 @@ export function AlertsPanel({ sensors }: AlertsPanelProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

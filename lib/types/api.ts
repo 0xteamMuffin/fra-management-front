@@ -13,10 +13,10 @@ export interface User {
 }
 
 export enum UserRole {
-  VillagePerson = 'VillagePerson',
-  GramSabha = 'GramSabha', 
-  SubDivisionalCommittee = 'SubDivisionalCommittee',
-  DistrictCommittee = 'DistrictCommittee',
+  VillagePerson = "VillagePerson",
+  GramSabha = "GramSabha",
+  SubDivisionalCommittee = "SubDivisionalCommittee",
+  DistrictCommittee = "DistrictCommittee",
 }
 
 export interface AuthResponse {
@@ -68,16 +68,16 @@ export interface Village {
 
 // FRA Claims
 export enum FRAType {
-  IFR = 'IFR',
-  CR = 'CR', 
-  CFR = 'CFR',
+  IFR = "IFR",
+  CR = "CR",
+  CFR = "CFR",
 }
 
 export enum ClaimStatus {
-  Pending = 'Pending',
-  Verified = 'Verified',
-  Granted = 'Granted',
-  Rejected = 'Rejected',
+  Pending = "Pending",
+  Verified = "Verified",
+  Granted = "Granted",
+  Rejected = "Rejected",
 }
 
 export interface FamilyMember {
@@ -166,7 +166,7 @@ export interface DocumentProcessingResponse {
 export interface DocumentProcessingStatus {
   id: string;
   s3Key: string;
-  status: 'PENDING' | 'OCR_COMPLETE' | 'NER_COMPLETE' | 'FAILED';
+  status: "PENDING" | "OCR_COMPLETE" | "NER_COMPLETE" | "FAILED";
   ocrEngineUsed?: string;
   extractedText?: string;
   structuredData?: any;

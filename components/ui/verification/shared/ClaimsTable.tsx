@@ -1,39 +1,51 @@
 // @/components/ui/verification/shared/ClaimsTable.tsx
 
-"use client"
-import { useState, useMemo, useEffect } from "react"
-import type { ClaimRow } from "./types"
+"use client";
+import { useState, useMemo, useEffect } from "react";
+import type { ClaimRow } from "./types";
 // 1. Imports for the styled Select component are added
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const StatusBadge = ({ status }: { status: ClaimRow['status'] }) => {
-  const styles: Record<ClaimRow['status'], string> = {
-    "Approved": "bg-green-100 text-green-800",
-    "Rejected": "bg-red-100 text-red-800",
+const StatusBadge = ({ status }: { status: ClaimRow["status"] }) => {
+  const styles: Record<ClaimRow["status"], string> = {
+    Approved: "bg-green-100 text-green-800",
+    Rejected: "bg-red-100 text-red-800",
     "Under DLC Review": "bg-blue-100 text-blue-800",
     "Under SDLC Review": "bg-amber-100 text-amber-800",
     "Awaiting FRC Verification": "bg-yellow-100 text-yellow-800",
-  }
+  };
   return (
     <span className={`px-2 py-1 text-xs font-medium rounded ${styles[status]}`}>
       {status}
     </span>
-  )
-}
+  );
+};
 
 interface ClaimsTableProps {
   claims: ClaimRow[];
   renderActions: (claim: ClaimRow) => React.ReactNode;
-  filterHierarchy?: ('District' | 'Village')[];
+  filterHierarchy?: ("District" | "Village")[];
 }
 
-export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: ClaimsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [primaryFilterValue, setPrimaryFilterValue] = useState("All")
-  const [secondaryFilterValue, setSecondaryFilterValue] = useState("All")
+export function ClaimsTable({
+  claims,
+  renderActions,
+  filterHierarchy = [],
+}: ClaimsTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [primaryFilterValue, setPrimaryFilterValue] = useState("All");
+  const [secondaryFilterValue, setSecondaryFilterValue] = useState("All");
 
-  const primaryFilterType = filterHierarchy.length > 0 ? filterHierarchy[0] : null;
-  const secondaryFilterType = filterHierarchy.length > 1 ? filterHierarchy[1] : null;
+  const primaryFilterType =
+    filterHierarchy.length > 0 ? filterHierarchy[0] : null;
+  const secondaryFilterType =
+    filterHierarchy.length > 1 ? filterHierarchy[1] : null;
 
   useEffect(() => {
     setSecondaryFilterValue("All");
@@ -41,40 +53,52 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
 
   const primaryOptions = useMemo(() => {
     if (!primaryFilterType) return [];
-    const key = primaryFilterType === 'District' ? 'district' : 'village';
-    return [...new Set(claims.map(c => c[key]))].sort();
+    const key = primaryFilterType === "District" ? "district" : "village";
+    return [...new Set(claims.map((c) => c[key]))].sort();
   }, [claims, primaryFilterType]);
 
   const secondaryOptions = useMemo(() => {
-    if (!secondaryFilterType || primaryFilterValue === 'All') return [];
-    const primaryKey = primaryFilterType === 'District' ? 'district' : 'village';
-    const secondaryKey = secondaryFilterType === 'Village' ? 'village' : 'district';
-    const relevantClaims = claims.filter(c => c[primaryKey] === primaryFilterValue);
-    return [...new Set(relevantClaims.map(c => c[secondaryKey]))].sort();
+    if (!secondaryFilterType || primaryFilterValue === "All") return [];
+    const primaryKey =
+      primaryFilterType === "District" ? "district" : "village";
+    const secondaryKey =
+      secondaryFilterType === "Village" ? "village" : "district";
+    const relevantClaims = claims.filter(
+      (c) => c[primaryKey] === primaryFilterValue,
+    );
+    return [...new Set(relevantClaims.map((c) => c[secondaryKey]))].sort();
   }, [claims, primaryFilterValue, primaryFilterType, secondaryFilterType]);
 
   const filteredClaims = useMemo(() => {
     let results = claims;
     if (primaryFilterType && primaryFilterValue !== "All") {
-      const key = primaryFilterType === 'District' ? 'district' : 'village';
-      results = results.filter(c => c[key] === primaryFilterValue);
+      const key = primaryFilterType === "District" ? "district" : "village";
+      results = results.filter((c) => c[key] === primaryFilterValue);
     }
     if (secondaryFilterType && secondaryFilterValue !== "All") {
-      const key = secondaryFilterType === 'Village' ? 'village' : 'district';
-      results = results.filter(c => c[key] === secondaryFilterValue);
+      const key = secondaryFilterType === "Village" ? "village" : "district";
+      results = results.filter((c) => c[key] === secondaryFilterValue);
     }
     if (searchTerm) {
       const lower = searchTerm.toLowerCase();
-      results = results.filter(c =>
-        c.applicantName.toLowerCase().includes(lower) ||
-        c.gramPanchayat.toLowerCase().includes(lower) ||
-        c.village.toLowerCase().includes(lower) ||
-        c.district.toLowerCase().includes(lower) ||
-        c.id.toLowerCase().includes(lower)
+      results = results.filter(
+        (c) =>
+          c.applicantName.toLowerCase().includes(lower) ||
+          c.gramPanchayat.toLowerCase().includes(lower) ||
+          c.village.toLowerCase().includes(lower) ||
+          c.district.toLowerCase().includes(lower) ||
+          c.id.toLowerCase().includes(lower),
       );
     }
     return results;
-  }, [claims, searchTerm, primaryFilterValue, secondaryFilterValue, primaryFilterType, secondaryFilterType]);
+  }, [
+    claims,
+    searchTerm,
+    primaryFilterValue,
+    secondaryFilterValue,
+    primaryFilterType,
+    secondaryFilterType,
+  ]);
 
   return (
     <div className="space-y-4">
@@ -92,26 +116,42 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
 
         {/* 2. Primary Filter dropdown updated to use the styled Select component */}
         {primaryFilterType && (
-          <Select value={primaryFilterValue} onValueChange={setPrimaryFilterValue}>
+          <Select
+            value={primaryFilterValue}
+            onValueChange={setPrimaryFilterValue}
+          >
             <SelectTrigger className="w-full border-slate-200 sm:w-[200px]">
               <SelectValue placeholder={`Filter by ${primaryFilterType}...`} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All {primaryFilterType}s</SelectItem>
-              {primaryOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+              {primaryOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         )}
 
         {/* 3. Secondary Filter dropdown updated to use the styled Select component */}
-        {secondaryFilterType && primaryFilterValue !== 'All' && (
-           <Select value={secondaryFilterValue} onValueChange={setSecondaryFilterValue}>
+        {secondaryFilterType && primaryFilterValue !== "All" && (
+          <Select
+            value={secondaryFilterValue}
+            onValueChange={setSecondaryFilterValue}
+          >
             <SelectTrigger className="w-full border-slate-200 sm:w-[200px]">
-              <SelectValue placeholder={`Filter by ${secondaryFilterType}...`} />
+              <SelectValue
+                placeholder={`Filter by ${secondaryFilterType}...`}
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All {secondaryFilterType}s</SelectItem>
-              {secondaryOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+              {secondaryOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         )}
@@ -139,9 +179,13 @@ export function ClaimsTable({ claims, renderActions, filterHierarchy = [] }: Cla
                   <td className="p-3">{claim.village}</td>
                   <td className="p-3">{claim.gramPanchayat}</td>
                   <td className="p-3">{claim.applicantName}</td>
-                  <td className="p-3"><StatusBadge status={claim.status} /></td>
                   <td className="p-3">
-                    <div className="flex gap-2 justify-center">{renderActions(claim)}</div>
+                    <StatusBadge status={claim.status} />
+                  </td>
+                  <td className="p-3">
+                    <div className="flex gap-2 justify-center">
+                      {renderActions(claim)}
+                    </div>
                   </td>
                 </tr>
               ))}

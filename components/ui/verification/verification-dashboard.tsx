@@ -1,5 +1,5 @@
 // @/app/verification/page.tsx
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { GramPanchayatDashboard } from "./dashboards/GramPanchayatDashboard";
@@ -17,7 +17,7 @@ import { generateClaimDisplayId } from "@/lib/utils/claim-helpers";
 export default function VerificationPortal() {
   const { user } = useAuth();
 
-  const { 
+  const {
     claims,
     rawClaims,
     isLoading: isLoadingClaims,
@@ -34,12 +34,17 @@ export default function VerificationPortal() {
       await forwardClaim(claimId, remarks);
       toast.success(`Claim has been forwarded successfully.`);
     } catch (error) {
-      toast.error('Failed to forward claim');
+      toast.error("Failed to forward claim");
     }
   };
 
-  const handleStatusUpdate = async (claimId: string, newStatus: ClaimRow['status']) => {
-    const originalClaim = rawClaims.find(c => generateClaimDisplayId(c) === claimId);
+  const handleStatusUpdate = async (
+    claimId: string,
+    newStatus: ClaimRow["status"],
+  ) => {
+    const originalClaim = rawClaims.find(
+      (c) => generateClaimDisplayId(c) === claimId,
+    );
 
     if (!originalClaim) {
       toast.error("Could not find the original claim to update.");
@@ -47,17 +52,17 @@ export default function VerificationPortal() {
     }
 
     try {
-      if (newStatus === 'Approved') {
+      if (newStatus === "Approved") {
         await approveClaim(originalClaim.id);
         toast.success(`Claim ${claimId} has been approved!`);
-      } else if (newStatus === 'Rejected') {
+      } else if (newStatus === "Rejected") {
         toast.error(`Claim ${claimId} has been rejected.`);
       }
     } catch (error) {
-      toast.error('Failed to update claim status');
+      toast.error("Failed to update claim status");
     }
   };
-  
+
   const handleUpdateClaim = async (updatedClaim: ClaimRow) => {
     toast.success(`Claim ${updatedClaim.id} has been saved successfully.`);
   };
@@ -65,7 +70,7 @@ export default function VerificationPortal() {
   if (isLoadingClaims) {
     return <LoadingPage message="Loading claims data..." />;
   }
-  
+
   if (claimsError) {
     return <ApiError error={claimsError} />;
   }
@@ -78,7 +83,7 @@ export default function VerificationPortal() {
             claims={claims}
             rawClaims={rawClaims}
             onForward={handleForwardClaim}
-            onSave={handleUpdateClaim} 
+            onSave={handleUpdateClaim}
           />
         );
       case UserRole.SubDivisionalCommittee:
@@ -101,7 +106,7 @@ export default function VerificationPortal() {
       default:
         return <p>You do not have the required role to view this dashboard.</p>;
     }
-  }
+  };
 
   return (
     <div className="p-4 md:p-8 space-y-6 bg-slate-50 min-h-screen">

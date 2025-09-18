@@ -1,5 +1,5 @@
 // Frontend form types that follow the exact Prisma schema structure
-import { FRAType, FamilyMember, Evidence } from './api';
+import { FRAType, FamilyMember, Evidence } from "./api";
 
 // Form data interface matching the Prisma FRAClaim model exactly
 export interface FRAClaimFormData {
@@ -25,16 +25,16 @@ export interface FRAClaimFormData {
     fishingRights?: boolean;
     waterRights?: boolean;
     ntfpRights?: boolean; // Non-Timber Forest Produce
-    
+
     // Area and location details
     landArea?: number; // in acres
     surveyNumbers?: string[];
     boundaries?: string;
-    
+
     // Additional details
     traditionOfUse?: string;
     evidenceOfUse?: string;
-    
+
     // Other rights
     otherRights?: string;
   };
@@ -46,7 +46,7 @@ export interface FRAClaimFormData {
     relationship: string;
   }>;
 
-  // Section 4: Evidence (matching Evidence schema)  
+  // Section 4: Evidence (matching Evidence schema)
   evidence: Array<{
     s3Key: string;
     category: string;
@@ -84,17 +84,17 @@ export interface StepFormData {
   // Step 3: Forest Rights Claimed
   rightsInfo: {
     type: FRAType;
-    claimedRights: FRAClaimFormData['claimedRights'];
+    claimedRights: FRAClaimFormData["claimedRights"];
   };
 
   // Step 4: Family Members
   familyInfo: {
-    familyMembers: FRAClaimFormData['familyMembers'];
+    familyMembers: FRAClaimFormData["familyMembers"];
   };
 
   // Step 5: Evidence Upload
   evidenceInfo: {
-    evidence: FRAClaimFormData['evidence'];
+    evidence: FRAClaimFormData["evidence"];
   };
 
   // Step 6: Additional Information
@@ -107,42 +107,48 @@ export interface StepFormData {
 // Validation schemas for each step
 export const stepValidationConfig = {
   personalInfo: {
-    required: ['claimantName', 'claimantCategory'],
-    optional: ['spouseName', 'fatherOrMotherName', 'fullResidentialAddress', 'casteOrTribeCertificateS3Key']
+    required: ["claimantName", "claimantCategory"],
+    optional: [
+      "spouseName",
+      "fatherOrMotherName",
+      "fullResidentialAddress",
+      "casteOrTribeCertificateS3Key",
+    ],
   },
   locationInfo: {
-    required: ['villageId'],
-    optional: ['villageName', 'gramPanchayat', 'tehsil', 'district']
+    required: ["villageId"],
+    optional: ["villageName", "gramPanchayat", "tehsil", "district"],
   },
   rightsInfo: {
-    required: ['type'],
-    optional: ['claimedRights']
+    required: ["type"],
+    optional: ["claimedRights"],
   },
   familyInfo: {
     required: [],
-    optional: ['familyMembers']
+    optional: ["familyMembers"],
   },
   evidenceInfo: {
-    required: ['evidence'],
-    optional: []
+    required: ["evidence"],
+    optional: [],
   },
   additionalInfo: {
     required: [],
-    optional: ['otherRelevantInfo', 'applicantSignatureOrThumbS3Key']
-  }
+    optional: ["otherRelevantInfo", "applicantSignatureOrThumbS3Key"],
+  },
 };
 
 // Helper type for document categories (matching Evidence.category)
 export const DocumentCategories = {
-  IDENTITY_PROOF: 'IdentityProof',
-  ADDRESS_PROOF: 'AddressProof', 
-  CASTE_CERTIFICATE: 'CasteCertificate',
-  OCCUPATION_PROOF: 'OccupationProof',
-  LAND_RECORDS: 'LandRecords',
-  GOVERNMENT_RECORDS: 'GovernmentRecords',
-  PHYSICAL_EVIDENCE: 'PhysicalEvidence',
-  WITNESS_STATEMENT: 'WitnessStatement',
-  OTHER: 'Other'
+  IDENTITY_PROOF: "IdentityProof",
+  ADDRESS_PROOF: "AddressProof",
+  CASTE_CERTIFICATE: "CasteCertificate",
+  OCCUPATION_PROOF: "OccupationProof",
+  LAND_RECORDS: "LandRecords",
+  GOVERNMENT_RECORDS: "GovernmentRecords",
+  PHYSICAL_EVIDENCE: "PhysicalEvidence",
+  WITNESS_STATEMENT: "WitnessStatement",
+  OTHER: "Other",
 } as const;
 
-export type DocumentCategory = typeof DocumentCategories[keyof typeof DocumentCategories];
+export type DocumentCategory =
+  (typeof DocumentCategories)[keyof typeof DocumentCategories];

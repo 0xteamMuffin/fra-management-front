@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 interface UseApiState<T> {
   data: T | null;
@@ -12,7 +12,7 @@ interface UseApiReturn<T> extends UseApiState<T> {
 }
 
 export function useApi<T>(
-  apiFunction: (...args: any[]) => Promise<T>
+  apiFunction: (...args: any[]) => Promise<T>,
 ): UseApiReturn<T> {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
@@ -20,31 +20,35 @@ export function useApi<T>(
     error: null,
   });
 
-  const execute = useCallback(async (...args: any[]): Promise<T | null> => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const result = await apiFunction(...args);
-      
-      setState({
-        data: result,
-        isLoading: false,
-        error: null,
-      });
-      
-      return result;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
-      
-      setState({
-        data: null,
-        isLoading: false,
-        error: errorMessage,
-      });
-      
-      return null;
-    }
-  }, [apiFunction]);
+  const execute = useCallback(
+    async (...args: any[]): Promise<T | null> => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const result = await apiFunction(...args);
+
+        setState({
+          data: result,
+          isLoading: false,
+          error: null,
+        });
+
+        return result;
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || "An error occurred";
+
+        setState({
+          data: null,
+          isLoading: false,
+          error: errorMessage,
+        });
+
+        return null;
+      }
+    },
+    [apiFunction],
+  );
 
   const reset = useCallback(() => {
     setState({
@@ -63,7 +67,11 @@ export function useApi<T>(
 
 // Specialized hook for paginated data
 export function usePaginatedApi<T>(
-  apiFunction: (page: number, limit: number, ...args: any[]) => Promise<{ data: T[]; total: number; page: number; limit: number }>
+  apiFunction: (
+    page: number,
+    limit: number,
+    ...args: any[]
+  ) => Promise<{ data: T[]; total: number; page: number; limit: number }>,
 ) {
   const [state, setState] = useState({
     data: [] as T[],
@@ -74,34 +82,38 @@ export function usePaginatedApi<T>(
     error: null as string | null,
   });
 
-  const fetchData = useCallback(async (page: number = 1, limit: number = 10, ...args: any[]) => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const result = await apiFunction(page, limit, ...args);
-      
-      setState({
-        data: result.data,
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        isLoading: false,
-        error: null,
-      });
-      
-      return result;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
-      
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }));
-      
-      return null;
-    }
-  }, [apiFunction]);
+  const fetchData = useCallback(
+    async (page: number = 1, limit: number = 10, ...args: any[]) => {
+      try {
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const result = await apiFunction(page, limit, ...args);
+
+        setState({
+          data: result.data,
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+          isLoading: false,
+          error: null,
+        });
+
+        return result;
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || "An error occurred";
+
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        return null;
+      }
+    },
+    [apiFunction],
+  );
 
   const reset = useCallback(() => {
     setState({

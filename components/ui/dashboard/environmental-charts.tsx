@@ -1,42 +1,90 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
 
 interface SensorData {
-  id: string
-  name: string
-  soilMoisture: number
-  groundwaterLevel: number
-  temperature: number
-  humidity: number
+  id: string;
+  name: string;
+  soilMoisture: number;
+  groundwaterLevel: number;
+  temperature: number;
+  humidity: number;
 }
 
 interface EnvironmentalChartsProps {
-  sensors: SensorData[]
-  timeRange: string
+  sensors: SensorData[];
+  timeRange: string;
 }
 
-export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsProps) {
+export function EnvironmentalCharts({
+  sensors,
+  timeRange,
+}: EnvironmentalChartsProps) {
   // Generate mock historical data
   const generateHistoricalData = () => {
-    const hours = timeRange === "1h" ? 1 : timeRange === "24h" ? 24 : timeRange === "7d" ? 168 : 720
-    const interval = timeRange === "1h" ? 5 : timeRange === "24h" ? 60 : timeRange === "7d" ? 360 : 1440
+    const hours =
+      timeRange === "1h"
+        ? 1
+        : timeRange === "24h"
+          ? 24
+          : timeRange === "7d"
+            ? 168
+            : 720;
+    const interval =
+      timeRange === "1h"
+        ? 5
+        : timeRange === "24h"
+          ? 60
+          : timeRange === "7d"
+            ? 360
+            : 1440;
 
-    return Array.from({ length: Math.floor(hours * (60 / interval)) }, (_, i) => {
-      const time = new Date(Date.now() - (hours * 60 - i * interval) * 60 * 1000)
-      return {
-        time: time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        soilMoisture: Number((35 + Math.sin(i * 0.1) * 10 + Math.random() * 5).toFixed(2)),
-        groundwater: Number((12 + Math.cos(i * 0.05) * 3 + Math.random() * 2).toFixed(2)),
-        temperature: Number((28 + Math.sin(i * 0.08) * 4 + Math.random() * 2).toFixed(2)),
-        humidity: Number((65 + Math.cos(i * 0.12) * 15 + Math.random() * 5).toFixed(2)),
+    return Array.from(
+      { length: Math.floor(hours * (60 / interval)) },
+      (_, i) => {
+        const time = new Date(
+          Date.now() - (hours * 60 - i * interval) * 60 * 1000,
+        );
+        return {
+          time: time.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          soilMoisture: Number(
+            (35 + Math.sin(i * 0.1) * 10 + Math.random() * 5).toFixed(2),
+          ),
+          groundwater: Number(
+            (12 + Math.cos(i * 0.05) * 3 + Math.random() * 2).toFixed(2),
+          ),
+          temperature: Number(
+            (28 + Math.sin(i * 0.08) * 4 + Math.random() * 2).toFixed(2),
+          ),
+          humidity: Number(
+            (65 + Math.cos(i * 0.12) * 15 + Math.random() * 5).toFixed(2),
+          ),
+        };
+      },
+    );
+  };
 
-      }
-    })
-  }
-
-  const historicalData = generateHistoricalData()
+  const historicalData = generateHistoricalData();
 
   return (
     <div className="space-y-4">
@@ -44,7 +92,9 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
       <Card className="border-border bg-white">
         <CardHeader>
           <CardTitle className="text-lg">Soil Moisture Trends</CardTitle>
-          <CardDescription>Real-time soil moisture levels across monitoring sites</CardDescription>
+          <CardDescription>
+            Real-time soil moisture levels across monitoring sites
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-64">
@@ -146,5 +196,5 @@ export function EnvironmentalCharts({ sensors, timeRange }: EnvironmentalChartsP
         </Card>
       </div>
     </div>
-  )
+  );
 }

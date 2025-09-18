@@ -1,11 +1,23 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X } from "lucide-react";
 
 // Add State Modal
@@ -16,8 +28,8 @@ interface AddStateModalProps {
 
 export function AddStateModal({ onClose, onSubmit }: AddStateModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    code: '',
+    name: "",
+    code: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,7 +44,9 @@ export function AddStateModal({ onClose, onSubmit }: AddStateModalProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Add New State</CardTitle>
-            <CardDescription>Create a new state or union territory</CardDescription>
+            <CardDescription>
+              Create a new state or union territory
+            </CardDescription>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
@@ -45,7 +59,9 @@ export function AddStateModal({ onClose, onSubmit }: AddStateModalProps) {
               <Input
                 id="stateName"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="e.g., Maharashtra"
                 required
               />
@@ -55,7 +71,12 @@ export function AddStateModal({ onClose, onSubmit }: AddStateModalProps) {
               <Input
                 id="stateCode"
                 value={formData.code}
-                onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    code: e.target.value.toUpperCase(),
+                  }))
+                }
                 placeholder="e.g., MH"
                 maxLength={2}
                 required
@@ -65,7 +86,12 @@ export function AddStateModal({ onClose, onSubmit }: AddStateModalProps) {
               <Button type="submit" className="flex-1">
                 Create State
               </Button>
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
                 Cancel
               </Button>
             </div>
@@ -83,11 +109,15 @@ interface AddDistrictModalProps {
   onSubmit: (data: { name: string; code: string; stateId: string }) => void;
 }
 
-export function AddDistrictModal({ states, onClose, onSubmit }: AddDistrictModalProps) {
+export function AddDistrictModal({
+  states,
+  onClose,
+  onSubmit,
+}: AddDistrictModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    code: '',
-    stateId: '',
+    name: "",
+    code: "",
+    stateId: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,7 +145,9 @@ export function AddDistrictModal({ states, onClose, onSubmit }: AddDistrictModal
               <Input
                 id="districtName"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="e.g., Mumbai"
                 required
               />
@@ -125,14 +157,24 @@ export function AddDistrictModal({ states, onClose, onSubmit }: AddDistrictModal
               <Input
                 id="districtCode"
                 value={formData.code}
-                onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    code: e.target.value.toUpperCase(),
+                  }))
+                }
                 placeholder="e.g., MUM"
                 required
               />
             </div>
             <div>
               <Label htmlFor="state">State *</Label>
-              <Select value={formData.stateId} onValueChange={(value) => setFormData(prev => ({ ...prev, stateId: value }))}>
+              <Select
+                value={formData.stateId}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, stateId: value }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a state" />
                 </SelectTrigger>
@@ -149,7 +191,12 @@ export function AddDistrictModal({ states, onClose, onSubmit }: AddDistrictModal
               <Button type="submit" className="flex-1">
                 Create District
               </Button>
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
                 Cancel
               </Button>
             </div>
@@ -167,10 +214,14 @@ interface AddVillageModalProps {
   onSubmit: (data: { name: string; districtId: string }) => void;
 }
 
-export function AddVillageModal({ districts, onClose, onSubmit }: AddVillageModalProps) {
+export function AddVillageModal({
+  districts,
+  onClose,
+  onSubmit,
+}: AddVillageModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    districtId: '',
+    name: "",
+    districtId: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -198,14 +249,21 @@ export function AddVillageModal({ districts, onClose, onSubmit }: AddVillageModa
               <Input
                 id="villageName"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="e.g., Lembujharan"
                 required
               />
             </div>
             <div>
               <Label htmlFor="district">District *</Label>
-              <Select value={formData.districtId} onValueChange={(value) => setFormData(prev => ({ ...prev, districtId: value }))}>
+              <Select
+                value={formData.districtId}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, districtId: value }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a district" />
                 </SelectTrigger>
@@ -222,7 +280,12 @@ export function AddVillageModal({ districts, onClose, onSubmit }: AddVillageModa
               <Button type="submit" className="flex-1">
                 Create Village
               </Button>
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
                 Cancel
               </Button>
             </div>

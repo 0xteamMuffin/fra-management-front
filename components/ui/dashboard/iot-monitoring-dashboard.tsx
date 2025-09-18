@@ -1,37 +1,52 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { SensorMetrics } from "./sensor-metrics"
-import { EnvironmentalCharts } from "./environmental-charts"
-import { SensorMap } from "./sensor-map"
-import { AlertsPanel } from "./alerts-panel"
-import { DeviceStatus } from "./device-status"
-import { RefreshCw, Download, Settings, Activity, MapPin, Thermometer, Droplets, Battery } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { SensorMetrics } from "./sensor-metrics";
+import { EnvironmentalCharts } from "./environmental-charts";
+import { SensorMap } from "./sensor-map";
+import { AlertsPanel } from "./alerts-panel";
+import { DeviceStatus } from "./device-status";
+import {
+  RefreshCw,
+  Download,
+  Settings,
+  Activity,
+  MapPin,
+  Thermometer,
+  Droplets,
+  Battery,
+} from "lucide-react";
 
 interface SensorData {
-  id: string
-  name: string
-  location: { lat: number; lng: number }
-  village: string
-  soilMoisture: number
-  groundwaterLevel: number
-  temperature: number
-  humidity: number
-  batteryLevel: number
-  lastUpdate: string
-  status: "online" | "offline" | "warning"
+  id: string;
+  name: string;
+  location: { lat: number; lng: number };
+  village: string;
+  soilMoisture: number;
+  groundwaterLevel: number;
+  temperature: number;
+  humidity: number;
+  batteryLevel: number;
+  lastUpdate: string;
+  status: "online" | "offline" | "warning";
 }
 
 export function IoTMonitoringDashboard() {
-  const [selectedVillage, setSelectedVillage] = useState("all")
-  const [selectedTimeRange, setSelectedTimeRange] = useState("24h")
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+  const [selectedVillage, setSelectedVillage] = useState("all");
+  const [selectedTimeRange, setSelectedTimeRange] = useState("24h");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Mock sensor data
   const [sensorData, setSensorData] = useState<SensorData[]>([
@@ -87,58 +102,73 @@ export function IoTMonitoringDashboard() {
       lastUpdate: "2024-01-25T10:32:00Z",
       status: "online",
     },
-  ])
+  ]);
 
   useEffect(() => {
     // Set initial client-only date
-    setLastRefresh(new Date())
-  }, [])
+    setLastRefresh(new Date());
+  }, []);
 
   const handleRefresh = async () => {
-    setIsRefreshing(true)
+    setIsRefreshing(true);
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     setSensorData((prev) =>
       prev.map((sensor) => ({
         ...sensor,
-        soilMoisture: Math.max(0, Math.min(100, sensor.soilMoisture + (Math.random() - 0.5) * 5)),
-        groundwaterLevel: Math.max(0, sensor.groundwaterLevel + (Math.random() - 0.5) * 2),
-        temperature: Math.max(0, sensor.temperature + (Math.random() - 0.5) * 3),
-        humidity: Math.max(0, Math.min(100, sensor.humidity + (Math.random() - 0.5) * 8)),
+        soilMoisture: Math.max(
+          0,
+          Math.min(100, sensor.soilMoisture + (Math.random() - 0.5) * 5),
+        ),
+        groundwaterLevel: Math.max(
+          0,
+          sensor.groundwaterLevel + (Math.random() - 0.5) * 2,
+        ),
+        temperature: Math.max(
+          0,
+          sensor.temperature + (Math.random() - 0.5) * 3,
+        ),
+        humidity: Math.max(
+          0,
+          Math.min(100, sensor.humidity + (Math.random() - 0.5) * 8),
+        ),
         lastUpdate: new Date().toISOString(),
       })),
-    )
+    );
 
-    setLastRefresh(new Date())
-    setIsRefreshing(false)
-  }
+    setLastRefresh(new Date());
+    setIsRefreshing(false);
+  };
 
   const getFilteredSensors = () => {
-    if (selectedVillage === "all") return sensorData
-    return sensorData.filter((sensor) => sensor.village === selectedVillage)
-  }
+    if (selectedVillage === "all") return sensorData;
+    return sensorData.filter((sensor) => sensor.village === selectedVillage);
+  };
 
   const getStatusCounts = () => {
-    const filtered = getFilteredSensors()
+    const filtered = getFilteredSensors();
     return {
       online: filtered.filter((s) => s.status === "online").length,
       warning: filtered.filter((s) => s.status === "warning").length,
       offline: filtered.filter((s) => s.status === "offline").length,
       total: filtered.length,
-    }
-  }
+    };
+  };
 
-  const statusCounts = getStatusCounts()
+  const statusCounts = getStatusCounts();
 
   return (
     <div className="min-h-screen bg-background">
       <div className="bg-white">
         <div className="container mx-auto px-6 pt-8 border-b pb-6">
           <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">IoT Environmental Monitoring</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              IoT Environmental Monitoring
+            </h1>
             <p className="text-muted-foreground text-balance">
-              Real-time monitoring of environmental sensors across rural villages
+              Real-time monitoring of environmental sensors across rural
+              villages
             </p>
           </div>
         </div>
@@ -148,8 +178,13 @@ export function IoTMonitoringDashboard() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Village Filter</label>
-              <Select value={selectedVillage} onValueChange={setSelectedVillage}>
+              <label className="text-sm font-medium text-foreground">
+                Village Filter
+              </label>
+              <Select
+                value={selectedVillage}
+                onValueChange={setSelectedVillage}
+              >
                 <SelectTrigger className="w-48">
                   <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder="Select village" />
@@ -165,8 +200,13 @@ export function IoTMonitoringDashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Time Range</label>
-              <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+              <label className="text-sm font-medium text-foreground">
+                Time Range
+              </label>
+              <Select
+                value={selectedTimeRange}
+                onValueChange={setSelectedTimeRange}
+              >
                 <SelectTrigger className="w-36">
                   <SelectValue placeholder="Select range" />
                 </SelectTrigger>
@@ -192,7 +232,9 @@ export function IoTMonitoringDashboard() {
                 variant="outline"
                 size="sm"
               >
-                <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
                 Refresh
               </Button>
               <Button variant="outline" size="sm">
@@ -209,31 +251,49 @@ export function IoTMonitoringDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Sensors</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Sensors
+              </CardTitle>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Activity className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
-            <CardContent >
-              <div className="text-3xl font-bold text-foreground mb-1">{statusCounts.total}</div>
-              <p className="text-sm text-muted-foreground">Active monitoring devices</p>
+            <CardContent>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {statusCounts.total}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Active monitoring devices
+              </p>
             </CardContent>
           </Card>
 
           <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Online</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Online
+              </CardTitle>
               <div className="p-2 bg-green-500/10 rounded-lg">
                 <div className="w-4 h-4 bg-green-500 rounded-full" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600 mb-1">{statusCounts.online}</div>
+              <div className="text-3xl font-bold text-green-600 mb-1">
+                {statusCounts.online}
+              </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-muted-foreground">
-                  {statusCounts.total > 0 ? Math.round((statusCounts.online / statusCounts.total) * 100) : 0}% operational
+                  {statusCounts.total > 0
+                    ? Math.round(
+                        (statusCounts.online / statusCounts.total) * 100,
+                      )
+                    : 0}
+                  % operational
                 </p>
-                <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-200">
+                <Badge
+                  variant="secondary"
+                  className="bg-green-500/10 text-green-700 border-green-200"
+                >
                   Healthy
                 </Badge>
               </div>
@@ -242,17 +302,26 @@ export function IoTMonitoringDashboard() {
 
           <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Warning</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Warning
+              </CardTitle>
               <div className="p-2 bg-yellow-500/10 rounded-lg">
                 <div className="w-4 h-4 bg-yellow-500 rounded-full" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-yellow-600 mb-1">{statusCounts.warning}</div>
+              <div className="text-3xl font-bold text-yellow-600 mb-1">
+                {statusCounts.warning}
+              </div>
               <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">Require attention</p>
+                <p className="text-sm text-muted-foreground">
+                  Require attention
+                </p>
                 {statusCounts.warning > 0 && (
-                  <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
+                  <Badge
+                    variant="secondary"
+                    className="bg-yellow-500/10 text-yellow-700 border-yellow-200"
+                  >
                     Alert
                   </Badge>
                 )}
@@ -262,17 +331,26 @@ export function IoTMonitoringDashboard() {
 
           <Card className="relative overflow-hidden bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Offline</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Offline
+              </CardTitle>
               <div className="p-2 bg-red-500/10 rounded-lg">
                 <div className="w-4 h-4 bg-red-500 rounded-full" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600 mb-1">{statusCounts.offline}</div>
+              <div className="text-3xl font-bold text-red-600 mb-1">
+                {statusCounts.offline}
+              </div>
               <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">Need maintenance</p>
+                <p className="text-sm text-muted-foreground">
+                  Need maintenance
+                </p>
                 {statusCounts.offline > 0 && (
-                  <Badge variant="destructive" className="bg-red-500/10 text-red-700 border-red-200">
+                  <Badge
+                    variant="destructive"
+                    className="bg-red-500/10 text-red-700 border-red-200"
+                  >
                     Critical
                   </Badge>
                 )}
@@ -283,16 +361,28 @@ export function IoTMonitoringDashboard() {
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted/50">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Overview
             </TabsTrigger>
-            <TabsTrigger value="sensors" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="sensors"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Sensor Data
             </TabsTrigger>
-            <TabsTrigger value="map" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="map"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               GPS Mapping
             </TabsTrigger>
-            <TabsTrigger value="alerts" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="alerts"
+              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Alerts
             </TabsTrigger>
           </TabsList>
@@ -300,7 +390,10 @@ export function IoTMonitoringDashboard() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               <div className="xl:col-span-2">
-                <EnvironmentalCharts sensors={getFilteredSensors()} timeRange={selectedTimeRange} />
+                <EnvironmentalCharts
+                  sensors={getFilteredSensors()}
+                  timeRange={selectedTimeRange}
+                />
               </div>
               <div>
                 <SensorMetrics sensors={getFilteredSensors()} />
@@ -322,5 +415,5 @@ export function IoTMonitoringDashboard() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

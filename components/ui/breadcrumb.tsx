@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import React from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 interface BreadcrumbItem {
-  label: string
-  href?: string
+  label: string;
+  href?: string;
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[]
+  items: BreadcrumbItem[];
 }
 
 export const Breadcrumb = ({ items }: BreadcrumbProps) => {
@@ -29,5 +29,5 @@ export const Breadcrumb = ({ items }: BreadcrumbProps) => {
         </React.Fragment>
       ))}
     </nav>
-  )
-}
+  );
+};

@@ -1,9 +1,21 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, UserRole, AuthResponse, LoginRequest, SignupRequest } from '@/lib/types/api';
-import { api, endpoints } from '@/lib/api-client';
-import { toast } from 'sonner';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import {
+  User,
+  UserRole,
+  AuthResponse,
+  LoginRequest,
+  SignupRequest,
+} from "@/lib/types/api";
+import { api, endpoints } from "@/lib/api-client";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -38,29 +50,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (credentials: LoginRequest): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post<AuthResponse>(endpoints.auth.login, credentials);
-      
+      const response = await api.post<AuthResponse>(
+        endpoints.auth.login,
+        credentials,
+      );
+
       if (response.data.success && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token);
-        
+        localStorage.setItem("auth_token", response.data.token);
+
         // If user data is included in login response, use it
         if (response.data.user) {
           setUser(response.data.user);
-          localStorage.setItem('user_data', JSON.stringify(response.data.user));
+          localStorage.setItem("user_data", JSON.stringify(response.data.user));
         } else {
           // Otherwise fetch user data
           await refreshUser();
         }
-        
-        toast.success('Login successful!');
+
+        toast.success("Login successful!");
         return true;
       }
-      
-      toast.error('Login failed');
+
+      toast.error("Login failed");
       return false;
     } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed');
+      console.error("Login error:", error);
+      toast.error(error.response?.data?.message || "Login failed");
       return false;
     } finally {
       setIsLoading(false);
@@ -71,18 +86,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signup = async (userData: SignupRequest): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post<AuthResponse>(endpoints.auth.signup, userData);
-      
+      const response = await api.post<AuthResponse>(
+        endpoints.auth.signup,
+        userData,
+      );
+
       if (response.data.success) {
-        toast.success('Account created successfully! Please login.');
+        toast.success("Account created successfully! Please login.");
         return true;
       }
-      
-      toast.error('Signup failed');
+
+      toast.error("Signup failed");
       return false;
     } catch (error: any) {
-      console.error('Signup error:', error);
-      toast.error(error.response?.data?.message || 'Signup failed');
+      console.error("Signup error:", error);
+      toast.error(error.response?.data?.message || "Signup failed");
       return false;
     } finally {
       setIsLoading(false);
@@ -91,18 +109,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Logout function
   const logout = () => {
-    const redirectPath = user?.role === UserRole.VillagePerson ? '/login/citizen' : '/login/govt';
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
+    const redirectPath =
+      user?.role === UserRole.VillagePerson ? "/login/citizen" : "/login/govt";
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_data");
     setUser(null);
-    toast.info('Logged out successfully');
+    toast.info("Logged out successfully");
     window.location.href = redirectPath;
   };
 
   // Refresh user data
   const refreshUser = async (): Promise<void> => {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem("auth_token");
       if (!token) return;
 
       // Try to fetch fresh user data from backend
@@ -110,20 +129,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const response = await api.get(endpoints.auth.me);
         if (response.data.success && response.data.user) {
           setUser(response.data.user);
-          localStorage.setItem('user_data', JSON.stringify(response.data.user));
+          localStorage.setItem("user_data", JSON.stringify(response.data.user));
           return;
         }
       } catch (apiError) {
-        console.log('API call failed, using stored data');
+        console.log("API call failed, using stored data");
       }
 
       // Fallback to stored user data
-      const storedUser = localStorage.getItem('user_data');
+      const storedUser = localStorage.getItem("user_data");
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
     } catch (error) {
-      console.error('Error refreshing user:', error);
+      console.error("Error refreshing user:", error);
       logout();
     }
   };
@@ -132,12 +151,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = localStorage.getItem("auth_token");
         if (token) {
           await refreshUser();
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error("Auth initialization error:", error);
         logout();
       } finally {
         setIsLoading(false);
@@ -165,7 +184,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -173,7 +192,7 @@ export function useAuth(): AuthContextType {
 // HOC for protected routes
 export function withAuth<P extends object>(
   Component: React.ComponentType<P>,
-  allowedRoles?: UserRole[]
+  allowedRoles?: UserRole[],
 ) {
   return function AuthenticatedComponent(props: P) {
     const { isAuthenticated, isLoading, hasRole } = useAuth();
@@ -187,7 +206,7 @@ export function withAuth<P extends object>(
     }
 
     if (!isAuthenticated) {
-      window.location.href = '/login/govt';
+      window.location.href = "/login/govt";
       return null;
     }
 
@@ -196,7 +215,9 @@ export function withAuth<P extends object>(
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-red-600">Access Denied</h2>
-            <p className="text-gray-600 mt-2">You don't have permission to access this page.</p>
+            <p className="text-gray-600 mt-2">
+              You don't have permission to access this page.
+            </p>
           </div>
         </div>
       );

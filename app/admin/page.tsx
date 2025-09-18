@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,11 +20,11 @@ import { useApi } from "@/lib/hooks/useApi";
 import { adminService, type AdminStats } from "@/lib/api/admin.service";
 import { geographicService } from "@/lib/api";
 import { UserRole } from "@/lib/types/api";
-import { 
-  Database, 
-  Users, 
-  MapPin, 
-  Building2, 
+import {
+  Database,
+  Users,
+  MapPin,
+  Building2,
   TreePine,
   Upload,
   Download,
@@ -31,7 +37,11 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
-import { AddStateModal, AddDistrictModal, AddVillageModal } from "@/components/admin/modals";
+import {
+  AddStateModal,
+  AddDistrictModal,
+  AddVillageModal,
+} from "@/components/admin/modals";
 
 export default function AdminPanelPage() {
   return (
@@ -47,26 +57,23 @@ function AdminPanel() {
   const [error, setError] = useState<string | null>(null);
 
   // API hooks
-  const { 
-    execute: getStats, 
+  const {
+    execute: getStats,
     isLoading: statsLoading,
-    error: statsError 
+    error: statsError,
   } = useApi(adminService.getStats);
 
-  const { 
-    execute: quickSetup, 
-    isLoading: setupLoading 
-  } = useApi(adminService.quickSetup);
+  const { execute: quickSetup, isLoading: setupLoading } = useApi(
+    adminService.quickSetup,
+  );
 
-  const { 
-    execute: seedStates, 
-    isLoading: statesLoading 
-  } = useApi(adminService.seedIndianStates);
+  const { execute: seedStates, isLoading: statesLoading } = useApi(
+    adminService.seedIndianStates,
+  );
 
-  const { 
-    execute: createUser, 
-    isLoading: userLoading 
-  } = useApi(adminService.createUser);
+  const { execute: createUser, isLoading: userLoading } = useApi(
+    adminService.createUser,
+  );
 
   // Load initial data
   useEffect(() => {
@@ -76,16 +83,16 @@ function AdminPanel() {
   const loadStats = async () => {
     try {
       setIsLoading(true);
-      console.log('Loading admin stats...');
+      console.log("Loading admin stats...");
       const data = await getStats();
-      console.log('Admin stats result:', data);
+      console.log("Admin stats result:", data);
       if (data) {
         setStats(data);
       }
       setError(null);
     } catch (err: any) {
-      console.error('Load stats error:', err);
-      setError(err.message || 'Failed to load admin statistics');
+      console.error("Load stats error:", err);
+      setError(err.message || "Failed to load admin statistics");
     } finally {
       setIsLoading(false);
     }
@@ -93,31 +100,33 @@ function AdminPanel() {
 
   const handleQuickSetup = async () => {
     try {
-      console.log('Starting quick setup...');
+      console.log("Starting quick setup...");
       const result = await quickSetup();
-      console.log('Quick setup result:', result);
+      console.log("Quick setup result:", result);
       if (result) {
-        toast.success(`Quick setup completed! Created ${result.results.states} states, ${result.results.districts} districts, ${result.results.villages} villages, and ${result.results.users} users.`);
+        toast.success(
+          `Quick setup completed! Created ${result.results.states} states, ${result.results.districts} districts, ${result.results.villages} villages, and ${result.results.users} users.`,
+        );
         await loadStats(); // Refresh stats
       }
     } catch (error: any) {
-      console.error('Quick setup error:', error);
-      toast.error(error.message || 'Quick setup failed');
+      console.error("Quick setup error:", error);
+      toast.error(error.message || "Quick setup failed");
     }
   };
 
   const handleSeedStates = async () => {
     try {
-      console.log('Starting seed states...');
+      console.log("Starting seed states...");
       const states = await seedStates();
-      console.log('Seed states result:', states);
+      console.log("Seed states result:", states);
       if (states) {
         toast.success(`Successfully created ${states.length} Indian states`);
         await loadStats();
       }
     } catch (error: any) {
-      console.error('Seed states error:', error);
-      toast.error(error.message || 'Failed to seed states');
+      console.error("Seed states error:", error);
+      toast.error(error.message || "Failed to seed states");
     }
   };
 
@@ -162,7 +171,7 @@ function AdminPanel() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 onClick={handleQuickSetup}
                 disabled={setupLoading}
                 className="bg-green-600 hover:bg-green-700"
@@ -174,7 +183,7 @@ function AdminPanel() {
                 )}
                 Complete Setup
               </Button>
-              <Button 
+              <Button
                 onClick={handleSeedStates}
                 disabled={statesLoading}
                 variant="outline"
@@ -284,18 +293,26 @@ interface StatCardProps {
   description: string;
 }
 
-function StatCard({ title, value, icon: Icon, color, description }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  color,
+  description,
+}: StatCardProps) {
   const colorClasses = {
-    blue: 'bg-blue-100 text-blue-800 border-blue-200',
-    green: 'bg-green-100 text-green-800 border-green-200',
-    amber: 'bg-amber-100 text-amber-800 border-amber-200',
-    purple: 'bg-purple-100 text-purple-800 border-purple-200',
-    teal: 'bg-teal-100 text-teal-800 border-teal-200',
-    pink: 'bg-pink-100 text-pink-800 border-pink-200',
+    blue: "bg-blue-100 text-blue-800 border-blue-200",
+    green: "bg-green-100 text-green-800 border-green-200",
+    amber: "bg-amber-100 text-amber-800 border-amber-200",
+    purple: "bg-purple-100 text-purple-800 border-purple-200",
+    teal: "bg-teal-100 text-teal-800 border-teal-200",
+    pink: "bg-pink-100 text-pink-800 border-pink-200",
   };
 
   return (
-    <Card className={`border ${colorClasses[color as keyof typeof colorClasses]} bg-opacity-50`}>
+    <Card
+      className={`border ${colorClasses[color as keyof typeof colorClasses]} bg-opacity-50`}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -311,9 +328,13 @@ function StatCard({ title, value, icon: Icon, color, description }: StatCardProp
 }
 
 // Management Components
-function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
-  const [selectedState, setSelectedState] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
+function GeographicManagement({
+  onStatsUpdate,
+}: {
+  onStatsUpdate: () => void;
+}) {
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [showAddState, setShowAddState] = useState(false);
   const [showAddDistrict, setShowAddDistrict] = useState(false);
   const [showAddVillage, setShowAddVillage] = useState(false);
@@ -322,7 +343,9 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
 
   // API hooks
   const { execute: getAllStates } = useApi(geographicService.states.getAll);
-  const { execute: getAllDistricts } = useApi(geographicService.districts.getAll);
+  const { execute: getAllDistricts } = useApi(
+    geographicService.districts.getAll,
+  );
   const { execute: createState } = useApi(adminService.bulkCreateStates);
   const { execute: createDistrict } = useApi(adminService.bulkCreateDistricts);
   const { execute: createVillage } = useApi(adminService.bulkCreateVillages);
@@ -338,7 +361,7 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
       const data = await getAllStates();
       if (data) setStates(data);
     } catch (error) {
-      console.error('Failed to load states:', error);
+      console.error("Failed to load states:", error);
       setStates([]);
     }
   };
@@ -348,7 +371,7 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
       const data = await getAllDistricts();
       if (data) setDistricts(data);
     } catch (error) {
-      console.error('Failed to load districts:', error);
+      console.error("Failed to load districts:", error);
       setDistricts([]);
     }
   };
@@ -363,17 +386,23 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
         onStatsUpdate();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create state');
+      toast.error(error.message || "Failed to create state");
     }
   };
 
-  const handleAddDistrict = async (districtData: { name: string; code: string; stateId: string }) => {
+  const handleAddDistrict = async (districtData: {
+    name: string;
+    code: string;
+    stateId: string;
+  }) => {
     try {
-      const result = await createDistrict({ 
-        districts: [{ 
-          ...districtData, 
-          boundary: JSON.stringify({ type: "Polygon", coordinates: [[]] }) 
-        }] 
+      const result = await createDistrict({
+        districts: [
+          {
+            ...districtData,
+            boundary: JSON.stringify({ type: "Polygon", coordinates: [[]] }),
+          },
+        ],
       });
       if (result) {
         toast.success(`District "${districtData.name}" created successfully`);
@@ -382,18 +411,23 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
         onStatsUpdate();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create district');
+      toast.error(error.message || "Failed to create district");
     }
   };
 
-  const handleAddVillage = async (villageData: { name: string; districtId: string }) => {
+  const handleAddVillage = async (villageData: {
+    name: string;
+    districtId: string;
+  }) => {
     try {
-      const result = await createVillage({ 
-        villages: [{ 
-          ...villageData, 
-          coordinates: JSON.stringify({ type: "Point", coordinates: [0, 0] }),
-          boundary: JSON.stringify({ type: "Polygon", coordinates: [[]] })
-        }] 
+      const result = await createVillage({
+        villages: [
+          {
+            ...villageData,
+            coordinates: JSON.stringify({ type: "Point", coordinates: [0, 0] }),
+            boundary: JSON.stringify({ type: "Polygon", coordinates: [[]] }),
+          },
+        ],
       });
       if (result) {
         toast.success(`Village "${villageData.name}" created successfully`);
@@ -401,7 +435,7 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
         onStatsUpdate();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create village');
+      toast.error(error.message || "Failed to create village");
     }
   };
 
@@ -416,24 +450,24 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-center"
               onClick={() => setShowAddState(true)}
             >
               <MapPin className="w-4 h-4 mr-2" />
               Add State
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-center"
               onClick={() => setShowAddDistrict(true)}
             >
               <Building2 className="w-4 h-4 mr-2" />
               Add District
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center justify-center"
               onClick={() => setShowAddVillage(true)}
             >
@@ -441,17 +475,18 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
               Add Village
             </Button>
           </div>
-          
+
           <div className="text-sm text-muted-foreground bg-yellow-50 p-4 rounded border">
             <AlertCircle className="w-4 h-4 inline mr-2" />
-            Use "Complete Setup" above to quickly seed all Indian states, Odisha districts, and sample villages.
+            Use "Complete Setup" above to quickly seed all Indian states, Odisha
+            districts, and sample villages.
           </div>
         </CardContent>
       </Card>
 
       {/* Add State Modal */}
       {showAddState && (
-        <AddStateModal 
+        <AddStateModal
           onClose={() => setShowAddState(false)}
           onSubmit={handleAddState}
         />
@@ -459,7 +494,7 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
 
       {/* Add District Modal */}
       {showAddDistrict && (
-        <AddDistrictModal 
+        <AddDistrictModal
           states={states}
           onClose={() => setShowAddDistrict(false)}
           onSubmit={handleAddDistrict}
@@ -468,7 +503,7 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
 
       {/* Add Village Modal */}
       {showAddVillage && (
-        <AddVillageModal 
+        <AddVillageModal
           districts={districts}
           onClose={() => setShowAddVillage(false)}
           onSubmit={handleAddVillage}
@@ -480,20 +515,22 @@ function GeographicManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) 
 
 function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
   const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
-    password: '',
+    name: "",
+    email: "",
+    password: "",
     role: UserRole.VillagePerson,
-    phone: '',
+    phone: "",
   });
 
-  const { execute: createUser, isLoading: creating } = useApi(adminService.createUser);
+  const { execute: createUser, isLoading: creating } = useApi(
+    adminService.createUser,
+  );
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newUser.name || !newUser.email || !newUser.password) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -502,20 +539,20 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
         ...newUser,
         phone: newUser.phone || undefined,
       });
-      
+
       if (user) {
         toast.success(`User ${user.name} created successfully`);
         setNewUser({
-          name: '',
-          email: '',
-          password: '',
+          name: "",
+          email: "",
+          password: "",
           role: UserRole.VillagePerson,
-          phone: '',
+          phone: "",
         });
         onStatsUpdate();
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create user');
+      toast.error(error.message || "Failed to create user");
     }
   };
 
@@ -536,7 +573,9 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
                 <Input
                   id="name"
                   value={newUser.name}
-                  onChange={(e) => setNewUser(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   required
                 />
               </div>
@@ -546,7 +585,9 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
                   id="email"
                   type="email"
                   value={newUser.email}
-                  onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, email: e.target.value }))
+                  }
                   required
                 />
               </div>
@@ -556,7 +597,12 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
                   id="password"
                   type="password"
                   value={newUser.password}
-                  onChange={(e) => setNewUser(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
                   required
                 />
               </div>
@@ -565,7 +611,9 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
                 <Input
                   id="phone"
                   value={newUser.phone}
-                  onChange={(e) => setNewUser(prev => ({ ...prev, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({ ...prev, phone: e.target.value }))
+                  }
                 />
               </div>
               <div className="md:col-span-2">
@@ -573,18 +621,27 @@ function UserManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
                 <select
                   id="role"
                   value={newUser.role}
-                  onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value as UserRole }))}
+                  onChange={(e) =>
+                    setNewUser((prev) => ({
+                      ...prev,
+                      role: e.target.value as UserRole,
+                    }))
+                  }
                   className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
                   <option value={UserRole.VillagePerson}>Village Person</option>
                   <option value={UserRole.GramSabha}>Gram Sabha</option>
-                  <option value={UserRole.SubDivisionalCommittee}>Sub Divisional Committee</option>
-                  <option value={UserRole.DistrictCommittee}>District Committee</option>
+                  <option value={UserRole.SubDivisionalCommittee}>
+                    Sub Divisional Committee
+                  </option>
+                  <option value={UserRole.DistrictCommittee}>
+                    District Committee
+                  </option>
                 </select>
               </div>
             </div>
-            
+
             <Button type="submit" disabled={creating} className="w-full">
               {creating ? (
                 <LoadingSpinner size="sm" className="mr-2" />
@@ -613,7 +670,9 @@ function SchemeManagement({ onStatsUpdate }: { onStatsUpdate: () => void }) {
         <div className="text-center py-8 text-muted-foreground">
           <BarChart3 className="w-12 h-12 mx-auto mb-4" />
           <p>Scheme management will be implemented here</p>
-          <p className="text-sm">Configure schemes, eligibility, and assignments</p>
+          <p className="text-sm">
+            Configure schemes, eligibility, and assignments
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -628,34 +687,34 @@ function ImportExportManagement() {
       const blob = await exportData();
       if (blob) {
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `fra_data_export_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `fra_data_export_${new Date().toISOString().split("T")[0]}.json`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        toast.success('Data exported successfully');
+        toast.success("Data exported successfully");
       }
     } catch (error: any) {
-      toast.error(error.message || 'Export failed');
+      toast.error(error.message || "Export failed");
     }
   };
 
   const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,.csv';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,.csv";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         try {
           const formData = new FormData();
-          formData.append('file', file);
+          formData.append("file", file);
           // TODO: Implement import endpoint
-          toast.info('Import functionality coming soon');
+          toast.info("Import functionality coming soon");
         } catch (error: any) {
-          toast.error(error.message || 'Import failed');
+          toast.error(error.message || "Import failed");
         }
       }
     };
@@ -682,9 +741,7 @@ function ImportExportManagement() {
       <Card>
         <CardHeader>
           <CardTitle>Data Import</CardTitle>
-          <CardDescription>
-            Import data from CSV or JSON files
-          </CardDescription>
+          <CardDescription>Import data from CSV or JSON files</CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" onClick={handleImport}>
@@ -702,9 +759,7 @@ function SystemManagement({ stats }: { stats: AdminStats | null }) {
     <Card>
       <CardHeader>
         <CardTitle>System Information</CardTitle>
-        <CardDescription>
-          System status and configuration
-        </CardDescription>
+        <CardDescription>System status and configuration</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -717,7 +772,9 @@ function SystemManagement({ stats }: { stats: AdminStats | null }) {
           </div>
           <div className="flex justify-between">
             <span>Total Records:</span>
-            <span>{stats ? Object.values(stats).reduce((a, b) => a + b, 0) : 0}</span>
+            <span>
+              {stats ? Object.values(stats).reduce((a, b) => a + b, 0) : 0}
+            </span>
           </div>
         </div>
       </CardContent>

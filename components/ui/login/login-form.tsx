@@ -1,35 +1,49 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, EyeOff, LogIn } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 
 export function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [userType, setUserType] = useState<string>("")
+  const [showPassword, setShowPassword] = useState(false);
+  const [userType, setUserType] = useState<string>("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     userType: "",
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle login logic here
-    console.log("Login attempt:", formData)
-  }
+    console.log("Login attempt:", formData);
+  };
 
   return (
     <Card className="border-border">
       <CardHeader>
         <CardTitle className="text-xl">Login Credentials</CardTitle>
-        <CardDescription>Enter your credentials to access the portal</CardDescription>
+        <CardDescription>
+          Enter your credentials to access the portal
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,8 +56,12 @@ export function LoginForm() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="citizen">Citizen</SelectItem>
-                <SelectItem value="gram-panchayat">Gram Panchayat Official</SelectItem>
-                <SelectItem value="district-admin">District Administrator</SelectItem>
+                <SelectItem value="gram-panchayat">
+                  Gram Panchayat Official
+                </SelectItem>
+                <SelectItem value="district-admin">
+                  District Administrator
+                </SelectItem>
                 <SelectItem value="state-admin">State Administrator</SelectItem>
               </SelectContent>
             </Select>
@@ -57,7 +75,9 @@ export function LoginForm() {
               type="email"
               placeholder="Enter your email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
               className="bg-background"
             />
@@ -72,7 +92,9 @@ export function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
                 className="bg-background pr-10"
               />
@@ -88,7 +110,9 @@ export function LoginForm() {
                 ) : (
                   <Eye className="h-4 w-4 text-muted-foreground" />
                 )}
-                <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                <span className="sr-only">
+                  {showPassword ? "Hide password" : "Show password"}
+                </span>
               </Button>
             </div>
           </div>
@@ -105,7 +129,10 @@ export function LoginForm() {
                 Remember me
               </Label>
             </div>
-            <a href="/forgot-password" className="text-sm text-primary hover:underline">
+            <a
+              href="/forgot-password"
+              className="text-sm text-primary hover:underline"
+            >
               Forgot password?
             </a>
           </div>
@@ -118,5 +145,5 @@ export function LoginForm() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

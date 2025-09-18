@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,25 +8,29 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface ForwardClaimDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (remarks: string) => void
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (remarks: string) => void;
 }
 
-export function ForwardClaimDialog({ isOpen, onOpenChange, onConfirm }: ForwardClaimDialogProps) {
-  const [remarks, setRemarks] = useState("")
+export function ForwardClaimDialog({
+  isOpen,
+  onOpenChange,
+  onConfirm,
+}: ForwardClaimDialogProps) {
+  const [remarks, setRemarks] = useState("");
 
   const handleConfirm = () => {
-    onConfirm(remarks)
-    onOpenChange(false)
-    setRemarks("")
-  }
+    onConfirm(remarks);
+    onOpenChange(false);
+    setRemarks("");
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -34,7 +38,8 @@ export function ForwardClaimDialog({ isOpen, onOpenChange, onConfirm }: ForwardC
         <DialogHeader>
           <DialogTitle>Forward Claim</DialogTitle>
           <DialogDescription>
-            Add any remarks or notes before forwarding this claim to the next level.
+            Add any remarks or notes before forwarding this claim to the next
+            level.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
@@ -50,11 +55,9 @@ export function ForwardClaimDialog({ isOpen, onOpenChange, onConfirm }: ForwardC
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleConfirm}>
-            Confirm & Forward
-          </Button>
+          <Button onClick={handleConfirm}>Confirm & Forward</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

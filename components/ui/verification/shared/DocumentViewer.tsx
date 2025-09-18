@@ -1,8 +1,8 @@
 // @/components/ui/verification/shared/DocumentViewer.tsx
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { ArrowLeft, ArrowRight, Link as LinkIcon, File } from "lucide-react"
-import { FRAClaim } from "@/lib/types/api"
+} from "@/components/ui/dialog";
+import { ArrowLeft, ArrowRight, Link as LinkIcon, File } from "lucide-react";
+import { FRAClaim } from "@/lib/types/api";
 
 interface DocumentViewerProps {
   isOpen: boolean;
@@ -21,7 +21,12 @@ interface DocumentViewerProps {
   onViewDocument: (s3Key: string) => Promise<void>;
 }
 
-export function DocumentViewer({ isOpen, onOpenChange, claim, onViewDocument }: DocumentViewerProps) {
+export function DocumentViewer({
+  isOpen,
+  onOpenChange,
+  claim,
+  onViewDocument,
+}: DocumentViewerProps) {
   if (!isOpen || !claim) {
     return null;
   }
@@ -38,16 +43,23 @@ export function DocumentViewer({ isOpen, onOpenChange, claim, onViewDocument }: 
 
         <div className="max-h-[60vh] overflow-y-auto p-1">
           <ul className="divide-y divide-border">
-            {claim.evidence?.map(doc => (
-              <li key={doc.id} className="flex justify-between items-center py-3">
+            {claim.evidence?.map((doc) => (
+              <li
+                key={doc.id}
+                className="flex justify-between items-center py-3"
+              >
                 <div className="flex items-center">
-                  <File className="h-5 w-5 mr-3 text-muted-foreground"/>
+                  <File className="h-5 w-5 mr-3 text-muted-foreground" />
                   <div>
                     <p className="font-medium">{doc.category}</p>
                     <p className="text-xs text-muted-foreground">{doc.s3Key}</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => onViewDocument(doc.s3Key)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onViewDocument(doc.s3Key)}
+                >
                   <LinkIcon className="h-3 w-3 mr-1" />
                   View
                 </Button>
@@ -55,9 +67,11 @@ export function DocumentViewer({ isOpen, onOpenChange, claim, onViewDocument }: 
             ))}
           </ul>
         </div>
-        
+
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

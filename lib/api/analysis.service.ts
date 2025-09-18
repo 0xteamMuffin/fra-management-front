@@ -1,4 +1,4 @@
-import { api, endpoints } from '@/lib/api-client';
+import { api, endpoints } from "@/lib/api-client";
 
 export interface SegmentationResponse {
   // The segmented image will be returned as a blob/buffer
@@ -10,13 +10,16 @@ export const analysisService = {
   // Segment land image
   async segmentImage(imageFile: File): Promise<SegmentationResponse> {
     const formData = new FormData();
-    formData.append('file', imageFile);
+    formData.append("file", imageFile);
 
-    const response = await api.upload<Blob>(endpoints.analysis.segment, formData);
-    
+    const response = await api.upload<Blob>(
+      endpoints.analysis.segment,
+      formData,
+    );
+
     return {
       imageData: response.data,
-      contentType: response.headers['content-type'] || 'image/jpeg',
+      contentType: response.headers["content-type"] || "image/jpeg",
     };
   },
 
@@ -31,9 +34,9 @@ export const analysisService = {
   },
 
   // Download segmented image
-  downloadSegmentedImage(blob: Blob, filename: string = 'segmented-image.jpg') {
+  downloadSegmentedImage(blob: Blob, filename: string = "segmented-image.jpg") {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,27 +8,31 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface RejectClaimDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (reason: string) => void
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (reason: string) => void;
 }
 
-export function RejectClaimDialog({ isOpen, onOpenChange, onConfirm }: RejectClaimDialogProps) {
-  const [reason, setReason] = useState("")
+export function RejectClaimDialog({
+  isOpen,
+  onOpenChange,
+  onConfirm,
+}: RejectClaimDialogProps) {
+  const [reason, setReason] = useState("");
 
   const handleConfirm = () => {
     if (reason.trim()) {
-      onConfirm(reason)
-      onOpenChange(false)
-      setReason("")
+      onConfirm(reason);
+      onOpenChange(false);
+      setReason("");
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -36,7 +40,8 @@ export function RejectClaimDialog({ isOpen, onOpenChange, onConfirm }: RejectCla
         <DialogHeader>
           <DialogTitle>Reject Claim</DialogTitle>
           <DialogDescription>
-            Please provide a reason for rejecting this claim. This information will be recorded.
+            Please provide a reason for rejecting this claim. This information
+            will be recorded.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
@@ -58,5 +63,5 @@ export function RejectClaimDialog({ isOpen, onOpenChange, onConfirm }: RejectCla
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

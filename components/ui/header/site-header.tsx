@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { MapPin, Menu } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { MainNav } from "@/components/ui/header/main-nav"
+import Link from "next/link";
+import { useState } from "react";
+import { MapPin, Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { MainNav } from "@/components/ui/header/main-nav";
 
 export function SiteHeader() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -55,5 +55,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

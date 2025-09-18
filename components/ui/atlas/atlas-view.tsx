@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useMemo, useCallback, useRef } from "react"
-import domtoimage from "dom-to-image-more"
-import axios from "axios"
-import MapComponent from "./map-container"
-import { Card } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { useState, useMemo, useCallback, useRef } from "react";
+import domtoimage from "dom-to-image-more";
+import axios from "axios";
+import MapComponent from "./map-container";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import LegendCard from "./legend"
+} from "@/components/ui/select";
+import LegendCard from "./legend";
 
 // 1. --- NEW: Helper to convert Blob to Base64 ---
 // This function creates a permanent, self-contained data URL from a blob.
@@ -27,7 +27,6 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
     reader.readAsDataURL(blob);
   });
 };
-
 
 const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
   <div className="border-b border-green-200/60">
@@ -65,16 +64,16 @@ const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
       </div>
     </div>
   </div>
-)
+);
 
 export type Claim = {
-  id: string
-  applicant: string
-  areaHa: number
-  status: "Approved" | "Pending" | "Rejected"
-  year: number
-  polygon: [number, number][]
-}
+  id: string;
+  applicant: string;
+  areaHa: number;
+  status: "Approved" | "Pending" | "Rejected";
+  year: number;
+  polygon: [number, number][];
+};
 
 const sampleClaims: Claim[] = [
   {
@@ -116,68 +115,69 @@ const sampleClaims: Claim[] = [
       [21.0, 77.76],
     ],
   },
-]
+];
 
 export default function AtlasView() {
-  const [q, setQ] = useState("")
-  const [status, setStatus] = useState<string>("all")
-  const [year, setYear] = useState<string>("all")
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [openSections, setOpenSections] = useState<string[]>(["", ""])
-  const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [analysisError, setAnalysisError] = useState<string | null>(null)
-  
-  const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [segmentedImage, setSegmentedImage] = useState<string | null>(null)
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState<string>("all");
+  const [year, setYear] = useState<string>("all");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(["", ""]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
-  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [segmentedImage, setSegmentedImage] = useState<string | null>(null);
+
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     return sampleClaims.filter((c) => {
       const matchQ =
         q.trim().length === 0 ||
         c.id.toLowerCase().includes(q.toLowerCase()) ||
-        c.applicant.toLowerCase().includes(q.toLowerCase())
-      const matchStatus = status === "all" || c.status === status
-      const matchYear = year === "all" || String(c.year) === year
-      return matchQ && matchStatus && matchYear
-    })
-  }, [q, status, year])
+        c.applicant.toLowerCase().includes(q.toLowerCase());
+      const matchStatus = status === "all" || c.status === status;
+      const matchYear = year === "all" || String(c.year) === year;
+      return matchQ && matchStatus && matchYear;
+    });
+  }, [q, status, year]);
 
   // 2. --- UPDATED: Convert blobs to Base64 ---
   const handleAnalyze = useCallback(async () => {
     if (!mapContainerRef.current) return;
-    
-    setIsAnalyzing(true)
-    setCapturedImage(null)
-    setSegmentedImage(null)
-    setAnalysisError(null)
+
+    setIsAnalyzing(true);
+    setCapturedImage(null);
+    setSegmentedImage(null);
+    setAnalysisError(null);
 
     try {
-      const originalImageBlob = await domtoimage.toBlob(mapContainerRef.current)
+      const originalImageBlob = await domtoimage.toBlob(
+        mapContainerRef.current,
+      );
       const originalImageBase64 = await blobToBase64(originalImageBlob);
-      setCapturedImage(originalImageBase64) // Set original image for preview
+      setCapturedImage(originalImageBase64); // Set original image for preview
 
-      const formData = new FormData()
-      formData.append("file", originalImageBlob, "map-capture.png")
+      const formData = new FormData();
+      formData.append("file", originalImageBlob, "map-capture.png");
 
       const response = await axios.post(
         "http://109.230.237.112:3000/api/v1/segment/segment",
         formData,
-        { responseType: 'blob' }
-      )
-      
+        { responseType: "blob" },
+      );
+
       const segmentedImageBlob = response.data;
       const segmentedImageBase64 = await blobToBase64(segmentedImageBlob);
-      setSegmentedImage(segmentedImageBase64) // Set the returned image
-
+      setSegmentedImage(segmentedImageBase64); // Set the returned image
     } catch (error) {
-      console.error("Failed to analyze map image:", error)
-      setAnalysisError("Failed to get analysis. Please try again.")
+      console.error("Failed to analyze map image:", error);
+      setAnalysisError("Failed to get analysis. Please try again.");
     } finally {
-      setIsAnalyzing(false)
+      setIsAnalyzing(false);
     }
-  }, [])
+  }, []);
 
   // 3. --- REMOVED: Cleanup effect is no longer needed ---
   // We don't need to revoke Base64 URLs, so the useEffect hook is gone.
@@ -187,8 +187,8 @@ export default function AtlasView() {
       prev.includes(sectionId)
         ? prev.filter((id) => id !== sectionId)
         : [...prev, sectionId],
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -202,8 +202,15 @@ export default function AtlasView() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
+              <h3 className="font-bold text-lg text-green-900">
+                Analysis Details
+              </h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setIsPopupOpen(false)}
+              >
                 X
               </Button>
             </div>
@@ -213,9 +220,15 @@ export default function AtlasView() {
               <img src={capturedImage} alt="Original View" className="w-full" />
             </div>
 
-            <h4 className="font-semibold text-green-800 mb-2 mt-4">Segmented Analysis</h4>
+            <h4 className="font-semibold text-green-800 mb-2 mt-4">
+              Segmented Analysis
+            </h4>
             <div className="mb-4 border rounded-lg overflow-hidden">
-              <img src={segmentedImage} alt="Segmented Analysis" className="w-full" />
+              <img
+                src={segmentedImage}
+                alt="Segmented Analysis"
+                className="w-full"
+              />
             </div>
           </Card>
         </div>
@@ -235,8 +248,22 @@ export default function AtlasView() {
                 Toggle contextual overlays
               </p>
               <ul className="space-y-1 text-xs text-green-900">
-                <li><input type="checkbox" defaultChecked className="mr-1 accent-green-600"/> Forest Areas</li>
-                <li><input type="checkbox" defaultChecked className="mr-1 accent-green-600"/> Claimant Territories</li>
+                <li>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="mr-1 accent-green-600"
+                  />{" "}
+                  Forest Areas
+                </li>
+                <li>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="mr-1 accent-green-600"
+                  />{" "}
+                  Claimant Territories
+                </li>
               </ul>
             </CustomAccordion>
             <CustomAccordion
@@ -246,22 +273,47 @@ export default function AtlasView() {
             >
               <div className="space-y-2">
                 <div className="space-y-1">
-                  <Label htmlFor="atlas-search" className="text-green-950 text-xs">Search</Label>
-                  <Input id="atlas-search" placeholder="Find by claim ID or name..." value={q} onChange={(e) => setQ(e.target.value)} className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"/>
+                  <Label
+                    htmlFor="atlas-search"
+                    className="text-green-950 text-xs"
+                  >
+                    Search
+                  </Label>
+                  <Input
+                    id="atlas-search"
+                    placeholder="Find by claim ID or name..."
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <Label className="text-green-950 text-xs">Status</Label>
                     <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"><SelectValue placeholder="All" /></SelectTrigger>
-                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="Approved">Approved</SelectItem><SelectItem value="Pending">Pending</SelectItem><SelectItem value="Rejected">Rejected</SelectItem></SelectContent>
+                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="Approved">Approved</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Rejected">Rejected</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-green-950 text-xs">Year</Label>
                     <Select value={year} onValueChange={setYear}>
-                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md"><SelectValue placeholder="All" /></SelectTrigger>
-                      <SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="2021">2021</SelectItem><SelectItem value="222">2022</SelectItem><SelectItem value="2023">2023</SelectItem></SelectContent>
+                      <SelectTrigger className="border-green-400 focus:border-green-600 focus:ring-green-600 h-8 text-xs rounded-md">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="2021">2021</SelectItem>
+                        <SelectItem value="222">2022</SelectItem>
+                        <SelectItem value="2023">2023</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -290,15 +342,18 @@ export default function AtlasView() {
               {!isAnalyzing && !capturedImage && !analysisError && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
             </div>
           </div> */}
-          
-          <LegendCard/>
+
+          <LegendCard />
         </aside>
 
         {/* Map */}
-        <div ref={mapContainerRef} className="rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0">
-          <MapComponent claims={filtered} isVillageBoundriesNeeded={true}/>
+        <div
+          ref={mapContainerRef}
+          className="rounded-2xl shadow-xl overflow-hidden h-[85vh] z-0"
+        >
+          <MapComponent claims={filtered} isVillageBoundriesNeeded={true} />
         </div>
       </div>
     </>
-  )
+  );
 }

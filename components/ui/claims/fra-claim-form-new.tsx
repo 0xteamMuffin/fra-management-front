@@ -1,25 +1,50 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { DocumentUpload } from "./document-upload"
-import { VillageSearch } from "./village-search"
-import { User, MapPin, FileText, Upload, Send, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { FRAClaimFormData, StepFormData, DocumentCategories } from "@/lib/types/claim-form"
-import { useGeographicHierarchy } from "@/lib/hooks/useGeographic"
-import { useClaims } from "@/lib/hooks/useClaims"
-import { formatClaimForAPI } from "@/lib/utils/claim-helpers"
-import { LoadingSpinner } from "@/components/ui/loading"
-import { ApiError } from "@/components/ui/error-boundary"
-import { toast } from "sonner"
-import { FRAType } from "@/lib/types/api"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { DocumentUpload } from "./document-upload";
+import { VillageSearch } from "./village-search";
+import {
+  User,
+  MapPin,
+  FileText,
+  Upload,
+  Send,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  FRAClaimFormData,
+  StepFormData,
+  DocumentCategories,
+} from "@/lib/types/claim-form";
+import { useGeographicHierarchy } from "@/lib/hooks/useGeographic";
+import { useClaims } from "@/lib/hooks/useClaims";
+import { formatClaimForAPI } from "@/lib/utils/claim-helpers";
+import { LoadingSpinner } from "@/components/ui/loading";
+import { ApiError } from "@/components/ui/error-boundary";
+import { toast } from "sonner";
+import { FRAType } from "@/lib/types/api";
 
 const steps = [
   { id: 1, name: "Personal Information", icon: User },
@@ -28,32 +53,32 @@ const steps = [
   { id: 4, name: "Family Members", icon: User },
   { id: 5, name: "Evidence Upload", icon: Upload },
   { id: 6, name: "Review & Submit", icon: Send },
-]
+];
 
 interface FamilyMember {
-  name: string
-  age: number
-  relationship: string
+  name: string;
+  age: number;
+  relationship: string;
 }
 
 export function FRAClaimFormNew() {
-  const router = useRouter()
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  
+  const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Form data following exact Prisma schema
   const [formData, setFormData] = useState<Partial<FRAClaimFormData>>({
     type: FRAType.IFR,
-    claimantName: '',
-    spouseName: '',
-    fatherOrMotherName: '',
-    fullResidentialAddress: '',
-    villageName: '',
-    gramPanchayat: '',
-    tehsil: '',
-    district: '',
-    claimantCategory: 'ST',
-    casteOrTribeCertificateS3Key: '',
+    claimantName: "",
+    spouseName: "",
+    fatherOrMotherName: "",
+    fullResidentialAddress: "",
+    villageName: "",
+    gramPanchayat: "",
+    tehsil: "",
+    district: "",
+    claimantCategory: "ST",
+    casteOrTribeCertificateS3Key: "",
     claimedRights: {
       habitationRights: false,
       cultivationRights: false,
@@ -63,85 +88,97 @@ export function FRAClaimFormNew() {
       ntfpRights: false,
       landArea: 0,
       surveyNumbers: [],
-      boundaries: '',
-      traditionOfUse: '',
-      evidenceOfUse: '',
-      otherRights: '',
+      boundaries: "",
+      traditionOfUse: "",
+      evidenceOfUse: "",
+      otherRights: "",
     },
     familyMembers: [],
     evidence: [],
-    otherRelevantInfo: '',
-    applicantSignatureOrThumbS3Key: '',
-    villageId: '',
-  })
+    otherRelevantInfo: "",
+    applicantSignatureOrThumbS3Key: "",
+    villageId: "",
+  });
 
-  const [uploadedDocuments, setUploadedDocuments] = useState<{ [key: string]: string }>({})
-  
+  const [uploadedDocuments, setUploadedDocuments] = useState<{
+    [key: string]: string;
+  }>({});
+
   // API hooks
-  const geographic = useGeographicHierarchy()
-  const { createClaim, isCreating, error: claimError } = useClaims({ autoFetch: false })
+  const geographic = useGeographicHierarchy();
+  const {
+    createClaim,
+    isCreating,
+    error: claimError,
+  } = useClaims({ autoFetch: false });
 
   const updateFormData = (field: keyof FRAClaimFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const updateClaimedRights = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       claimedRights: {
         ...prev.claimedRights,
-        [field]: value
-      }
-    }))
-  }
+        [field]: value,
+      },
+    }));
+  };
 
   const addFamilyMember = () => {
-    const newMember: FamilyMember = { name: '', age: 0, relationship: '' }
-    setFormData(prev => ({
+    const newMember: FamilyMember = { name: "", age: 0, relationship: "" };
+    setFormData((prev) => ({
       ...prev,
-      familyMembers: [...(prev.familyMembers || []), newMember]
-    }))
-  }
+      familyMembers: [...(prev.familyMembers || []), newMember],
+    }));
+  };
 
-  const updateFamilyMember = (index: number, field: keyof FamilyMember, value: any) => {
-    setFormData(prev => ({
+  const updateFamilyMember = (
+    index: number,
+    field: keyof FamilyMember,
+    value: any,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      familyMembers: prev.familyMembers?.map((member, i) => 
-        i === index ? { ...member, [field]: value } : member
-      )
-    }))
-  }
+      familyMembers: prev.familyMembers?.map((member, i) =>
+        i === index ? { ...member, [field]: value } : member,
+      ),
+    }));
+  };
 
   const removeFamilyMember = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      familyMembers: prev.familyMembers?.filter((_, i) => i !== index)
-    }))
-  }
+      familyMembers: prev.familyMembers?.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleDocumentsChange = (documents: { [key: string]: string }) => {
-    setUploadedDocuments(documents)
-    
+    setUploadedDocuments(documents);
+
     // Convert uploaded documents to evidence array
     const evidence = Object.entries(documents).map(([category, s3Key]) => ({
       s3Key,
-      category
-    }))
-    
-    updateFormData('evidence', evidence)
-  }
+      category,
+    }));
+
+    updateFormData("evidence", evidence);
+  };
 
   const handleSubmit = async () => {
     if (!formData.claimantName || !formData.villageId) {
-      toast.error('Please fill in all required fields')
-      return
+      toast.error("Please fill in all required fields");
+      return;
     }
 
     // Validate family members
     if (formData.familyMembers && formData.familyMembers.length > 0) {
       for (const member of formData.familyMembers) {
         if (!member.name || !member.relationship || member.age <= 0) {
-          toast.error("Please ensure all family members have a name, age, and relationship.");
+          toast.error(
+            "Please ensure all family members have a name, age, and relationship.",
+          );
           setCurrentStep(4); // Navigate to the family members step
           return;
         }
@@ -155,23 +192,23 @@ export function FRAClaimFormNew() {
       return;
     }
 
-    setIsSubmitting(true)
-    
+    setIsSubmitting(true);
+
     try {
-      const claimData = formatClaimForAPI(formData)
-      const result = await createClaim(claimData)
-      
+      const claimData = formatClaimForAPI(formData);
+      const result = await createClaim(claimData);
+
       if (result) {
-        toast.success('FRA Claim submitted successfully!')
-        router.push('/dashboard/u')
+        toast.success("FRA Claim submitted successfully!");
+        router.push("/dashboard/u");
       }
     } catch (error) {
-      console.error('Submission error:', error)
-      toast.error('Failed to submit claim')
+      console.error("Submission error:", error);
+      toast.error("Failed to submit claim");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const nextStep = () => {
     // Step 1 validation
@@ -181,7 +218,7 @@ export function FRAClaimFormNew() {
         return;
       }
     }
-    
+
     // Step 2 validation
     if (currentStep === 2) {
       if (!formData.villageId) {
@@ -191,15 +228,15 @@ export function FRAClaimFormNew() {
     }
 
     if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -209,7 +246,7 @@ export function FRAClaimFormNew() {
             formData={formData}
             updateFormData={updateFormData}
           />
-        )
+        );
       case 2:
         return (
           <LocationDetailsStep
@@ -217,7 +254,7 @@ export function FRAClaimFormNew() {
             updateFormData={updateFormData}
             geographic={geographic}
           />
-        )
+        );
       case 3:
         return (
           <ForestRightsStep
@@ -225,7 +262,7 @@ export function FRAClaimFormNew() {
             updateFormData={updateFormData}
             updateClaimedRights={updateClaimedRights}
           />
-        )
+        );
       case 4:
         return (
           <FamilyMembersStep
@@ -234,14 +271,14 @@ export function FRAClaimFormNew() {
             updateFamilyMember={updateFamilyMember}
             removeFamilyMember={removeFamilyMember}
           />
-        )
+        );
       case 5:
         return (
           <EvidenceUploadStep
             uploadedDocuments={uploadedDocuments}
             handleDocumentsChange={handleDocumentsChange}
           />
-        )
+        );
       case 6:
         return (
           <ReviewSubmitStep
@@ -249,11 +286,11 @@ export function FRAClaimFormNew() {
             uploadedDocuments={uploadedDocuments}
             geographic={geographic}
           />
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -276,7 +313,7 @@ export function FRAClaimFormNew() {
                     "flex items-center justify-center w-10 h-10 rounded-full border-2 mb-2 transition-colors",
                     currentStep >= step.id
                       ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background text-muted-foreground border-border"
+                      : "bg-background text-muted-foreground border-border",
                   )}
                 >
                   {currentStep > step.id ? (
@@ -288,7 +325,9 @@ export function FRAClaimFormNew() {
                 <span
                   className={cn(
                     "text-sm font-medium text-center",
-                    currentStep >= step.id ? "text-primary" : "text-muted-foreground"
+                    currentStep >= step.id
+                      ? "text-primary"
+                      : "text-muted-foreground",
                   )}
                 >
                   {step.name}
@@ -297,7 +336,7 @@ export function FRAClaimFormNew() {
                   <div
                     className={cn(
                       "h-0.5 w-20 mt-2 transition-colors",
-                      currentStep > step.id ? "bg-primary" : "bg-border"
+                      currentStep > step.id ? "bg-primary" : "bg-border",
                     )}
                   />
                 )}
@@ -313,16 +352,16 @@ export function FRAClaimFormNew() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {React.createElement(steps[currentStep - 1].icon, { className: "w-5 h-5" })}
+              {React.createElement(steps[currentStep - 1].icon, {
+                className: "w-5 h-5",
+              })}
               Step {currentStep}: {steps[currentStep - 1].name}
             </CardTitle>
             <CardDescription>
               Complete this step to proceed to the next section
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {renderStepContent()}
-          </CardContent>
+          <CardContent>{renderStepContent()}</CardContent>
         </Card>
 
         {/* Navigation */}
@@ -347,7 +386,7 @@ export function FRAClaimFormNew() {
               disabled={isSubmitting || isCreating}
               className="bg-green-600 hover:bg-green-700"
             >
-              {(isSubmitting || isCreating) ? (
+              {isSubmitting || isCreating ? (
                 <>
                   <LoadingSpinner size="sm" className="mr-2" />
                   Submitting...
@@ -363,7 +402,7 @@ export function FRAClaimFormNew() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Step Components
@@ -375,8 +414,8 @@ function PersonalInformationStep({ formData, updateFormData }: any) {
           <Label htmlFor="claimantName">Claimant Name *</Label>
           <Input
             id="claimantName"
-            value={formData.claimantName || ''}
-            onChange={(e) => updateFormData('claimantName', e.target.value)}
+            value={formData.claimantName || ""}
+            onChange={(e) => updateFormData("claimantName", e.target.value)}
             required
           />
         </div>
@@ -384,30 +423,34 @@ function PersonalInformationStep({ formData, updateFormData }: any) {
           <Label htmlFor="spouseName">Spouse Name</Label>
           <Input
             id="spouseName"
-            value={formData.spouseName || ''}
-            onChange={(e) => updateFormData('spouseName', e.target.value)}
+            value={formData.spouseName || ""}
+            onChange={(e) => updateFormData("spouseName", e.target.value)}
           />
         </div>
         <div>
           <Label htmlFor="fatherOrMotherName">Father/Mother Name</Label>
           <Input
             id="fatherOrMotherName"
-            value={formData.fatherOrMotherName || ''}
-            onChange={(e) => updateFormData('fatherOrMotherName', e.target.value)}
+            value={formData.fatherOrMotherName || ""}
+            onChange={(e) =>
+              updateFormData("fatherOrMotherName", e.target.value)
+            }
           />
         </div>
         <div>
           <Label htmlFor="claimantCategory">Claimant Category *</Label>
           <Select
             value={formData.claimantCategory}
-            onValueChange={(value) => updateFormData('claimantCategory', value)}
+            onValueChange={(value) => updateFormData("claimantCategory", value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ST">Scheduled Tribe (ST)</SelectItem>
-              <SelectItem value="OTFD">Other Traditional Forest Dwellers (OTFD)</SelectItem>
+              <SelectItem value="OTFD">
+                Other Traditional Forest Dwellers (OTFD)
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -416,13 +459,15 @@ function PersonalInformationStep({ formData, updateFormData }: any) {
         <Label htmlFor="fullResidentialAddress">Full Residential Address</Label>
         <Textarea
           id="fullResidentialAddress"
-          value={formData.fullResidentialAddress || ''}
-          onChange={(e) => updateFormData('fullResidentialAddress', e.target.value)}
+          value={formData.fullResidentialAddress || ""}
+          onChange={(e) =>
+            updateFormData("fullResidentialAddress", e.target.value)
+          }
           rows={3}
         />
       </div>
     </div>
-  )
+  );
 }
 
 function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
@@ -471,8 +516,8 @@ function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
           <VillageSearch
             districtId={geographic.selectedDistrictId}
             onVillageSelect={(village) => {
-              updateFormData('villageId', village.id)
-              updateFormData('villageName', village.name)
+              updateFormData("villageId", village.id);
+              updateFormData("villageName", village.name);
             }}
           />
         </div>
@@ -480,31 +525,35 @@ function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
           <Label htmlFor="gramPanchayat">Gram Panchayat</Label>
           <Input
             id="gramPanchayat"
-            value={formData.gramPanchayat || ''}
-            onChange={(e) => updateFormData('gramPanchayat', e.target.value)}
+            value={formData.gramPanchayat || ""}
+            onChange={(e) => updateFormData("gramPanchayat", e.target.value)}
           />
         </div>
         <div>
           <Label htmlFor="tehsil">Tehsil/Block</Label>
           <Input
             id="tehsil"
-            value={formData.tehsil || ''}
-            onChange={(e) => updateFormData('tehsil', e.target.value)}
+            value={formData.tehsil || ""}
+            onChange={(e) => updateFormData("tehsil", e.target.value)}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function ForestRightsStep({ formData, updateFormData, updateClaimedRights }: any) {
+function ForestRightsStep({
+  formData,
+  updateFormData,
+  updateClaimedRights,
+}: any) {
   return (
     <div className="space-y-6">
       <div>
         <Label htmlFor="type">Type of Forest Rights *</Label>
         <Select
           value={formData.type}
-          onValueChange={(value) => updateFormData('type', value)}
+          onValueChange={(value) => updateFormData("type", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select rights type" />
@@ -521,18 +570,20 @@ function ForestRightsStep({ formData, updateFormData, updateClaimedRights }: any
         <Label>Rights Being Claimed</Label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
           {[
-            { key: 'habitationRights', label: 'Habitation Rights' },
-            { key: 'cultivationRights', label: 'Cultivation Rights' },
-            { key: 'grazingRights', label: 'Grazing Rights' },
-            { key: 'fishingRights', label: 'Fishing Rights' },
-            { key: 'waterRights', label: 'Water Rights' },
-            { key: 'ntfpRights', label: 'NTFP Rights' },
+            { key: "habitationRights", label: "Habitation Rights" },
+            { key: "cultivationRights", label: "Cultivation Rights" },
+            { key: "grazingRights", label: "Grazing Rights" },
+            { key: "fishingRights", label: "Fishing Rights" },
+            { key: "waterRights", label: "Water Rights" },
+            { key: "ntfpRights", label: "NTFP Rights" },
           ].map((right) => (
             <label key={right.key} className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={formData.claimedRights?.[right.key] || false}
-                onChange={(e) => updateClaimedRights(right.key, e.target.checked)}
+                onChange={(e) =>
+                  updateClaimedRights(right.key, e.target.checked)
+                }
                 className="rounded border-gray-300"
               />
               <span className="text-sm">{right.label}</span>
@@ -547,8 +598,10 @@ function ForestRightsStep({ formData, updateFormData, updateClaimedRights }: any
           <Input
             id="landArea"
             type="number"
-            value={formData.claimedRights?.landArea || ''}
-            onChange={(e) => updateClaimedRights('landArea', parseFloat(e.target.value) || 0)}
+            value={formData.claimedRights?.landArea || ""}
+            onChange={(e) =>
+              updateClaimedRights("landArea", parseFloat(e.target.value) || 0)
+            }
             step="0.01"
             min="0"
           />
@@ -557,8 +610,8 @@ function ForestRightsStep({ formData, updateFormData, updateClaimedRights }: any
           <Label htmlFor="boundaries">Boundaries Description</Label>
           <Input
             id="boundaries"
-            value={formData.claimedRights?.boundaries || ''}
-            onChange={(e) => updateClaimedRights('boundaries', e.target.value)}
+            value={formData.claimedRights?.boundaries || ""}
+            onChange={(e) => updateClaimedRights("boundaries", e.target.value)}
           />
         </div>
       </div>
@@ -567,17 +620,24 @@ function ForestRightsStep({ formData, updateFormData, updateClaimedRights }: any
         <Label htmlFor="traditionOfUse">Tradition of Use</Label>
         <Textarea
           id="traditionOfUse"
-          value={formData.claimedRights?.traditionOfUse || ''}
-          onChange={(e) => updateClaimedRights('traditionOfUse', e.target.value)}
+          value={formData.claimedRights?.traditionOfUse || ""}
+          onChange={(e) =>
+            updateClaimedRights("traditionOfUse", e.target.value)
+          }
           rows={3}
           placeholder="Describe how you or your community has traditionally used this land/forest"
         />
       </div>
     </div>
-  )
+  );
 }
 
-function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, removeFamilyMember }: any) {
+function FamilyMembersStep({
+  formData,
+  addFamilyMember,
+  updateFamilyMember,
+  removeFamilyMember,
+}: any) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -594,7 +654,9 @@ function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, remo
               <Label>Name *</Label>
               <Input
                 value={member.name}
-                onChange={(e) => updateFamilyMember(index, 'name', e.target.value)}
+                onChange={(e) =>
+                  updateFamilyMember(index, "name", e.target.value)
+                }
                 required
               />
             </div>
@@ -603,7 +665,13 @@ function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, remo
               <Input
                 type="number"
                 value={member.age}
-                onChange={(e) => updateFamilyMember(index, 'age', parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  updateFamilyMember(
+                    index,
+                    "age",
+                    parseInt(e.target.value) || 0,
+                  )
+                }
                 min="1"
                 required
               />
@@ -612,7 +680,9 @@ function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, remo
               <Label>Relationship *</Label>
               <Input
                 value={member.relationship}
-                onChange={(e) => updateFamilyMember(index, 'relationship', e.target.value)}
+                onChange={(e) =>
+                  updateFamilyMember(index, "relationship", e.target.value)
+                }
                 required
               />
             </div>
@@ -632,11 +702,12 @@ function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, remo
 
       {(!formData.familyMembers || formData.familyMembers.length === 0) && (
         <div className="text-center py-8 text-muted-foreground">
-          No family members added yet. Click "Add Member" to include family information.
+          No family members added yet. Click "Add Member" to include family
+          information.
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function EvidenceUploadStep({ uploadedDocuments, handleDocumentsChange }: any) {
@@ -647,26 +718,43 @@ function EvidenceUploadStep({ uploadedDocuments, handleDocumentsChange }: any) {
         onDocumentsChange={handleDocumentsChange}
       />
     </div>
-  )
+  );
 }
 
 function ReviewSubmitStep({ formData, uploadedDocuments, geographic }: any) {
-  const selectedVillage = geographic.villages.find((v: any) => v.id === formData.villageId)
-  const selectedDistrict = geographic.districts.find((d: any) => d.id === geographic.selectedDistrictId)
-  const selectedState = geographic.states.find((s: any) => s.id === geographic.selectedStateId)
+  const selectedVillage = geographic.villages.find(
+    (v: any) => v.id === formData.villageId,
+  );
+  const selectedDistrict = geographic.districts.find(
+    (d: any) => d.id === geographic.selectedDistrictId,
+  );
+  const selectedState = geographic.states.find(
+    (s: any) => s.id === geographic.selectedStateId,
+  );
 
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium">Review Your Application</h3>
-      
+
       {/* Personal Information */}
       <Card className="p-4">
         <h4 className="font-medium mb-3">Personal Information</h4>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><span className="font-medium">Name:</span> {formData.claimantName}</div>
-          <div><span className="font-medium">Category:</span> {formData.claimantCategory}</div>
-          <div><span className="font-medium">Spouse:</span> {formData.spouseName || 'N/A'}</div>
-          <div><span className="font-medium">Father/Mother:</span> {formData.fatherOrMotherName || 'N/A'}</div>
+          <div>
+            <span className="font-medium">Name:</span> {formData.claimantName}
+          </div>
+          <div>
+            <span className="font-medium">Category:</span>{" "}
+            {formData.claimantCategory}
+          </div>
+          <div>
+            <span className="font-medium">Spouse:</span>{" "}
+            {formData.spouseName || "N/A"}
+          </div>
+          <div>
+            <span className="font-medium">Father/Mother:</span>{" "}
+            {formData.fatherOrMotherName || "N/A"}
+          </div>
         </div>
       </Card>
 
@@ -674,10 +762,22 @@ function ReviewSubmitStep({ formData, uploadedDocuments, geographic }: any) {
       <Card className="p-4">
         <h4 className="font-medium mb-3">Location</h4>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><span className="font-medium">Village:</span> {selectedVillage?.name || 'N/A'}</div>
-          <div><span className="font-medium">District:</span> {selectedDistrict?.name || 'N/A'}</div>
-          <div><span className="font-medium">State:</span> {selectedState?.name || 'N/A'}</div>
-          <div><span className="font-medium">Gram Panchayat:</span> {formData.gramPanchayat || 'N/A'}</div>
+          <div>
+            <span className="font-medium">Village:</span>{" "}
+            {selectedVillage?.name || "N/A"}
+          </div>
+          <div>
+            <span className="font-medium">District:</span>{" "}
+            {selectedDistrict?.name || "N/A"}
+          </div>
+          <div>
+            <span className="font-medium">State:</span>{" "}
+            {selectedState?.name || "N/A"}
+          </div>
+          <div>
+            <span className="font-medium">Gram Panchayat:</span>{" "}
+            {formData.gramPanchayat || "N/A"}
+          </div>
         </div>
       </Card>
 
@@ -685,8 +785,13 @@ function ReviewSubmitStep({ formData, uploadedDocuments, geographic }: any) {
       <Card className="p-4">
         <h4 className="font-medium mb-3">Forest Rights</h4>
         <div className="text-sm">
-          <div><span className="font-medium">Type:</span> {formData.type}</div>
-          <div><span className="font-medium">Land Area:</span> {formData.claimedRights?.landArea || 0} acres</div>
+          <div>
+            <span className="font-medium">Type:</span> {formData.type}
+          </div>
+          <div>
+            <span className="font-medium">Land Area:</span>{" "}
+            {formData.claimedRights?.landArea || 0} acres
+          </div>
         </div>
       </Card>
 
@@ -707,5 +812,5 @@ function ReviewSubmitStep({ formData, uploadedDocuments, geographic }: any) {
         </div>
       </Card>
     </div>
-  )
+  );
 }

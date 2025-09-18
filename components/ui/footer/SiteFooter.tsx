@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { MapPin, Mail, Phone, ExternalLink } from "lucide-react"
+import Link from "next/link";
+import { MapPin, Mail, Phone, ExternalLink } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -14,11 +14,14 @@ export function SiteFooter() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">FRA Atlas</h3>
-                <p className="text-xs text-muted-foreground">Government Portal</p>
+                <p className="text-xs text-muted-foreground">
+                  Government Portal
+                </p>
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Forest Rights Act implementation and monitoring platform for transparent land rights management.
+              Forest Rights Act implementation and monitoring platform for
+              transparent land rights management.
             </p>
           </div>
 
@@ -26,10 +29,16 @@ export function SiteFooter() {
           <div className="space-y-4">
             <h4 className="font-medium text-foreground">Quick Links</h4>
             <nav className="flex flex-col space-y-2">
-              <Link href="/claims" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="/claims"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Submit FRA Claim
               </Link>
-              <Link href="/atlas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="/atlas"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
                 View Atlas Map
               </Link>
               <Link
@@ -93,22 +102,33 @@ export function SiteFooter() {
 
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 border-t flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-          <p className="text-xs text-muted-foreground">© 2024 Government of India. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">
+            © 2024 Government of India. All rights reserved.
+          </p>
           <div className="flex space-x-4">
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
               Privacy Policy
             </Link>
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
               Terms of Service
             </Link>
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
               Accessibility
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
 
-export default SiteFooter
+export default SiteFooter;

@@ -1,19 +1,31 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Eye, EyeOff, UserPlus } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
 
 export function RegisterForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,19 +38,21 @@ export function RegisterForm() {
     password: "",
     confirmPassword: "",
     address: "",
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle registration logic here
-    console.log("Registration attempt:", formData)
-  }
+    console.log("Registration attempt:", formData);
+  };
 
   return (
     <Card className="border-border">
       <CardHeader>
         <CardTitle className="text-xl">Create Account</CardTitle>
-        <CardDescription>Fill in your details to register for FRA Atlas</CardDescription>
+        <CardDescription>
+          Fill in your details to register for FRA Atlas
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,7 +64,9 @@ export function RegisterForm() {
                 id="firstName"
                 placeholder="First name"
                 value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
                 required
                 className="bg-background"
               />
@@ -61,7 +77,9 @@ export function RegisterForm() {
                 id="lastName"
                 placeholder="Last name"
                 value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
                 required
                 className="bg-background"
               />
@@ -76,7 +94,9 @@ export function RegisterForm() {
               type="email"
               placeholder="your.email@example.com"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
               className="bg-background"
             />
@@ -89,7 +109,9 @@ export function RegisterForm() {
               type="tel"
               placeholder="+91 XXXXX XXXXX"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
               required
               className="bg-background"
             />
@@ -98,13 +120,20 @@ export function RegisterForm() {
           {/* User Type */}
           <div className="space-y-2">
             <Label htmlFor="userType">Account Type</Label>
-            <Select value={formData.userType} onValueChange={(value) => setFormData({ ...formData, userType: value })}>
+            <Select
+              value={formData.userType}
+              onValueChange={(value) =>
+                setFormData({ ...formData, userType: value })
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select account type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="citizen">Citizen</SelectItem>
-                <SelectItem value="gram-panchayat">Gram Panchayat Official</SelectItem>
+                <SelectItem value="gram-panchayat">
+                  Gram Panchayat Official
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -117,7 +146,9 @@ export function RegisterForm() {
                 id="village"
                 placeholder="Village name"
                 value={formData.village}
-                onChange={(e) => setFormData({ ...formData, village: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, village: e.target.value })
+                }
                 required
                 className="bg-background"
               />
@@ -128,7 +159,9 @@ export function RegisterForm() {
                 id="district"
                 placeholder="District name"
                 value={formData.district}
-                onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, district: e.target.value })
+                }
                 required
                 className="bg-background"
               />
@@ -139,7 +172,9 @@ export function RegisterForm() {
                 id="state"
                 placeholder="State name"
                 value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, state: e.target.value })
+                }
                 required
                 className="bg-background"
               />
@@ -153,7 +188,9 @@ export function RegisterForm() {
               id="address"
               placeholder="Complete address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
               required
               className="bg-background min-h-[80px]"
             />
@@ -168,7 +205,9 @@ export function RegisterForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
                 className="bg-background pr-10"
               />
@@ -196,7 +235,9 @@ export function RegisterForm() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
                 required
                 className="bg-background pr-10"
               />
@@ -224,7 +265,10 @@ export function RegisterForm() {
               required
               className="h-4 w-4 rounded border-border text-primary focus:ring-ring mt-1"
             />
-            <Label htmlFor="terms" className="text-sm font-normal leading-relaxed">
+            <Label
+              htmlFor="terms"
+              className="text-sm font-normal leading-relaxed"
+            >
               I agree to the{" "}
               <a href="/terms" className="text-primary hover:underline">
                 Terms of Service
@@ -244,5 +288,5 @@ export function RegisterForm() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }
