@@ -8,12 +8,12 @@ import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { LogOut, User } from "lucide-react"
 
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/atlas", label: "FRA Atlas" },
-  { href: "/iot", label: "IoT Dashboard" },
-  { href: "/dss", label: "DSS Engine" },
-]
+const navLinks = [
+  { href: "/atlas", label: "Atlas" },
+  { href: "/dss", label: "DSS" },
+  { href: "/iot", label: "IoT" },
+  { href: "/track", label: "Track Claim" },
+];
 
 interface MainNavProps {
   variant?: "desktop" | "mobile"
@@ -52,7 +52,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
           variant === "desktop" ? "gap-6" : "flex-col items-start gap-3 w-full px-3"
         )}
       >
-        {links.map((l) => {
+        {navLinks.map((l) => {
           const active = pathname === l.href
           return (
             <Link 

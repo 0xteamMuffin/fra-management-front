@@ -148,6 +148,13 @@ export function FRAClaimFormNew() {
       }
     }
 
+    // Validate evidence
+    if (!formData.evidence || formData.evidence.length < 2) {
+      toast.error("At least two forms of evidence are required.");
+      setCurrentStep(5); // Navigate to the evidence upload step
+      return;
+    }
+
     setIsSubmitting(true)
     
     try {
