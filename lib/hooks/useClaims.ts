@@ -34,6 +34,11 @@ export function useClaims(options: UseClaimsOptions = {}) {
   } = useApi(claimsService.approveClaim);
 
   const { 
+    execute: rejectClaim, 
+    isLoading: isRejecting 
+  } = useApi(claimsService.rejectClaim);
+
+  const { 
     execute: createClaim, 
     isLoading: isCreating 
   } = useApi(claimsService.createClaim);
@@ -88,6 +93,15 @@ export function useClaims(options: UseClaimsOptions = {}) {
     return result;
   }, [approveClaim, refreshClaims]);
 
+  // Reject a claim
+  const handleRejectClaim = useCallback(async (claimId: string, reason: string) => {
+    const result = await rejectClaim(claimId, reason);
+    if (result) {
+      await refreshClaims();
+    }
+    return result;
+  }, [rejectClaim, refreshClaims]);
+
   // Create a new claim
   const handleCreateClaim = useCallback(async (claimData: any) => {
     const result = await createClaim(claimData);
@@ -107,6 +121,7 @@ export function useClaims(options: UseClaimsOptions = {}) {
     isVerifying,
     isApproving,
     isCreating,
+    isRejecting,
     
     // Error
     error,
@@ -115,6 +130,7 @@ export function useClaims(options: UseClaimsOptions = {}) {
     refreshClaims,
     verifyClaim: handleVerifyClaim,
     approveClaim: handleApproveClaim,
+    rejectClaim: handleRejectClaim,
     createClaim: handleCreateClaim,
     
     // Utilities

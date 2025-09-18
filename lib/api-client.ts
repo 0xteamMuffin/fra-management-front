@@ -121,6 +121,7 @@ export const endpoints = {
   fra: {
     verify: (id: string) => `/fra/verify/${id}`,
     approve: (id: string) => `/fra/approve/${id}`,
+    reject: (id: string) => `/fra/reject/${id}`,
   },
   
   // File handling

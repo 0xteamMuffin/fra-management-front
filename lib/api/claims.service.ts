@@ -80,6 +80,12 @@ export const claimsService = {
     return response.data;
   },
 
+  // Reject claim (for DistrictCommittee)
+  async rejectClaim(id: string, reason: string): Promise<FRAClaim> {
+    const response = await api.post<FRAClaim>(endpoints.fra.reject(id), { reason });
+    return response.data;
+  },
+
   // Get claims by status
   async getClaimsByStatus(status: ClaimStatus): Promise<FRAClaim[]> {
     const response = await api.get<FRAClaim[]>(`${endpoints.claims}?status=${status}`);
