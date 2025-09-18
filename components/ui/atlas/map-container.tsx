@@ -6,11 +6,12 @@ import {
   WMSTileLayer,
   GeoJSON,
   ScaleControl,
+  Polygon,
 } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState, useRef } from "react"
 import L, { Layer, LeafletEvent, FeatureGroup } from "leaflet"
-import { Claim } from "./atlas-view" 
+import { Claim } from "./atlas-view"
 import { Map, Satellite, Loader2 } from "lucide-react"
 
 interface MapComponentProps {
@@ -22,9 +23,18 @@ export default function MapComponent({ claims }: MapComponentProps) {
   const [villageData, setDistrictData] = useState(null)
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null)
   const [isSatelliteView, setIsSatelliteView] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) 
+  const [isLoading, setIsLoading] = useState(false)
 
   const geoJsonRef = useRef<L.GeoJSON | null>(null)
+
+  const house: [number, number][][] = [
+    [
+      [21.86109316294638, 86.36452387644682],
+      [21.86078961773848, 86.3643632598546],
+      [21.860660467261486, 86.36456209295017],
+      [21.86093385547088, 86.3647176402236],
+    ],
+  ]
 
   useEffect(() => {
     fetch("data/odisha.geojson")
@@ -36,12 +46,12 @@ export default function MapComponent({ claims }: MapComponentProps) {
     if (districtName === selectedDistrict) return;
 
     setIsLoading(true)
-    setDistrictData(null) 
+    setDistrictData(null)
 
     fetch("data/data1.geojson")
       .then((response) => response.json())
       .then((data) => {
-        console.log("GeoJSON CRS:", data.crs); 
+        console.log("GeoJSON CRS:", data.crs);
         const filteredFeatures = {
           ...data,
           features: data.features.filter(
@@ -86,13 +96,36 @@ export default function MapComponent({ claims }: MapComponentProps) {
     fillOpacity: 0,
   }
 
+  const getVillageStyle = (feature: any) => {
+  const rand = Math.random()
+  let randomColor: string
+
+  if (rand < 0.07) {
+    randomColor = "darkgreen"   
+  } else if (rand < 0.14) {
+    randomColor = "red"    
+  } else if (rand < 0.57) {
+    randomColor = "lightblue"  
+  } else {
+    randomColor = "orange"     
+  }
+
+  return {
+    color: "black",
+    weight: 0.5,
+    fillColor: randomColor,
+    fillOpacity: 0.5,
+  }
+}
+
+
   const districtStyle = {
     color: "blue",
     weight: 2,
     fillColor: "lightblue",
     fillOpacity: 0,
   }
-  
+
   const styleGeoJson = (feature: any) => {
     if (isSatelliteView) {
       return satelliteBoundaryStyle
@@ -156,7 +189,7 @@ export default function MapComponent({ claims }: MapComponentProps) {
         zoom={7.3}
         style={{ height: "100%", width: "100%" }}
       >
-         <ScaleControl position="bottomleft" imperial={false} />
+        <ScaleControl position="bottomleft" imperial={false} />
         {isSatelliteView ? (
           <TileLayer
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
@@ -165,7 +198,7 @@ export default function MapComponent({ claims }: MapComponentProps) {
         ) : (
           <TileLayer url="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAokB9pSgZf0AAAAASUVORK5CYII=" />
         )}
-{/* 
+        {/* 
         <WMSTileLayer
           url="http://localhost:8080/geoserver/wms"
           layers="bhuvan:BAND3"
@@ -190,24 +223,27 @@ export default function MapComponent({ claims }: MapComponentProps) {
         )}
 
         {/* Village Boundary Layer */}
-        {villageData && (
-          <GeoJSON
-            key={selectedDistrict} 
-            data={villageData}
-            style={districtStyle}
-            onEachFeature={(feature: any, layer: Layer) => {
-              if (feature.properties?.NAME) {
-                layer.bindPopup(`
-                    <h3 class="font-bold">${feature.properties.NAME}</h3>
-                `)
-                layer.on("click", (e: any) => {
-                  const map = e.target._map
-                  map.fitBounds((layer as FeatureGroup).getBounds())
-                })
-              }
-            }}
-          />
-        )}
+{villageData && (
+  <GeoJSON
+    key={selectedDistrict}
+    data={villageData}
+    style={getVillageStyle}   // <-- use random style function
+    onEachFeature={(feature: any, layer: Layer) => {
+      if (feature.properties?.NAME) {
+        layer.bindPopup(`
+            <h3 class="font-bold">${feature.properties.NAME}</h3>
+        `)
+        layer.on("click", (e: any) => {
+          const map = e.target._map
+          map.fitBounds((layer as FeatureGroup).getBounds())
+        })
+      }
+    }}
+  />
+)}
+
+
+        <Polygon pathOptions={{color:"green"}} positions={house} />
       </MapContainer>
     </div>
   )
