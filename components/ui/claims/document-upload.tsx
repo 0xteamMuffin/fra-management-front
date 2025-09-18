@@ -1,13 +1,12 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Upload, File, X, CheckCircle, AlertCircle } from "lucide-react"
 import { s3Service } from "@/lib/api"
-import { LoadingSpinner } from "@/components/ui/loading"
 import { toast } from "sonner"
 
 interface DocumentUploadProps {
@@ -106,35 +105,38 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
   }, [])
 
   const handleFiles = async (files: FileList, documentType?: string) => {
-    for (const file of Array.from(files)) {
+    const uploadPromises = Array.from(files).map(async (file) => {
       // Validate file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File size must be less than 10MB");
-        continue;
+        toast.error(`File ${file.name} exceeds the 10MB size limit.`);
+        return;
       }
-
+  
       // Validate file type
       const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Only PDF, JPG, and PNG files are allowed");
-        continue;
+        toast.error(`File type for ${file.name} is not supported.`);
+        return;
       }
-
+  
       // Determine document type (use first available if not specified)
-      const docType = documentType || documentTypes.find(doc => !doc.uploaded)?.id || 'general-document';
+      const docType = documentType || documentTypes.find(doc => !doc.uploaded)?.id;
+      if (!docType) {
+        toast.error("All document slots are filled. Please remove a document to upload a new one.");
+        return;
+      }
+  
+      const fileId = `${Date.now()}-${file.name}`;
       
       try {
-        // Set uploading state
+        // Set uploading state and initial progress
         setDocumentTypes(prev => 
           prev.map(doc => 
             doc.id === docType ? { ...doc, uploading: true } : doc
           )
         );
-
-        // Start progress tracking
-        const fileId = `${Date.now()}-${file.name}`;
         setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
-
+  
         // Simulate progress for UI feedback
         const progressInterval = setInterval(() => {
           setUploadProgress(prev => {
@@ -143,7 +145,7 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
             return { ...prev, [fileId]: newProgress };
           });
         }, 200);
-
+  
         // Upload to S3
         const s3Key = await s3Service.uploadFileComplete(file);
         
@@ -154,20 +156,11 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
           // Complete progress
           setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
           
-          // Update uploaded documents - now using object format
+          // Update uploaded documents
           const newDocuments = { ...uploadedDocuments, [docType]: s3Key };
           onDocumentsChange(newDocuments);
           
-          // Update document types
-          setDocumentTypes(prev => 
-            prev.map(doc => 
-              doc.id === docType 
-                ? { ...doc, uploaded: true, s3Key, uploading: false }
-                : doc
-            )
-          );
-          
-          toast.success(`${file.name} uploaded successfully`);
+          toast.success(`${file.name} uploaded successfully as ${docType}`);
           
           // Remove from progress tracking after a delay
           setTimeout(() => {
@@ -178,27 +171,29 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
             });
           }, 2000);
         } else {
-          throw new Error('Upload failed');
+          throw new Error('Upload failed to return S3 key');
         }
       } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Upload error for file:', file.name, error);
         toast.error(`Failed to upload ${file.name}`);
         
-        // Reset uploading state
+        // Reset uploading state on failure
         setDocumentTypes(prev => 
           prev.map(doc => 
             doc.id === docType ? { ...doc, uploading: false } : doc
           )
         );
         
-        // Remove from progress tracking
+        // Remove from progress tracking on failure
         setUploadProgress(prev => {
           const newProgress = { ...prev };
-          delete newProgress[`${Date.now()}-${file.name}`];
+          delete newProgress[fileId];
           return newProgress;
         });
       }
-    }
+    });
+  
+    await Promise.all(uploadPromises);
   }
 
   const removeDocument = (documentType: string) => {
@@ -304,7 +299,7 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
           </div>
 
           {/* Uploaded Files List */}
-          {(Object.keys(uploadProgress).length > 0 || uploadedDocuments.length > 0) && (
+          {(Object.keys(uploadProgress).length > 0 || Object.keys(uploadedDocuments).length > 0) && (
             <div className="mt-6 space-y-3">
               <h4 className="font-medium text-foreground">Uploaded Files</h4>
 
@@ -326,24 +321,27 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
               ))}
 
               {/* Completed uploads */}
-              {uploadedDocuments.map((documentId) => (
-                <div key={documentId} className="flex items-center space-x-3 p-3 bg-accent/10 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-accent" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{documentId.split("-").slice(1).join("-")}</p>
-                    <p className="text-xs text-muted-foreground">Upload completed</p>
+              {Object.entries(uploadedDocuments).map(([docType, s3Key]) => {
+                const docName = documentTypes.find(d => d.id === docType)?.name || docType;
+                return (
+                  <div key={docType} className="flex items-center space-x-3 p-3 bg-accent/10 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-accent" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{docName}</p>
+                      <p className="text-xs text-muted-foreground">S3 Key: {s3Key.substring(0, 30)}...</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeDocument(docType)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDocument(documentId)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

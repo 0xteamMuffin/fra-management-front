@@ -69,7 +69,7 @@ export function useDistricts(stateId?: string) {
   };
 }
 
-export function useVillages(districtId?: string) {
+export function useVillages(districtId?: string, search?: string) {
   const { 
     data: villages, 
     isLoading, 
@@ -86,13 +86,12 @@ export function useVillages(districtId?: string) {
   // Fetch villages
   const fetchVillages = useCallback(async () => {
     if (districtId) {
-      const result = await fetchVillagesByDistrict(districtId);
+      const result = await fetchVillagesByDistrict(districtId, search);
       setFilteredVillages(result || []);
     } else {
-      const result = await fetchAllVillages();
-      setFilteredVillages(result || []);
+      setFilteredVillages([]);
     }
-  }, [districtId, fetchVillagesByDistrict, fetchAllVillages]);
+  }, [districtId, search, fetchVillagesByDistrict]);
 
   useEffect(() => {
     fetchVillages();

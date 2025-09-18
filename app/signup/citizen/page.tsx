@@ -1,19 +1,21 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, User } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from '@/components/ui/loading';
 import { ApiError } from '@/components/ui/error-boundary';
+import { UserRole } from '@/lib/types/api';
 
-const CitizenLoginPage = () => {
+const CitizenSignupPage = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     
-    const { login, isLoading, isAuthenticated } = useAuth();
+    const { signup, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
 
     // Redirect if already authenticated
@@ -27,19 +29,15 @@ const CitizenLoginPage = () => {
         e.preventDefault();
         setError(null);
 
-        if (!email || !password) {
+        if (!name || !email || !password) {
             setError('Please fill in all fields');
             return;
         }
 
-        const success = await login({ email, password });
+        const success = await signup({ name, email, password, role: UserRole.VillagePerson });
         if (success) {
             router.push('/claims/new');
         }
-    };
-
-    const handleSignUpClick = () => {
-        router.push('/signup/citizen');
     };
 
     return (
@@ -67,16 +65,36 @@ const CitizenLoginPage = () => {
                     <div className="w-full max-w-md">
                         <div className="text-center lg:text-left mb-10">
                             <h2 className="text-3xl font-bold text-gray-900">
-                                Citizen Login
+                                Create Citizen Account
                             </h2>
                             <p className="mt-2 text-gray-500">
-                                Sign in to file a new claim or check your claim status.
+                                Sign up to file a new claim or check your claim status.
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Error Display */}
                             <ApiError error={error} onRetry={() => setError(null)} />
+
+                            {/* Name Input */}
+                            <div className="space-y-2">
+                                <label htmlFor="name" className="text-sm font-medium text-gray-700">
+                                    Full Name
+                                </label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        placeholder="Your Name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                        disabled={isLoading}
+                                        className="w-full pl-10 pr-3 py-2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
 
                             {/* Email Input */}
                             <div className="space-y-2">
@@ -104,9 +122,6 @@ const CitizenLoginPage = () => {
                                     <label htmlFor="password" className="text-sm font-medium text-gray-700">
                                         Password
                                     </label>
-                                    <a href="#" className="text-sm text-green-600 hover:underline">
-                                        Forgot Password?
-                                    </a>
                                 </div>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -132,22 +147,19 @@ const CitizenLoginPage = () => {
                                 {isLoading ? (
                                     <LoadingSpinner size="sm" className="mr-2" />
                                 ) : (
-                                    <LogIn className="mr-2 h-4 w-4" />
+                                    <UserPlus className="mr-2 h-4 w-4" />
                                 )}
-                                {isLoading ? 'Signing In...' : 'Login'}
+                                {isLoading ? 'Signing Up...' : 'Sign Up'}
                             </button>
                         </form>
 
-                        {/* Sign Up Option */}
+                        {/* Sign In Option */}
                         <div className="mt-6 text-center">
                             <p className="text-sm text-gray-600">
-                                Don't have an account?{' '}
-                                <button
-                                    onClick={handleSignUpClick}
-                                    className="font-medium text-green-600 hover:underline inline-flex items-center"
-                                >
-                                    Sign Up Now <UserPlus className="ml-1 h-4 w-4" />
-                                </button>
+                                Already have an account?{' '}
+                                <Link href="/login/citizen" className="font-medium text-green-600 hover:underline inline-flex items-center">
+                                    Login <LogIn className="ml-1 h-4 w-4" />
+                                </Link>
                             </p>
                         </div>
                     </div>
@@ -157,4 +169,4 @@ const CitizenLoginPage = () => {
     );
 };
 
-export default CitizenLoginPage;
+export default CitizenSignupPage;

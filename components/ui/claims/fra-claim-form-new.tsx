@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { DocumentUpload } from "./document-upload"
+import { VillageSearch } from "./village-search"
 import { User, MapPin, FileText, Upload, Send, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { FRAClaimFormData, StepFormData, DocumentCategories } from "@/lib/types/claim-form"
@@ -18,6 +19,7 @@ import { formatClaimForAPI } from "@/lib/utils/claim-helpers"
 import { LoadingSpinner } from "@/components/ui/loading"
 import { ApiError } from "@/components/ui/error-boundary"
 import { toast } from "sonner"
+import { FRAType } from "@/lib/types/api"
 
 const steps = [
   { id: 1, name: "Personal Information", icon: User },
@@ -41,7 +43,7 @@ export function FRAClaimFormNew() {
   
   // Form data following exact Prisma schema
   const [formData, setFormData] = useState<Partial<FRAClaimFormData>>({
-    type: 'IFR',
+    type: FRAType.IFR,
     claimantName: '',
     spouseName: '',
     fatherOrMotherName: '',
@@ -135,6 +137,17 @@ export function FRAClaimFormNew() {
       return
     }
 
+    // Validate family members
+    if (formData.familyMembers && formData.familyMembers.length > 0) {
+      for (const member of formData.familyMembers) {
+        if (!member.name || !member.relationship || member.age <= 0) {
+          toast.error("Please ensure all family members have a name, age, and relationship.");
+          setCurrentStep(4); // Navigate to the family members step
+          return;
+        }
+      }
+    }
+
     setIsSubmitting(true)
     
     try {
@@ -154,6 +167,22 @@ export function FRAClaimFormNew() {
   }
 
   const nextStep = () => {
+    // Step 1 validation
+    if (currentStep === 1) {
+      if (!formData.claimantName) {
+        toast.error("Please provide the claimant's name.");
+        return;
+      }
+    }
+    
+    // Step 2 validation
+    if (currentStep === 2) {
+      if (!formData.villageId) {
+        toast.error("Please select a state, district, and village.");
+        return;
+      }
+    }
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
     }
@@ -403,7 +432,7 @@ function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
               <SelectValue placeholder="Select state" />
             </SelectTrigger>
             <SelectContent>
-              {geographic.states.map((state) => (
+              {geographic.states.map((state: any) => (
                 <SelectItem key={state.id} value={state.id}>
                   {state.name}
                 </SelectItem>
@@ -422,7 +451,7 @@ function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
               <SelectValue placeholder="Select district" />
             </SelectTrigger>
             <SelectContent>
-              {geographic.districts.map((district) => (
+              {geographic.districts.map((district: any) => (
                 <SelectItem key={district.id} value={district.id}>
                   {district.name}
                 </SelectItem>
@@ -432,28 +461,13 @@ function LocationDetailsStep({ formData, updateFormData, geographic }: any) {
         </div>
         <div>
           <Label htmlFor="villageId">Village *</Label>
-          <Select
-            value={formData.villageId}
-            onValueChange={(value) => {
-              updateFormData('villageId', value)
-              const village = geographic.villages.find(v => v.id === value)
-              if (village) {
-                updateFormData('villageName', village.name)
-              }
+          <VillageSearch
+            districtId={geographic.selectedDistrictId}
+            onVillageSelect={(village) => {
+              updateFormData('villageId', village.id)
+              updateFormData('villageName', village.name)
             }}
-            disabled={!geographic.selectedDistrictId}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select village" />
-            </SelectTrigger>
-            <SelectContent>
-              {geographic.villages.map((village) => (
-                <SelectItem key={village.id} value={village.id}>
-                  {village.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
         <div>
           <Label htmlFor="gramPanchayat">Gram Panchayat</Label>
@@ -570,26 +584,29 @@ function FamilyMembersStep({ formData, addFamilyMember, updateFamilyMember, remo
         <Card key={index} className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label>Name</Label>
+              <Label>Name *</Label>
               <Input
                 value={member.name}
                 onChange={(e) => updateFamilyMember(index, 'name', e.target.value)}
+                required
               />
             </div>
             <div>
-              <Label>Age</Label>
+              <Label>Age *</Label>
               <Input
                 type="number"
                 value={member.age}
                 onChange={(e) => updateFamilyMember(index, 'age', parseInt(e.target.value) || 0)}
-                min="0"
+                min="1"
+                required
               />
             </div>
             <div>
-              <Label>Relationship</Label>
+              <Label>Relationship *</Label>
               <Input
                 value={member.relationship}
                 onChange={(e) => updateFamilyMember(index, 'relationship', e.target.value)}
+                required
               />
             </div>
             <div className="flex items-end">

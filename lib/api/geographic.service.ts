@@ -92,8 +92,8 @@ export const geographicService = {
       return response.data;
     },
 
-    async getByDistrict(districtId: string): Promise<Village[]> {
-      const response = await api.get<Village[]>(`${endpoints.villages}?districtId=${districtId}`);
+    async getByDistrict(districtId: string, search?: string): Promise<Village[]> {
+      const response = await api.get<Village[]>(`${endpoints.villages}?districtId=${districtId}${search ? `&search=${search}` : ''}`);
       return response.data;
     },
 
