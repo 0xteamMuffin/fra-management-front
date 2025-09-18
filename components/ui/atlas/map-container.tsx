@@ -156,8 +156,8 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
 
   return (
     <div className="relative h-full w-full">
-      {/* Loading Overlay */}
-      {isLoading && (
+      {/* Loader Overlay */}
+      {isLoading && isVillageBoundriesNeeded && (
         <div className="absolute inset-0 z-[2000] flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-lg bg-white p-4 shadow-xl">
             <Loader2 className="h-6 w-6 animate-spin text-gray-700" />
@@ -165,6 +165,7 @@ export default function MapComponent({ claims, isVillageBoundriesNeeded }: MapCo
           </div>
         </div>
       )}
+
 
       {/* View Toggle Button */}
       <button
