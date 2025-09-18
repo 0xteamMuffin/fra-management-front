@@ -8,6 +8,17 @@ export const s3Service = {
     return response.data;
   },
 
+  // Get presigned URL for viewing a file
+  async getViewUrl(key: string): Promise<string | null> {
+    try {
+      const response = await api.get<{ viewUrl: string }>(`${endpoints.s3.viewUrl}?key=${key}`);
+      return response.data.viewUrl;
+    } catch (error) {
+      console.error('Error getting view URL:', error);
+      return null;
+    }
+  },
+
   // Upload file to S3 using presigned URL
   async uploadFile(file: File, uploadUrl: string): Promise<boolean> {
     try {

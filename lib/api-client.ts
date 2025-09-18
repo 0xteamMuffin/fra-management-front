@@ -126,6 +126,7 @@ export const endpoints = {
   // File handling
   s3: {
     presignedUrl: '/s3/presigned-url',
+    viewUrl: '/s3/view-url',
   },
   
   // Document processing
