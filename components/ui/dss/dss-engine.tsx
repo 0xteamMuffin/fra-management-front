@@ -143,10 +143,6 @@ const AnalysisStatsDisplay = ({ stats }: { stats: AnalysisStats }) => (
           <span className="flex items-center gap-2"><Droplets className="h-4 w-4 text-green-700" /> Water Bodies:</span>
           <span className="font-bold">{stats.water}%</span>
         </div>
-         <div className="flex justify-between items-center">
-          <span className="flex items-center gap-2"><Building className="h-4 w-4 text-green-700" /> Buildings / Structures:</span>
-          <span className="font-bold">{stats.buildings}%</span>
-        </div>
         <div className="flex justify-between items-center">
           <span className="flex items-center gap-2"><TreePine className="h-4 w-4 text-green-700" /> Forest Cover:</span>
           <span className="font-bold">{stats.forest}%</span>
