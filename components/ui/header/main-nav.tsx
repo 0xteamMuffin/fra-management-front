@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { LogOut, User } from "lucide-react"
+import { UserRole } from "@/lib/types/api"
 
 const navLinks = [
   { href: "/atlas", label: "Atlas" },
@@ -38,6 +39,8 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
+
+  const dashboardUrl = user?.role === UserRole.VillagePerson ? "/dashboard/u" : "/dashboard/gp";
 
   return (
     <div className={cn(
@@ -131,7 +134,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                   <span className="text-green-600 font-medium">{user?.role}</span>
                 </div>
                 <Link 
-                  href="/dashboard/u" 
+                  href={dashboardUrl} 
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                   onClick={() => setIsDropdownOpen(false)}
                 >
