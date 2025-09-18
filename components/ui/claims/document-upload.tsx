@@ -1,15 +1,17 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, File, X, CheckCircle, AlertCircle } from "lucide-react"
+import { Upload, File, X, CheckCircle, Eye, Loader2 } from "lucide-react"
+import { s3Service } from "@/lib/api"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface DocumentUploadProps {
-  onDocumentsChange: (documents: string[]) => void
-  uploadedDocuments: string[]
+  onDocumentsChange: (documents: { [key: string]: string }) => void // Changed to object with document type as key and S3 key as value
+  uploadedDocuments: { [key: string]: string }
 }
 
 interface DocumentType {
@@ -18,10 +20,12 @@ interface DocumentType {
   description: string
   required: boolean
   uploaded: boolean
+  s3Key?: string
+  uploading?: boolean
 }
 
 export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: DocumentUploadProps) {
-  const [documentTypes] = useState<DocumentType[]>([
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([
     {
       id: "identity-proof",
       name: "Identity Proof",
@@ -66,190 +70,180 @@ export function DocumentUpload({ onDocumentsChange, uploadedDocuments }: Documen
     },
   ])
 
-  const [dragActive, setDragActive] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
+  const [dragActive, setDragActive] = useState<string | null>(null)
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
+  // Update document types with uploaded status
+  React.useEffect(() => {
+    setDocumentTypes(prev => 
+      prev.map(doc => ({
+        ...doc,
+        uploaded: !!uploadedDocuments[doc.id],
+        s3Key: uploadedDocuments[doc.id],
+      }))
+    );
+  }, [uploadedDocuments]);
+
+  const handleDrag = useCallback((e: React.DragEvent, docId: string) => {
     e.preventDefault()
     e.stopPropagation()
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
+      setDragActive(docId)
     } else if (e.type === "dragleave") {
-      setDragActive(false)
+      setDragActive(null)
     }
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent, docId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    setDragActive(false)
+    setDragActive(null)
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(e.dataTransfer.files)
+      handleFile(e.dataTransfer.files[0], docId)
     }
   }, [])
 
-  const handleFiles = (files: FileList) => {
-    Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size should not exceed 5MB")
-        return
+  const handleFile = async (file: File, documentType: string) => {
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(`File ${file.name} exceeds the 10MB size limit.`);
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(`File type for ${file.name} is not supported.`);
+      return;
+    }
+
+    try {
+      // Set uploading state
+      setDocumentTypes(prev => 
+        prev.map(doc => 
+          doc.id === documentType ? { ...doc, uploading: true } : doc
+        )
+      );
+
+      // Upload to S3
+      const s3Key = await s3Service.uploadFileComplete(file);
+      
+      if (s3Key) {
+        // Update uploaded documents
+        const newDocuments = { ...uploadedDocuments, [documentType]: s3Key };
+        onDocumentsChange(newDocuments);
+        
+        toast.success(`${file.name} uploaded successfully as ${documentType}`);
+      } else {
+        throw new Error('Upload failed to return S3 key');
       }
-
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"]
-      if (!allowedTypes.includes(file.type)) {
-        alert("Only PDF, JPG, and PNG files are allowed")
-        return
-      }
-
-      // Simulate upload progress
-      const fileId = `${Date.now()}-${file.name}`
-      setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }))
-
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const currentProgress = prev[fileId] || 0
-          if (currentProgress >= 100) {
-            clearInterval(interval)
-            onDocumentsChange([...uploadedDocuments, fileId])
-            return prev
-          }
-          return { ...prev, [fileId]: currentProgress + 10 }
-        })
-      }, 200)
-    })
+    } catch (error) {
+      console.error('Upload error for file:', file.name, error);
+      toast.error(`Failed to upload ${file.name}`);
+    } finally {
+      // Reset uploading state
+      setDocumentTypes(prev => 
+        prev.map(doc => 
+          doc.id === documentType ? { ...doc, uploading: false } : doc
+        )
+      );
+    }
   }
 
-  const removeDocument = (documentId: string) => {
-    const updatedDocuments = uploadedDocuments.filter((id) => id !== documentId)
-    onDocumentsChange(updatedDocuments)
-    setUploadProgress((prev) => {
-      const newProgress = { ...prev }
-      delete newProgress[documentId]
-      return newProgress
-    })
+  const removeDocument = (documentType: string) => {
+    // Remove from uploaded documents object
+    const newDocuments = { ...uploadedDocuments };
+    delete newDocuments[documentType];
+    onDocumentsChange(newDocuments);
+  }
+
+  const viewDocument = async (s3Key: string) => {
+    const toastId = toast.loading("Generating secure link...");
+    try {
+      const url = await s3Service.getViewUrl(s3Key);
+      if (url) {
+        toast.success("Link generated!", { id: toastId });
+        window.open(url, "_blank");
+      } else {
+        toast.error("Could not generate link.", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Failed to generate link.", { id: toastId });
+    }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Document Types Checklist */}
-      <Card className="border-border bg-white">
-        <CardHeader>
-          <CardTitle className="text-lg">Required Documents</CardTitle>
-          <CardDescription>Ensure you have all required documents before uploading</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {documentTypes.map((doc) => (
-              <div key={doc.id} className="flex items-start space-x-3 p-3 rounded-lg border border-border">
-                <div className="mt-0.5">
-                  {doc.required ? (
-                    <AlertCircle className="h-4 w-4 text-primary" />
-                  ) : (
-                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <h4 className="font-medium text-foreground">{doc.name}</h4>
-                    {doc.required && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded">Required</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{doc.description}</p>
-                </div>
+    <div className="space-y-8">
+        {documentTypes.map((doc) => (
+          <div key={doc.id} className="space-y-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-semibold text-foreground flex items-center">
+                  {doc.name}
+                  {doc.required && <span className="text-xs text-red-500 ml-2">(Required)</span>}
+                </h4>
+                <p className="text-sm text-muted-foreground">{doc.description}</p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Upload Area */}
-      <Card className="border-border bg-white">
-        <CardHeader>
-          <CardTitle className="text-lg">Upload Documents</CardTitle>
-          <CardDescription>Drag and drop files or click to browse</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-            }`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-          >
-            <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">Upload your documents</h3>
-            <p className="text-sm text-muted-foreground mb-4">Drag and drop files here, or click to select files</p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => document.getElementById("file-upload")?.click()}
-              className="bg-transparent"
-            >
-              <File className="mr-2 h-4 w-4" />
-              Choose Files
-            </Button>
-            <input
-              id="file-upload"
-              type="file"
-              multiple
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => e.target.files && handleFiles(e.target.files)}
-              className="hidden"
-            />
-            <p className="text-xs text-muted-foreground mt-4">
-              Supported formats: PDF, JPG, PNG • Maximum size: 5MB per file
-            </p>
-          </div>
-
-          {/* Uploaded Files List */}
-          {(Object.keys(uploadProgress).length > 0 || uploadedDocuments.length > 0) && (
-            <div className="mt-6 space-y-3">
-              <h4 className="font-medium text-foreground">Uploaded Files</h4>
-
-              {/* Files in progress */}
-              {Object.entries(uploadProgress).map(([fileId, progress]) => (
-                <div key={fileId} className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
-                  <File className="h-5 w-5 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{fileId.split("-").slice(1).join("-")}</p>
-                    <div className="w-full bg-border rounded-full h-2 mt-1">
-                      <div
-                        className="bg-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{progress}%</span>
-                </div>
-              ))}
-
-              {/* Completed uploads */}
-              {uploadedDocuments.map((documentId) => (
-                <div key={documentId} className="flex items-center space-x-3 p-3 bg-accent/10 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-accent" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{documentId.split("-").slice(1).join("-")}</p>
-                    <p className="text-xs text-muted-foreground">Upload completed</p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeDocument(documentId)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <X className="h-4 w-4" />
+              {doc.uploaded && doc.s3Key ? (
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => viewDocument(doc.s3Key!)}>
+                    <Eye className="h-4 w-4 mr-1" /> View
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => removeDocument(doc.id)}>
+                    <X className="h-4 w-4 text-red-500" />
                   </Button>
                 </div>
-              ))}
+              ) : doc.uploading ? (
+                <Button variant="outline" size="sm" disabled>
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Uploading...
+                </Button>
+              ) : null}
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            {!doc.uploaded && !doc.uploading && (
+              <div
+                className={cn(
+                  "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
+                  dragActive === doc.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                )}
+                onDragEnter={(e) => handleDrag(e, doc.id)}
+                onDragLeave={(e) => handleDrag(e, doc.id)}
+                onDragOver={(e) => handleDrag(e, doc.id)}
+                onDrop={(e) => handleDrop(e, doc.id)}
+              >
+                <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Drag and drop a file here, or
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById(`file-upload-${doc.id}`)?.click()}
+                >
+                  <File className="mr-2 h-4 w-4" />
+                  Choose File
+                </Button>
+                <input
+                  id={`file-upload-${doc.id}`}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => e.target.files && handleFile(e.target.files[0], doc.id)}
+                  className="hidden"
+                />
+              </div>
+            )}
+            {doc.uploaded && (
+              <div className="flex items-center p-3 bg-green-50 text-green-800 rounded-md">
+                <CheckCircle className="h-5 w-5 mr-3" />
+                <div>
+                  <p className="text-sm font-medium">Document uploaded successfully.</p>
+                  <p className="text-xs">S3 Key: {doc.s3Key?.substring(0, 40)}...</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
     </div>
   )
 }
