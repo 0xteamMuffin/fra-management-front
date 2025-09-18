@@ -263,13 +263,15 @@ export function DSSEnginePage() {
       setSegmentedImage(responseData.segmentedImage)
       setAnalysisStats(responseData.stats)
 
-      const stats = responseData.stats;
+      const stats = responseData.stats
+      const assetMapping: { [key: string]: string } = {}
+      if (typeof stats.soil === "number") assetMapping.land = `${stats.soil}%`
+      if (typeof stats.water === "number") assetMapping.water = `${stats.water}%`
+      if (typeof stats.buildings === "number") assetMapping.buildings = `${stats.buildings}%`
+      if (typeof stats.forest === "number") assetMapping.forest = `${stats.forest}%`
+
       const dssPayload = {
-        assetMapping: { 
-            land: `${stats.soil}%`, 
-            water: `${stats.water}%`, 
-            buildings: `${stats.buildings}%` 
-        },
+        assetMapping,
       }
       
       const dssResponse = await axios.post(
@@ -277,14 +279,12 @@ export function DSSEnginePage() {
         dssPayload,
       )
       
-      const suggestionsString = dssResponse.data.suggestions;
-      const jsonMatch = suggestionsString.match(/```json\n([\s\S]*?)\n```/);
-      if (jsonMatch && jsonMatch[1]) {
-        const cleanedJsonString = jsonMatch[1];
-        const parsedDssData = JSON.parse(cleanedJsonString);
-        setDssData(parsedDssData);
+      const dssData = dssResponse.data;
+
+      if (dssData && typeof dssData === "object") {
+        setDssData(dssData);
       } else {
-        throw new Error("Could not parse recommendations from API response.");
+        throw new Error("Received invalid DSS data from the API.");
       }
 
     } catch (error) {
