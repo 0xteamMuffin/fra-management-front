@@ -1,4 +1,4 @@
-import { FRAClaim, ClaimStatus, FRAType } from '@/lib/types/api';
+import { FRAClaim, ClaimStatus, FRAType, UserRole } from '@/lib/types/api';
 import type { ClaimRow, ApplicantDetails } from '@/components/ui/verification/shared/types';
 import type { CreateClaimRequest } from '@/lib/api/claims.service';
 
@@ -31,7 +31,7 @@ export function generateClaimDisplayId(fraClaim: FRAClaim): string {
 }
 
 // Convert FRAClaim to ClaimRow for UI compatibility (temporary bridge function)
-export function convertFRAClaimToClaimRow(fraClaim: FRAClaim): ClaimRow {
+export function convertFRAClaimToClaimRow(fraClaim: FRAClaim, userRole?: UserRole): ClaimRow {
   const applicantDetails: ApplicantDetails = {
     fullName: fraClaim.claimantName,
     fatherName: fraClaim.fatherOrMotherName || 'N/A',
@@ -53,17 +53,25 @@ export function convertFRAClaimToClaimRow(fraClaim: FRAClaim): ClaimRow {
     claimType: mapFRATypeToUI(fraClaim.type),
     dateFiled: fraClaim.createdAt.split('T')[0], // Convert to YYYY-MM-DD
     landArea: extractLandArea(fraClaim.claimedRights),
-    status: mapBackendStatusToUI(fraClaim.status),
+    status: mapBackendStatusToUI(fraClaim.status, userRole),
     applicantDetails,
   };
 }
 
 // Map backend ClaimStatus to UI status strings
-export function mapBackendStatusToUI(backendStatus: ClaimStatus): ClaimRow['status'] {
+export function mapBackendStatusToUI(backendStatus: ClaimStatus, userRole?: UserRole): ClaimRow['status'] {
   switch (backendStatus) {
     case ClaimStatus.Pending:
       return 'Awaiting FRC Verification';
     case ClaimStatus.Verified:
+      // For officials, "Verified" means it's at their desk for the next step
+      if (userRole === UserRole.SubDivisionalCommittee) {
+        return 'Under SDLC Review';
+      }
+      if (userRole === UserRole.DistrictCommittee) {
+        return 'Under DLC Review';
+      }
+      // For citizens, it's a generic "under review"
       return 'Under SDLC Review';
     case ClaimStatus.Granted:
       return 'Approved';

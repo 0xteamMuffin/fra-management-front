@@ -23,8 +23,20 @@ export default function VerificationPortal() {
     isLoading: isLoadingClaims,
     error: claimsError,
     verifyClaim,
+    forwardClaim,
     approveClaim,
+    rejectClaim,
   } = useClaims({ autoFetch: true });
+
+  const handleForwardClaim = async (claimId: string, remarks: string) => {
+    try {
+      // claimId here is the real UUID from the dashboard, so we can use it directly
+      await forwardClaim(claimId, remarks);
+      toast.success(`Claim has been forwarded successfully.`);
+    } catch (error) {
+      toast.error('Failed to forward claim');
+    }
+  };
 
   const handleStatusUpdate = async (claimId: string, newStatus: ClaimRow['status']) => {
     const originalClaim = rawClaims.find(c => generateClaimDisplayId(c) === claimId);
@@ -38,9 +50,6 @@ export default function VerificationPortal() {
       if (newStatus === 'Approved') {
         await approveClaim(originalClaim.id);
         toast.success(`Claim ${claimId} has been approved!`);
-      } else if (newStatus === 'Under SDLC Review') {
-        await verifyClaim(originalClaim.id);
-        toast.info(`Claim ${claimId} status updated to ${newStatus}.`);
       } else if (newStatus === 'Rejected') {
         toast.error(`Claim ${claimId} has been rejected.`);
       }
@@ -67,7 +76,8 @@ export default function VerificationPortal() {
         return (
           <GramPanchayatDashboard
             claims={claims}
-            onForward={handleStatusUpdate}
+            rawClaims={rawClaims}
+            onForward={handleForwardClaim}
             onSave={handleUpdateClaim} 
           />
         );
@@ -75,15 +85,17 @@ export default function VerificationPortal() {
         return (
           <SdlcDashboard
             claims={claims}
-            onForward={handleStatusUpdate}
+            rawClaims={rawClaims}
+            onForward={handleForwardClaim}
           />
         );
       case UserRole.DistrictCommittee:
         return (
           <DlcDashboard
             claims={claims}
+            rawClaims={rawClaims}
             onApprove={handleStatusUpdate}
-            onReject={handleStatusUpdate}
+            onReject={rejectClaim}
           />
         );
       default:

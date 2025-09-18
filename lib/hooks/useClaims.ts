@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from './useApi';
-import { claimsService, FRAClaim, ClaimStatus } from '@/lib/api';
+import { claimsService, FRAClaim, ClaimStatus, UserRole } from '@/lib/api';
 import { convertFRAClaimToClaimRow } from '@/lib/utils/claim-helpers';
 import type { ClaimRow } from '@/components/ui/verification/shared/types';
+import { useAuth } from '@/contexts/auth-context';
 
 interface UseClaimsOptions {
   autoFetch?: boolean;
@@ -12,6 +13,7 @@ interface UseClaimsOptions {
 
 export function useClaims(options: UseClaimsOptions = {}) {
   const { autoFetch = true, status, villageId } = options;
+  const { user } = useAuth();
   
   const [uiClaims, setUiClaims] = useState<ClaimRow[]>([]);
   
@@ -27,6 +29,11 @@ export function useClaims(options: UseClaimsOptions = {}) {
     execute: verifyClaim, 
     isLoading: isVerifying 
   } = useApi(claimsService.verifyClaim);
+
+  const { 
+    execute: forwardClaim, 
+    isLoading: isForwarding 
+  } = useApi(claimsService.forwardClaim);
 
   const { 
     execute: approveClaim, 
@@ -48,20 +55,15 @@ export function useClaims(options: UseClaimsOptions = {}) {
     if (rawClaims) {
       let filteredClaims = rawClaims;
       
-      // Filter by status if specified
-      if (status) {
-        filteredClaims = rawClaims.filter(claim => claim.status === status);
-      }
-      
       // Filter by village if specified
       if (villageId) {
         filteredClaims = rawClaims.filter(claim => claim.villageId === villageId);
       }
       
-      const converted = filteredClaims.map(convertFRAClaimToClaimRow);
+      const converted = filteredClaims.map(claim => convertFRAClaimToClaimRow(claim, user?.role));
       setUiClaims(converted);
     }
-  }, [rawClaims, status, villageId]);
+  }, [rawClaims, status, villageId, user]);
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -83,6 +85,15 @@ export function useClaims(options: UseClaimsOptions = {}) {
     }
     return result;
   }, [verifyClaim, refreshClaims]);
+
+  // Forward a claim
+  const handleForwardClaim = useCallback(async (claimId: string, remarks: string) => {
+    const result = await forwardClaim(claimId, remarks);
+    if (result) {
+      await refreshClaims();
+    }
+    return result;
+  }, [forwardClaim, refreshClaims]);
 
   // Approve a claim
   const handleApproveClaim = useCallback(async (claimId: string) => {
@@ -119,6 +130,7 @@ export function useClaims(options: UseClaimsOptions = {}) {
     // Loading states
     isLoading,
     isVerifying,
+    isForwarding,
     isApproving,
     isCreating,
     isRejecting,
@@ -129,6 +141,7 @@ export function useClaims(options: UseClaimsOptions = {}) {
     // Actions
     refreshClaims,
     verifyClaim: handleVerifyClaim,
+    forwardClaim: handleForwardClaim,
     approveClaim: handleApproveClaim,
     rejectClaim: handleRejectClaim,
     createClaim: handleCreateClaim,

@@ -74,6 +74,18 @@ export const claimsService = {
     return response.data;
   },
 
+  // Forward claim to the next stage
+  async forwardClaim(id: string, remarks: string): Promise<FRAClaim> {
+    const response = await api.post<FRAClaim>(endpoints.fra.forward(id), { remarks });
+    return response.data;
+  },
+
+  // Get dashboard stats
+  async getDashboardStats(): Promise<any> {
+    const response = await api.get(endpoints.fra.stats);
+    return response.data;
+  },
+
   // Approve claim (for DistrictCommittee)
   async approveClaim(id: string): Promise<FRAClaim> {
     const response = await api.post<FRAClaim>(endpoints.fra.approve(id));

@@ -119,7 +119,9 @@ export const endpoints = {
   
   // FRA Operations
   fra: {
+    stats: '/fra/stats',
     verify: (id: string) => `/fra/verify/${id}`,
+    forward: (id: string) => `/fra/forward/${id}`,
     approve: (id: string) => `/fra/approve/${id}`,
     reject: (id: string) => `/fra/reject/${id}`,
   },

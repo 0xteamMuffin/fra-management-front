@@ -121,12 +121,14 @@ export interface FRAClaim {
 
   // --- Core Claim Details ---
   status: ClaimStatus;
+  currentStage: UserRole;
   villageId: string;
 
   // --- Verification & Approval ---
   verifiedByUserId?: string;
   approvedByUserId?: string;
   grantedAt?: string; // DateTime? from Prisma becomes optional string in frontend
+  remarks?: string;
 
   // Relationships (populated when included)
   familyMembers?: FamilyMember[];
