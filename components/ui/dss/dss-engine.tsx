@@ -4,11 +4,11 @@ import { useState, useMemo, useCallback, useRef } from "react"
 import domtoimage from "dom-to-image-more"
 import axios from "axios"
 
-// Component Imports from the first file
+// Component Imports
 import MapComponent from "../atlas/map-container"
 import LegendCard from "../atlas/legend"
 
-// UI Component Imports from both files
+// UI Component Imports
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// Icon Imports from the second file
+// Icon Imports
 import {
   Droplets,
   Zap,
@@ -31,9 +31,37 @@ import {
   Heart,
   TrendingUp,
   ArrowRight,
+  LandPlot,
+  Building,
+  TreePine,
 } from "lucide-react"
 
-// --- Helper from first file: Convert Blob to Base64 ---
+// --- Type Definitions for API data ---
+type SchemeRecommendation = {
+  schemeName: string
+  eligibilityReason: string
+  priority: "High" | "Medium" | "Low"
+}
+
+type Intervention = {
+  intervention: string
+  reason: string
+  urgency: "High" | "Medium" | "Low"
+}
+
+type DssData = {
+  schemeRecommendations: SchemeRecommendation[]
+  interventions: Intervention[]
+  additionalNotes: string
+}
+
+type AnalysisStats = {
+  forest: number
+  water: number
+  soil: number
+  buildings: number
+}
+
 const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -43,7 +71,6 @@ const blobToBase64 = (blob: Blob): Promise<string> => {
   })
 }
 
-// --- Helper Component from first file: CustomAccordion ---
 const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
   <div className="border-b border-green-200/60">
     <h2>
@@ -82,7 +109,53 @@ const CustomAccordion = ({ title, children, isOpen, onToggle }: any) => (
   </div>
 )
 
-// --- Type Definition and Sample Data from first file ---
+const SchemeCardSkeleton = () => (
+    <Card className="h-fit">
+      <CardContent className="p-4">
+        <div className="space-y-3 animate-pulse">
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-32"></div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div className="h-5 bg-gray-200 rounded-full w-20"></div>
+          </div>
+          <div className="space-y-1 mt-1">
+            <div className="h-3 bg-gray-200 rounded w-full"></div>
+            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+          </div>
+          <div className="h-9 bg-gray-300 rounded w-full mt-3"></div>
+        </div>
+      </CardContent>
+    </Card>
+);
+
+const AnalysisStatsDisplay = ({ stats }: { stats: AnalysisStats }) => (
+    <div className="space-y-2">
+      <h3 className="font-semibold text-green-900 text-sm">Land Use Analysis</h3>
+      <div className="p-3 bg-white/90 border border-green-300 rounded-lg space-y-2 text-xs text-green-950">
+        <div className="flex justify-between items-center">
+          <span className="flex items-center gap-2"><LandPlot className="h-4 w-4 text-green-700" /> Soil / Barren Land:</span>
+          <span className="font-bold">{stats.soil}%</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="flex items-center gap-2"><Droplets className="h-4 w-4 text-green-700" /> Water Bodies:</span>
+          <span className="font-bold">{stats.water}%</span>
+        </div>
+         <div className="flex justify-between items-center">
+          <span className="flex items-center gap-2"><Building className="h-4 w-4 text-green-700" /> Buildings / Structures:</span>
+          <span className="font-bold">{stats.buildings}%</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="flex items-center gap-2"><TreePine className="h-4 w-4 text-green-700" /> Forest Cover:</span>
+          <span className="font-bold">{stats.forest}%</span>
+        </div>
+      </div>
+    </div>
+)
+
+
 export type Claim = {
   id: string
   applicant: string
@@ -135,16 +208,19 @@ const sampleClaims: Claim[] = [
 ]
 
 export function DSSEnginePage() {
-  // --- State and Logic from AtlasView (first file) ---
   const [q, setQ] = useState("")
   const [status, setStatus] = useState<string>("all")
   const [year, setYear] = useState<string>("all")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [openSections, setOpenSections] = useState<string[]>(["layers", "filters"]) // Default open
+  const [isDssLoading, setIsDssLoading] = useState(false)
+  const [openSections, setOpenSections] = useState<string[]>(["", ""])
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [segmentedImage, setSegmentedImage] = useState<string | null>(null)
+  const [dssData, setDssData] = useState<DssData | null>(null)
+  const [analysisStats, setAnalysisStats] = useState<AnalysisStats | null>(null)
+  const [selectedArea, setSelectedArea] = useState("")
   const mapContainerRef = useRef<HTMLDivElement>(null)
 
   const filtered = useMemo(() => {
@@ -163,6 +239,9 @@ export function DSSEnginePage() {
     if (!mapContainerRef.current) return
 
     setIsAnalyzing(true)
+    setIsDssLoading(true)
+    setDssData(null)
+    setAnalysisStats(null)
     setCapturedImage(null)
     setSegmentedImage(null)
     setAnalysisError(null)
@@ -175,20 +254,46 @@ export function DSSEnginePage() {
       const formData = new FormData()
       formData.append("file", originalImageBlob, "map-capture.png")
 
-      const response = await axios.post(
-        "http://109.230.237.112:3000/api/v1/segment/segment",
+      const segmentationResponse = await axios.post(
+        "http://109.230.237.112:3000/api/v1/analysis/segment",
         formData,
-        { responseType: "blob" },
       )
+      
+      const responseData = segmentationResponse.data
+      setSegmentedImage(responseData.segmentedImage)
+      setAnalysisStats(responseData.stats)
 
-      const segmentedImageBlob = response.data
-      const segmentedImageBase64 = await blobToBase64(segmentedImageBlob)
-      setSegmentedImage(segmentedImageBase64)
+      const stats = responseData.stats;
+      const dssPayload = {
+        assetMapping: { 
+            land: `${stats.soil}%`, 
+            water: `${stats.water}%`, 
+            buildings: `${stats.buildings}%` 
+        },
+      }
+      
+      const dssResponse = await axios.post(
+        "http://109.230.237.112:3000/api/v1/dss/dss",
+        dssPayload,
+      )
+      
+      const suggestionsString = dssResponse.data.suggestions;
+      const jsonMatch = suggestionsString.match(/```json\n([\s\S]*?)\n```/);
+      if (jsonMatch && jsonMatch[1]) {
+        const cleanedJsonString = jsonMatch[1];
+        const parsedDssData = JSON.parse(cleanedJsonString);
+        setDssData(parsedDssData);
+      } else {
+        throw new Error("Could not parse recommendations from API response.");
+      }
+
     } catch (error) {
-      console.error("Failed to analyze map image:", error)
+      console.error("Analysis process failed:", error)
       setAnalysisError("Failed to get analysis. Please try again.")
+      setDssData(null)
     } finally {
       setIsAnalyzing(false)
+      setIsDssLoading(false)
     }
   }, [])
 
@@ -199,98 +304,32 @@ export function DSSEnginePage() {
         : [...prev, sectionId],
     )
   }
-
-  // --- State and Data from original DSSEnginePage (second file) ---
-  const [selectedArea, setSelectedArea] = useState("") // Note: No component sets this state anymore, but kept for the lower section
-  const mockSchemes = [
-    {
-      id: 1,
-      name: "Jal Jeevan Mission",
-      category: "Water Supply",
-      priority: "Critical",
-      attentionLevel: "Immediate",
-      eligibility: "95%",
-      funding: "₹2.5 Cr",
-      timeline: "18 months",
-      description: "Provides functional household tap connections to every rural household",
-      benefits: ["Clean drinking water access", "Reduced water-borne diseases", "Women empowerment"],
-      status: "Recommended",
-      urgencyScore: 95,
-    },
-    {
-      id: 2,
-      name: "Digital India - BharatNet",
-      category: "Connectivity",
-      priority: "High",
-      attentionLevel: "High",
-      eligibility: "92%",
-      funding: "₹3.2 Cr",
-      timeline: "24 months",
-      description: "High-speed broadband connectivity to rural areas",
-      benefits: ["Digital literacy", "E-governance access", "Economic opportunities"],
-      status: "Recommended",
-      urgencyScore: 88,
-    },
-    {
-      id: 3,
-      name: "PM-KUSUM Scheme",
-      category: "Solar Energy",
-      priority: "Medium",
-      attentionLevel: "Moderate",
-      eligibility: "87%",
-      funding: "₹1.8 Cr",
-      timeline: "12 months",
-      description: "Solar pumps and grid-connected solar power plants for farmers",
-      benefits: ["Renewable energy access", "Reduced electricity costs", "Income generation"],
-      status: "Under Review",
-      urgencyScore: 72,
-    },
-    {
-      id: 4,
-      name: "Pradhan Mantri Gram Sadak Yojana",
-      category: "Infrastructure",
-      priority: "Medium",
-      attentionLevel: "Moderate",
-      eligibility: "78%",
-      funding: "₹4.1 Cr",
-      timeline: "30 months",
-      description: "All-weather road connectivity to unconnected habitations",
-      benefits: ["Better market access", "Emergency services", "Economic development"],
-      status: "Feasible",
-      urgencyScore: 65,
-    },
-    {
-      id: 5,
-      name: "Ayushman Bharat - Health & Wellness Centers",
-      category: "Healthcare",
-      priority: "High",
-      attentionLevel: "High",
-      eligibility: "89%",
-      funding: "₹1.2 Cr",
-      timeline: "15 months",
-      description: "Comprehensive primary healthcare services at village level",
-      benefits: ["Primary healthcare access", "Preventive care", "Maternal health"],
-      status: "Recommended",
-      urgencyScore: 82,
-    },
-  ]
-
+  
   const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "Critical":
+    switch (priority?.toLowerCase()) {
+      case "high":
         return "bg-red-100 text-red-800 border-red-200"
-      case "High":
+      case "medium":
         return "bg-orange-100 text-orange-800 border-orange-200"
-      case "Medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
 
+  const getPriorityBorderColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "border-l-red-500"
+      case "medium":
+        return "border-l-orange-500"
+      default:
+        return "border-l-gray-400"
+    }
+  }
+
   return (
     <>
-      {/* --- Popup Modal from first file --- */}
+      {/* --- Popup Modal --- */}
       {isPopupOpen && capturedImage && segmentedImage && (
         <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center"
@@ -302,9 +341,7 @@ export function DSSEnginePage() {
           >
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-lg text-green-900">Analysis Details</h3>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>
-                X
-              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}> X </Button>
             </div>
             <h4 className="font-semibold text-green-800 mb-2">Original View</h4>
             <div className="mb-4 border rounded-lg overflow-hidden">
@@ -319,8 +356,7 @@ export function DSSEnginePage() {
       )}
 
       <div className="container max-w-8xl mx-auto py-8 px-4 space-y-8">
-
-        {/* --- REPLACED SECTION: Sidebar and Map from the first file --- */}
+        {/* --- Main Layout: Sidebar and Map --- */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <aside className="lg:col-span-1 border-r rounded-2xl bg-gradient-to-b from-green-50 to-green-100 p-4 space-y-5 shadow-lg flex flex-col h-[85vh] overflow-y-auto">
@@ -373,6 +409,8 @@ export function DSSEnginePage() {
                 {!isAnalyzing && !capturedImage && !analysisError && (<p className="text-green-800/70 text-xs text-center">Your analysis result will appear here.</p>)}
               </div>
             </div>
+            {analysisStats && !isAnalyzing && <AnalysisStatsDisplay stats={analysisStats} />}
+
             <LegendCard/>
           </aside>
 
@@ -384,41 +422,79 @@ export function DSSEnginePage() {
         
         <div className="h-3"></div>
 
-        {/* --- RETAINED SECTION: Scheme Recommender from the second file --- */}
+        {/* DSS Recommendations Section*/}
         <div>
-          <div className="mb-4">
-            <div className="flex items-center gap-2 font-semibold text-lg">Scheme Recommender</div>
-            <p className="text-sm text-muted-foreground">Prioritized schemes based on area needs</p>
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Analysis Recommendations</h2>
+            <p className="text-sm text-muted-foreground">
+              {isDssLoading
+                ? "Generating recommendations based on analysis..."
+                : dssData
+                ? ""
+                : "Run an analysis on the map to generate recommendations."}
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[80vh] overflow-y-auto pr-2">
-            {mockSchemes.sort((a, b) => b.urgencyScore - a.urgencyScore).map((scheme) => (
-              <Card key={scheme.id} className="border-l-4 border-l-green-500 h-fit">
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <h4 className="font-semibold text-sm">{scheme.name}</h4>
-                        <p className="text-xs text-muted-foreground">{scheme.category}</p>
+
+          {/* Centrally Sponsored Schemes */}
+          <div className="mb-8">
+            <h3 className="font-semibold text-lg mb-3 text-green-900">Centrally Sponsored Schemes (CSS)</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {isDssLoading ? (
+                <>
+                  <SchemeCardSkeleton />
+                  <SchemeCardSkeleton />
+                  <SchemeCardSkeleton />
+                </>
+              ) : dssData && dssData.schemeRecommendations.length > 0 ? (
+                dssData.schemeRecommendations.map((scheme, index) => (
+                  <Card key={index} className={`shadow-sm hover:shadow-md transition-shadow ${getPriorityBorderColor(scheme.priority)} border-l-4 bg-white`}>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col h-full space-y-3">
+                        <h4 className="font-semibold text-sm text-gray-800">{scheme.schemeName}</h4>
+                        <Badge className={`${getPriorityColor(scheme.priority)} w-fit`} variant="outline">{scheme.priority} Priority</Badge>
+                        <p className="text-xs text-muted-foreground flex-grow">{scheme.eligibilityReason}</p>
+                        {/* <Button size="sm" className="w-full gradient-green text-white hover:gradient-green-hover mt-auto">
+                          View Details<ArrowRight className="h-3 w-3 ml-1" />
+                        </Button> */}
                       </div>
-                      <div className="text-right space-y-1">
-                        <div className="text-lg font-bold text-green-600">{scheme.urgencyScore}%</div>
-                        <p className="text-xs text-muted-foreground">Match</p>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                !isDssLoading && <p className="text-sm text-muted-foreground col-span-full">No schemes recommended or analysis not run yet.</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Recommended Interventions */}
+          <div>
+            <h3 className="font-semibold text-lg mb-3 text-green-900">Recommended Interventions</h3>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {isDssLoading ? (
+                <>
+                  <SchemeCardSkeleton />
+                  <SchemeCardSkeleton />
+                  <SchemeCardSkeleton />
+                </>
+              ) : dssData && dssData.interventions.length > 0 ? (
+                dssData.interventions.map((item, index) => (
+                  <Card key={index} className={`shadow-sm hover:shadow-md transition-shadow ${getPriorityBorderColor(item.urgency)} border-l-4 bg-white`}>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col h-full space-y-3">
+                        <h4 className="font-semibold text-sm text-gray-800">{item.intervention}</h4>
+                        <Badge className={`${getPriorityColor(item.urgency)} w-fit`} variant="outline">{item.urgency} Urgency</Badge>
+                        <p className="text-xs text-muted-foreground flex-grow">{item.reason}</p>
+                        {/* <Button size="sm" className="w-full gradient-green text-white hover:gradient-green-hover mt-auto">
+                          Plan Intervention<ArrowRight className="h-3 w-3 ml-1" />
+                        </Button> */}
                       </div>
-                    </div>
-                    <div className="flex gap-2 flex-wrap">
-                      <Badge className={getPriorityColor(scheme.priority)} variant="outline">{scheme.priority}</Badge>
-                      <Badge variant="secondary" className="text-xs">{scheme.attentionLevel} Attention</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{scheme.description}</p>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div><span className="text-muted-foreground">Funding: </span><span className="font-semibold">{scheme.funding}</span></div>
-                      <div><span className="text-muted-foreground">Timeline: </span><span className="font-semibold">{scheme.timeline}</span></div>
-                    </div>
-                    <Button size="sm" className="w-full gradient-green text-white hover:gradient-green-hover">View Details<ArrowRight className="h-3 w-3 ml-1" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                !isDssLoading && <p className="text-sm text-muted-foreground col-span-full">No interventions recommended or analysis not run yet.</p>
+              )}
+            </div>
           </div>
         </div>
 
