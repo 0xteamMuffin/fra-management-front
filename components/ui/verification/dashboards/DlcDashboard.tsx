@@ -22,6 +22,7 @@ import { s3Service } from "@/lib/api";
 import { toast } from "sonner";
 import { generateClaimDisplayId } from "@/lib/utils/claim-helpers";
 import { useDashboardStats } from "@/lib/hooks/useDashboardStats";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   claims: ClaimRow[];
@@ -36,6 +37,7 @@ export function DlcDashboard({
   onApprove,
   onReject,
 }: Props) {
+  const { t } = useTranslation();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<FRAClaim | null>(null);
@@ -85,38 +87,40 @@ export function DlcDashboard({
   };
 
   const handleViewDocument = async (s3Key: string) => {
-    const toastId = toast.loading("Generating secure link...");
+    const toastId = toast.loading(t("toast_generating_link"));
     const url = await s3Service.getViewUrl(s3Key);
     if (url) {
-      toast.success("Link generated!", { id: toastId });
+      toast.success(t("toast_link_generated"), { id: toastId });
       window.open(url, "_blank");
     } else {
-      toast.error("Could not generate link.", { id: toastId });
+      toast.error(t("toast_link_error"), { id: toastId });
     }
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-red-800">DLC Dashboard</h1>
+      <h1 className="text-3xl font-bold text-red-800">
+        {t("dlc_dashboard_title")}
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Pending Final Review"
+          title={t("stat_pending_final_review")}
           value={stats?.toReviewDlc || 0}
-          description="Claims received from SDLCs"
+          description={t("stat_pending_final_review_desc")}
           Icon={Clock}
           iconColorClass="text-amber-500"
         />
         <StatCard
-          title="Total Approved"
+          title={t("stat_total_approved")}
           value={stats?.granted || 0}
-          description="Claims approved by the District Committee"
+          description={t("stat_total_approved_desc")}
           Icon={Check}
           iconColorClass="text-green-500"
         />
         <StatCard
-          title="Total Rejected"
+          title={t("stat_total_rejected")}
           value={stats?.rejected || 0}
-          description="Claims rejected by the District Committee"
+          description={t("stat_total_rejected_desc")}
           Icon={X}
           iconColorClass="text-red-500"
         />
@@ -126,10 +130,10 @@ export function DlcDashboard({
         <Filter className="h-5 w-5 text-muted-foreground" />
         <Select value={selectedVillage} onValueChange={setSelectedVillage}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by village..." />
+            <SelectValue placeholder={t("filter_by_village")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Villages</SelectItem>
+            <SelectItem value="all">{t("all_villages")}</SelectItem>
             {villages.map((v) => (
               <SelectItem key={v.id} value={v.id}>
                 {v.name}
@@ -149,7 +153,7 @@ export function DlcDashboard({
                 size="sm"
                 onClick={() => handleViewDocuments(claim)}
               >
-                <FileText size={14} className="mr-1" /> View Docs
+                <FileText size={14} className="mr-1" /> {t("button_view_docs")}
               </Button>
               <Button
                 variant="outline"
@@ -157,7 +161,7 @@ export function DlcDashboard({
                 className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
                 onClick={() => handleApprove(claim.id)}
               >
-                <Check size={14} className="mr-1" /> Approve
+                <Check size={14} className="mr-1" /> {t("button_approve")}
               </Button>
               <Button
                 variant="outline"
@@ -165,7 +169,7 @@ export function DlcDashboard({
                 className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
                 onClick={() => handleRejectClick(claim)}
               >
-                <X size={14} className="mr-1" /> Reject
+                <X size={14} className="mr-1" /> {t("button_reject")}
               </Button>
             </div>
           )

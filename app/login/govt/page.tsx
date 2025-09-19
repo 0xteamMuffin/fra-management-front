@@ -7,8 +7,10 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { ApiError } from "@/components/ui/error-boundary";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 
 const GovernmentLoginPage = () => {
+  const { t } = useTranslation(); // 2. Initialize the t function
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ const GovernmentLoginPage = () => {
     setError(null);
 
     if (!email || !password) {
-      setError("Please fill in all fields");
+      setError(t("error_all_fields_required")); // Mapped
       return;
     }
 
@@ -61,16 +63,16 @@ const GovernmentLoginPage = () => {
 
           <div className="relative z-10">
             <h1 className="text-3xl font-bold tracking-tight">
-              Forest Rights Act Portal
+              {t("forest_rights_act_portal")} {/* Mapped */}
             </h1>
             <p className="mt-2 text-green-200">
-              Empowering tribal communities and forest dwellers.
+              {t("empowering_tribal_communities")} {/* Mapped */}
             </p>
           </div>
 
           <div className="relative z-10 text-sm">
             <p className="text-green-300">
-              © 2025 Ministry of Tribal Affairs, Government of India
+              {t("copyright_notice")} {/* Mapped */}
             </p>
           </div>
         </div>
@@ -79,9 +81,11 @@ const GovernmentLoginPage = () => {
         <div className="flex flex-col justify-center items-center p-8 sm:p-12">
           <div className="w-full max-w-md">
             <div className="text-center lg:text-left mb-10">
-              <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
+              <h2 className="text-3xl font-bold text-gray-900">
+                {t("welcome_back")} {/* Mapped */}
+              </h2>
               <p className="mt-2 text-gray-500">
-                Sign in to continue to your dashboard.
+                {t("sign_in_to_continue")} {/* Mapped */}
               </p>
             </div>
 
@@ -95,14 +99,14 @@ const GovernmentLoginPage = () => {
                   htmlFor="email"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Email Address
+                  {t("email_address")} {/* Mapped */}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="email"
                     type="email"
-                    placeholder="user@gov.in"
+                    placeholder={t("email_placeholder")} /* Mapped */
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -119,13 +123,13 @@ const GovernmentLoginPage = () => {
                     htmlFor="password"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Password
+                    {t("password")} {/* Mapped */}
                   </label>
                   <a
                     href="#"
                     className="text-sm text-green-600 hover:underline"
                   >
-                    Forgot Password?
+                    {t("forgot_password")} {/* Mapped */}
                   </a>
                 </div>
                 <div className="relative">
@@ -154,19 +158,22 @@ const GovernmentLoginPage = () => {
                 ) : (
                   <LogIn className="mr-2 h-4 w-4" />
                 )}
-                {isLoading && isMounted ? "Signing In..." : "Login"}
+                {isLoading && isMounted
+                  ? t("signing_in")
+                  : t("login_button")}{" "}
+                {/* Mapped */}
               </button>
             </form>
 
             {/* Sign Up Option */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                {t("dont_have_account")}{" "}
                 <button
                   onClick={handleSignUpClick}
                   className="font-medium text-green-600 hover:underline inline-flex items-center"
                 >
-                  Sign Up Now <UserPlus className="ml-1 h-4 w-4" />
+                  {t("sign_up_now")} <UserPlus className="ml-1 h-4 w-4" />
                 </button>
               </p>
             </div>

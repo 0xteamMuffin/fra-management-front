@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { ForwardClaimDialog } from "../shared/ForwardClaimDialog";
 import { generateClaimDisplayId } from "@/lib/utils/claim-helpers";
 import { useDashboardStats } from "@/lib/hooks/useDashboardStats";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   claims: ClaimRow[];
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export function SdlcDashboard({ claims, rawClaims, onForward }: Props) {
+  const { t } = useTranslation();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isForwardDialogOpen, setIsForwardDialogOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<FRAClaim | null>(null);
@@ -74,36 +76,36 @@ export function SdlcDashboard({ claims, rawClaims, onForward }: Props) {
   };
 
   const handleViewDocument = async (s3Key: string) => {
-    const toastId = toast.loading("Generating secure link...");
+    const toastId = toast.loading(t("toast_generating_link"));
     const url = await s3Service.getViewUrl(s3Key);
     if (url) {
-      toast.success("Link generated!", { id: toastId });
+      toast.success(t("toast_link_generated"), { id: toastId });
       window.open(url, "_blank");
     } else {
-      toast.error("Could not generate link.", { id: toastId });
+      toast.error(t("toast_link_error"), { id: toastId });
     }
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-blue-800">SDLC Dashboard</h1>
-        <p className="text-slate-600">
-          Review claims forwarded by Gram Panchayats.
-        </p>
+        <h1 className="text-3xl font-bold text-blue-800">
+          {t("sdlc_dashboard_title")}
+        </h1>
+        <p className="text-slate-600">{t("sdlc_dashboard_subtitle")}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Claims to Review"
+          title={t("stat_claims_to_review")}
           value={stats?.toReviewSdlc || 0}
-          description="Claims awaiting SDLC verification"
+          description={t("stat_claims_to_review_desc")}
           Icon={Clock}
           iconColorClass="text-blue-500"
         />
         <StatCard
-          title="Forwarded to DLC"
+          title={t("stat_forwarded_to_dlc")}
           value={stats?.forwardedToDlc || 0}
-          description="Claims sent for district-level review"
+          description={t("stat_forwarded_to_dlc_desc")}
           Icon={Check}
           iconColorClass="text-green-500"
         />
@@ -113,10 +115,10 @@ export function SdlcDashboard({ claims, rawClaims, onForward }: Props) {
         <Filter className="h-5 w-5 text-muted-foreground" />
         <Select value={selectedVillage} onValueChange={setSelectedVillage}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by village..." />
+            <SelectValue placeholder={t("filter_by_village")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Villages</SelectItem>
+            <SelectItem value="all">{t("all_villages")}</SelectItem>
             {villages.map((v) => (
               <SelectItem key={v.id} value={v.id}>
                 {v.name}
@@ -136,14 +138,14 @@ export function SdlcDashboard({ claims, rawClaims, onForward }: Props) {
                 size="sm"
                 onClick={() => handleViewDocuments(claim)}
               >
-                <FileText size={14} className="mr-1" /> View Docs
+                <FileText size={14} className="mr-1" /> {t("button_view_docs")}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleForwardClick(claim)}
               >
-                <Send size={14} className="mr-1" /> Forward to DLC
+                <Send size={14} className="mr-1" /> {t("button_forward_to_dlc")}
               </Button>
             </div>
           )

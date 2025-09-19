@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, ArrowRight, Link as LinkIcon, File } from "lucide-react";
 import { FRAClaim } from "@/lib/types/api";
+import { useTranslation } from "react-i18next";
 
 interface DocumentViewerProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export function DocumentViewer({
   claim,
   onViewDocument,
 }: DocumentViewerProps) {
+  const { t } = useTranslation();
+
   if (!isOpen || !claim) {
     return null;
   }
@@ -35,9 +38,11 @@ export function DocumentViewer({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Documents for {claim.claimantName}</DialogTitle>
+          <DialogTitle>
+            {t("doc_viewer_title", { claimantName: claim.claimantName })}
+          </DialogTitle>
           <DialogDescription>
-            Review the submitted evidence for this claim.
+            {t("doc_viewer_description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -61,7 +66,7 @@ export function DocumentViewer({
                   onClick={() => onViewDocument(doc.s3Key)}
                 >
                   <LinkIcon className="h-3 w-3 mr-1" />
-                  View
+                  {t("button_view")}
                 </Button>
               </li>
             ))}
@@ -70,7 +75,7 @@ export function DocumentViewer({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("button_close")}
           </Button>
         </DialogFooter>
       </DialogContent>
