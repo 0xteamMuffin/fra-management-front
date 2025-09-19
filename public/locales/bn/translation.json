@@ -367,5 +367,21 @@
   "th_status": "স্থিতি",
   "th_actions": "কার্যকলাপ",
   "Government_dashboard": "সরকারি ড্যাশবোর্ড",
-  "sdlc_review": "SDLC পর্যালোচনা কিউ"
+  "sdlc_review": "SDLC পর্যালোচনা কিউ",
+    "legendTitle": "সংকেত",
+  "legendDistrictBoundary": "জেলা সীমানা",
+  "legendCoast": "উপকূল",
+  "legendForest": "বন",
+  "legendIsland": "দ্বীপ",
+  "legendLake": "হ্রদ",
+  "legendMuhana": "মোহনা",
+  "legendNonPotential": "অ-সম্ভাব্য",
+  "legendPotential": "সম্ভাব্য",
+  "legendReservoir": "জলাধার",
+  "legendRiver": "নদী",
+  "legendSand": "বালি",
+  "legendULB": "ইউএলবি",
+  "legendUninhabited": "জনবসতিহীন",
+  "legendWaterlogged": "জলাবদ্ধ",
+  "legendClaimStatusTitle": "দাবির স্থিতি"
 }

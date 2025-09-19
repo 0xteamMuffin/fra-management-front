@@ -367,5 +367,21 @@
   "th_status": "ସ୍ଥିତି",
   "th_actions": "କାର୍ଯ୍ୟାନୁଷ୍ଠାନ",
   "Government_dashboard": "ସରକାରୀ ଡ୍ୟାଶବୋର୍ଡ",
-  "sdlc_review": "SDLC ସମୀକ୍ଷା ଧାଡି" 
+  "sdlc_review": "SDLC ସମୀକ୍ଷା ଧାଡି",
+  "legendTitle": "ସୂଚୀ",
+  "legendDistrictBoundary": "ଜିଲ୍ଲା ସୀମା",
+  "legendCoast": "ଉପକୂଳ",
+  "legendForest": "ଜଙ୍ଗଲ",
+  "legendIsland": "ଦ୍ୱୀପ",
+  "legendLake": "ହ୍ରଦ",
+  "legendMuhana": "ମୁହାଣ",
+  "legendNonPotential": "ଅଣ-ସମ୍ଭାବ୍ୟ",
+  "legendPotential": "ସମ୍ଭାବ୍ୟ",
+  "legendReservoir": "ଜଳାଶୟ",
+  "legendRiver": "ନଦୀ",
+  "legendSand": "ବାଲି",
+  "legendULB": "ୟୁଏଲବି",
+  "legendUninhabited": "ଜନଶୂନ୍ୟ",
+  "legendWaterlogged": "ଜଳବନ୍ଦୀ",
+  "legendClaimStatusTitle": "ଦାବି ସ୍ଥିତି"
 }

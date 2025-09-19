@@ -367,5 +367,21 @@
   "th_status": "స్థితి",
   "th_actions": "చర్యలు",
   "Government_dashboard": "ప్రభుత్వ డాష్‌బోర్డ్",
-  "sdlc_review": "SDLC సమీక్ష క్యూ"
+  "sdlc_review": "SDLC సమీక్ష క్యూ",
+  "legendTitle": "సూచిక",
+  "legendDistrictBoundary": "జిల్లా సరిహద్దు",
+  "legendCoast": "తీరం",
+  "legendForest": "అడవి",
+  "legendIsland": "ద్వీపం",
+  "legendLake": "సరస్సు",
+  "legendMuhana": "ముహానా",
+  "legendNonPotential": "సామర్థ్యం లేనిది",
+  "legendPotential": "సామర్థ్యం ఉన్నది",
+  "legendReservoir": "జలాశయం",
+  "legendRiver": "నది",
+  "legendSand": "ఇసుక",
+  "legendULB": "యుఎల్‌బి",
+  "legendUninhabited": "నిర్జనమైనది",
+  "legendWaterlogged": "నీరు నిలిచిన",
+  "legendClaimStatusTitle": "క్లెయిమ్ స్థితి"
 }

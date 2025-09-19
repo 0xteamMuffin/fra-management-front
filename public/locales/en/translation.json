@@ -371,5 +371,21 @@
   "th_status": "Status",
   "th_actions": "Actions",
   "Government_dashboard": "Government Dashboard",
-  "sdlc_review": "SDLC Review System"
+  "sdlc_review": "SDLC Review System",
+    "legendTitle": "LEGEND",
+  "legendDistrictBoundary": "District Boundary",
+  "legendCoast": "Coast",
+  "legendForest": "Forest",
+  "legendIsland": "Island",
+  "legendLake": "Lake",
+  "legendMuhana": "Muhana",
+  "legendNonPotential": "Non-Potential",
+  "legendPotential": "Potential",
+  "legendReservoir": "Reservoir",
+  "legendRiver": "River",
+  "legendSand": "Sand",
+  "legendULB": "ULB",
+  "legendUninhabited": "Uninhabited",
+  "legendWaterlogged": "Waterlogged",
+  "legendClaimStatusTitle": "CLAIM STATUS"
 }

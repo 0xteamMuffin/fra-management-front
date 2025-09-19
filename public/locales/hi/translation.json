@@ -371,5 +371,21 @@
   "th_status": "स्थिति",
   "th_actions": "कार्रवाइयां",
   "Government_dashboard": "सरकारी डैशबोर्ड",
-  "sdlc_review": "SDLC समीक्षा कतार"
+  "sdlc_review": "SDLC समीक्षा कतार",
+    "legendTitle": "संकेत",
+  "legendDistrictBoundary": "जिला सीमा",
+  "legendCoast": "तट",
+  "legendForest": "वन",
+  "legendIsland": "द्वीप",
+  "legendLake": "झील",
+  "legendMuhana": "मुहाना",
+  "legendNonPotential": "गैर-संभावित",
+  "legendPotential": "संभावित",
+  "legendReservoir": "जलाशय",
+  "legendRiver": "नदी",
+  "legendSand": "रेत",
+  "legendULB": "यूएलबी",
+  "legendUninhabited": "निर्जन",
+  "legendWaterlogged": "जलाक्रांत",
+  "legendClaimStatusTitle": "दावे की स्थिति"
 }
