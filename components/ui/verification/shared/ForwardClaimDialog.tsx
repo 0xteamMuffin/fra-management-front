@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 
 interface ForwardClaimDialogProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export function ForwardClaimDialog({
   onOpenChange,
   onConfirm,
 }: ForwardClaimDialogProps) {
+  const { t } = useTranslation();
   const [remarks, setRemarks] = useState("");
 
   const handleConfirm = () => {
@@ -36,26 +38,25 @@ export function ForwardClaimDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Forward Claim</DialogTitle>
+          <DialogTitle>{t("forward_claim_title")}</DialogTitle>
           <DialogDescription>
-            Add any remarks or notes before forwarding this claim to the next
-            level.
+            {t("forward_claim_description")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="remarks">Remarks (Optional)</Label>
+          <Label htmlFor="remarks">{t("label_remarks_optional")}</Label>
           <Textarea
             id="remarks"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            placeholder="e.g., All documents verified..."
+            placeholder={t("placeholder_remarks")}
           />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("button_cancel")}
           </Button>
-          <Button onClick={handleConfirm}>Confirm & Forward</Button>
+          <Button onClick={handleConfirm}>{t("button_confirm_forward")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

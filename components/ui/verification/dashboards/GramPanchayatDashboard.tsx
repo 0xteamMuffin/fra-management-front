@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { ForwardClaimDialog } from "../shared/ForwardClaimDialog";
 import { generateClaimDisplayId } from "@/lib/utils/claim-helpers";
 import { useDashboardStats } from "@/lib/hooks/useDashboardStats";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 
 interface Props {
   claims: ClaimRow[];
@@ -44,6 +45,7 @@ export function GramPanchayatDashboard({
   onForward,
   onSave,
 }: Props) {
+  const { t } = useTranslation(); // 2. Initialize the t function
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isForwardDialogOpen, setIsForwardDialogOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<FRAClaim | null>(null);
@@ -98,13 +100,13 @@ export function GramPanchayatDashboard({
   };
 
   const handleViewDocument = async (s3Key: string) => {
-    const toastId = toast.loading("Generating secure link...");
+    const toastId = toast.loading(t("toast_generating_link")); // Mapped
     const url = await s3Service.getViewUrl(s3Key);
     if (url) {
-      toast.success("Link generated!", { id: toastId });
+      toast.success(t("toast_link_generated"), { id: toastId }); // Mapped
       window.open(url, "_blank");
     } else {
-      toast.error("Could not generate link.", { id: toastId });
+      toast.error(t("toast_link_error"), { id: toastId }); // Mapped
     }
   };
 
@@ -123,26 +125,26 @@ export function GramPanchayatDashboard({
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-green-800">
-            Gram Panchayat Dashboard
+            {t("gp_dashboard_title")} {/* Mapped */}
           </h1>
           <p className="text-slate-600">
-            Manage and verify local forest rights claims.
+            {t("gp_dashboard_subtitle")} {/* Mapped */}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Awaiting Verification"
+          title={t("stat_awaiting_verification")} // Mapped
           value={stats?.pending || 0}
-          description="Claims to be reviewed by FRC"
+          description={t("stat_awaiting_verification_desc")} // Mapped
           Icon={Clock}
           iconColorClass="text-yellow-500"
         />
         <StatCard
-          title="Forwarded to SDLC"
+          title={t("stat_forwarded_to_sdlc")} // Mapped
           value={stats?.forwardedToSdlc || 0}
-          description="Claims sent for sub-divisional review"
+          description={t("stat_forwarded_to_sdlc_desc")} // Mapped
           Icon={AlertCircle}
           iconColorClass="text-amber-500"
         />
@@ -152,10 +154,10 @@ export function GramPanchayatDashboard({
         <Filter className="h-5 w-5 text-muted-foreground" />
         <Select value={selectedVillage} onValueChange={setSelectedVillage}>
           <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filter by village..." />
+            <SelectValue placeholder={t("filter_by_village")} /> {/* Mapped */}
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Villages</SelectItem>
+            <SelectItem value="all">{t("all_villages")}</SelectItem> {/* Mapped */}
             {villages.map((v) => (
               <SelectItem key={v.id} value={v.id}>
                 {v.name}
@@ -175,21 +177,24 @@ export function GramPanchayatDashboard({
                 size="sm"
                 onClick={() => handleEdit(claim)}
               >
-                <Pencil size={14} className="mr-1" /> Edit
+                <Pencil size={14} className="mr-1" /> {t("button_edit")}{" "}
+                {/* Mapped */}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleViewDocuments(claim)}
               >
-                <FileText size={14} className="mr-1" /> View Docs
+                <FileText size={14} className="mr-1" /> {t("button_view_docs")}{" "}
+                {/* Mapped */}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleForwardClick(claim)}
               >
-                <Send size={14} className="mr-1" /> Forward
+                <Send size={14} className="mr-1" /> {t("button_forward")}{" "}
+                {/* Mapped */}
               </Button>
             </div>
           )

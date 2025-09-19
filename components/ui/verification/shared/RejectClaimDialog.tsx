@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
 
 interface RejectClaimDialogProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export function RejectClaimDialog({
   onOpenChange,
   onConfirm,
 }: RejectClaimDialogProps) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
 
   const handleConfirm = () => {
@@ -38,27 +40,28 @@ export function RejectClaimDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reject Claim</DialogTitle>
+          <DialogTitle>{t("reject_claim_title")}</DialogTitle>
           <DialogDescription>
-            Please provide a reason for rejecting this claim. This information
-            will be recorded.
+            {t("reject_claim_description")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="rejection-reason">Rejection Reason</Label>
+          <Label htmlFor="rejection-reason">
+            {t("label_rejection_reason")}
+          </Label>
           <Textarea
             id="rejection-reason"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="e.g., Insufficient evidence provided..."
+            placeholder={t("placeholder_rejection_reason")}
           />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("button_cancel")}
           </Button>
           <Button onClick={handleConfirm} disabled={!reason.trim()}>
-            Confirm Rejection
+            {t("button_confirm_rejection")}
           </Button>
         </DialogFooter>
       </DialogContent>

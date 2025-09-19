@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 
 interface Props {
   claim: ClaimRow;
@@ -21,11 +22,11 @@ interface Props {
 }
 
 export function EditClaimForm({ claim, onBack, onSave }: Props) {
+  const { t } = useTranslation(); // 2. Initialize the t function
   const [formData, setFormData] = useState<ClaimRow>(claim);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     if (Object.keys(formData.applicantDetails).includes(name)) {
       setFormData((prev) => ({
         ...prev,
@@ -52,10 +53,7 @@ export function EditClaimForm({ claim, onBack, onSave }: Props) {
         applicantDetails: { ...prev.applicantDetails, [name]: value as any },
       }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -67,109 +65,64 @@ export function EditClaimForm({ claim, onBack, onSave }: Props) {
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-green-800">
-            Edit Claim: {claim.id}
+            {t("edit_claim_title", { claimId: claim.id })} {/* Mapped */}
           </h1>
-          <p className="text-slate-600">
-            Review and update the applicant and claim details below.
-          </p>
+          <p className="text-slate-600">{t("edit_claim_subtitle")}</p> {/* Mapped */}
         </div>
       </div>
 
       {/* Applicant Information Section */}
       <div className="p-6 border rounded-lg bg-white shadow-sm">
         <h2 className="text-2xl font-semibold text-slate-700 mb-4 border-b pb-2">
-          Applicant Personal Information
+          {t("section_applicant_info")} {/* Mapped */}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input
-              id="fullName"
-              name="fullName"
-              value={formData.applicantDetails.fullName}
-              onChange={handleChange}
-            />
+            <Label htmlFor="fullName">{t("label_full_name")}</Label> {/* Mapped */}
+            <Input id="fullName" name="fullName" value={formData.applicantDetails.fullName} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="fatherName">Father's Name</Label>
-            <Input
-              id="fatherName"
-              name="fatherName"
-              value={formData.applicantDetails.fatherName}
-              onChange={handleChange}
-            />
+            <Label htmlFor="fatherName">{t("label_father_name")}</Label> {/* Mapped */}
+            <Input id="fatherName" name="fatherName" value={formData.applicantDetails.fatherName} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="age">Age</Label>
-            <Input
-              id="age"
-              name="age"
-              type="number"
-              value={formData.applicantDetails.age}
-              onChange={handleChange}
-            />
+            <Label htmlFor="age">{t("label_age")}</Label> {/* Mapped */}
+            <Input id="age" name="age" type="number" value={formData.applicantDetails.age} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="gender">Gender</Label>
-            <Select
-              name="gender"
-              value={formData.applicantDetails.gender}
-              onValueChange={(v) => handleSelectChange("gender", v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Label htmlFor="gender">{t("label_gender")}</Label> {/* Mapped */}
+            <Select name="gender" value={formData.applicantDetails.gender} onValueChange={(v) => handleSelectChange("gender", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="Male">{t("gender_male")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Female">{t("gender_female")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Other">{t("gender_other")}</SelectItem> {/* Mapped */}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="casteCategory">Caste Category</Label>
-            <Select
-              name="casteCategory"
-              value={formData.applicantDetails.casteCategory}
-              onValueChange={(v) => handleSelectChange("casteCategory", v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Label htmlFor="casteCategory">{t("label_caste_category")}</Label> {/* Mapped */}
+            <Select name="casteCategory" value={formData.applicantDetails.casteCategory} onValueChange={(v) => handleSelectChange("casteCategory", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="ST">ST</SelectItem>
-                <SelectItem value="SC">SC</SelectItem>
-                <SelectItem value="OBC">OBC</SelectItem>
-                <SelectItem value="General">General</SelectItem>
+                <SelectItem value="ST">{t("caste_st")}</SelectItem> {/* Mapped */}
+                <SelectItem value="SC">{t("caste_sc")}</SelectItem> {/* Mapped */}
+                <SelectItem value="OBC">{t("caste_obc")}</SelectItem> {/* Mapped */}
+                <SelectItem value="General">{t("caste_general")}</SelectItem> {/* Mapped */}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="phoneNumber">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.applicantDetails.phoneNumber}
-              onChange={handleChange}
-            />
+            <Label htmlFor="phoneNumber">{t("label_phone_number")}</Label> {/* Mapped */}
+            <Input id="phoneNumber" name="phoneNumber" value={formData.applicantDetails.phoneNumber} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="aadharNumber">Aadhar Number</Label>
-            <Input
-              id="aadharNumber"
-              name="aadharNumber"
-              value={formData.applicantDetails.aadharNumber}
-              onChange={handleChange}
-            />
+            <Label htmlFor="aadharNumber">{t("label_aadhar_number")}</Label> {/* Mapped */}
+            <Input id="aadharNumber" name="aadharNumber" value={formData.applicantDetails.aadharNumber} onChange={handleChange}/>
           </div>
           <div className="md:col-span-2 lg:col-span-3">
-            <Label htmlFor="fullAddress">Complete Address</Label>
-            <Input
-              id="fullAddress"
-              name="fullAddress"
-              value={formData.applicantDetails.fullAddress}
-              onChange={handleChange}
-            />
+            <Label htmlFor="fullAddress">{t("label_complete_address")}</Label> {/* Mapped */}
+            <Input id="fullAddress" name="fullAddress" value={formData.applicantDetails.fullAddress} onChange={handleChange}/>
           </div>
         </div>
       </div>
@@ -177,99 +130,53 @@ export function EditClaimForm({ claim, onBack, onSave }: Props) {
       {/* Claim Details Section */}
       <div className="p-6 border rounded-lg bg-white shadow-sm">
         <h2 className="text-2xl font-semibold text-slate-700 mb-4 border-b pb-2">
-          Claim Details
+          {t("section_claim_details")} {/* Mapped */}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <Label>Claim ID (Read-only)</Label>
+            <Label>{t("label_claim_id_readonly")}</Label> {/* Mapped */}
             <Input value={formData.id} disabled />
           </div>
           <div>
-            <Label htmlFor="district">District</Label>
-            <Input
-              id="district"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-            />
+            <Label htmlFor="district">{t("label_district")}</Label> {/* Mapped */}
+            <Input id="district" name="district" value={formData.district} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="gramPanchayat">Gram Panchayat</Label>
-            <Input
-              id="gramPanchayat"
-              name="gramPanchayat"
-              value={formData.gramPanchayat}
-              onChange={handleChange}
-            />
+            <Label htmlFor="gramPanchayat">{t("label_gram_panchayat")}</Label> {/* Mapped */}
+            <Input id="gramPanchayat" name="gramPanchayat" value={formData.gramPanchayat} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="village">Village</Label>
-            <Input
-              id="village"
-              name="village"
-              value={formData.village}
-              onChange={handleChange}
-            />
+            <Label htmlFor="village">{t("label_village")}</Label> {/* Mapped */}
+            <Input id="village" name="village" value={formData.village} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="claimType">Claim Type</Label>
-            <Select
-              name="claimType"
-              value={formData.claimType}
-              onValueChange={(v) => handleSelectChange("claimType", v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Label htmlFor="claimType">{t("label_claim_type")}</Label> {/* Mapped */}
+            <Select name="claimType" value={formData.claimType} onValueChange={(v) => handleSelectChange("claimType", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Individual">Individual</SelectItem>
-                <SelectItem value="Community">Community</SelectItem>
+                <SelectItem value="Individual">{t("claim_type_individual")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Community">{t("claim_type_community")}</SelectItem> {/* Mapped */}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="landArea">Land Area (Acres)</Label>
-            <Input
-              id="landArea"
-              name="landArea"
-              type="number"
-              step="0.1"
-              value={formData.landArea}
-              onChange={handleChange}
-            />
+            <Label htmlFor="landArea">{t("label_land_area")}</Label> {/* Mapped */}
+            <Input id="landArea" name="landArea" type="number" step="0.1" value={formData.landArea} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="dateFiled">Date Filed</Label>
-            <Input
-              id="dateFiled"
-              name="dateFiled"
-              type="date"
-              value={formData.dateFiled}
-              onChange={handleChange}
-            />
+            <Label htmlFor="dateFiled">{t("label_date_filed")}</Label> {/* Mapped */}
+            <Input id="dateFiled" name="dateFiled" type="date" value={formData.dateFiled} onChange={handleChange}/>
           </div>
           <div>
-            <Label htmlFor="status">Current Status</Label>
-            <Select
-              name="status"
-              value={formData.status}
-              onValueChange={(v) => handleSelectChange("status", v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Label htmlFor="status">{t("label_current_status")}</Label> {/* Mapped */}
+            <Select name="status" value={formData.status} onValueChange={(v) => handleSelectChange("status", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Awaiting FRC Verification">
-                  Awaiting FRC Verification
-                </SelectItem>
-                <SelectItem value="Under SDLC Review">
-                  Under SDLC Review
-                </SelectItem>
-                <SelectItem value="Under DLC Review">
-                  Under DLC Review
-                </SelectItem>
-                <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
+                <SelectItem value="Awaiting FRC Verification">{t("status_awaiting_frc")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Under SDLC Review">{t("status_under_sdlc")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Under DLC Review">{t("status_under_dlc")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Approved">{t("status_approved")}</SelectItem> {/* Mapped */}
+                <SelectItem value="Rejected">{t("status_rejected")}</SelectItem> {/* Mapped */}
               </SelectContent>
             </Select>
           </div>
@@ -278,9 +185,11 @@ export function EditClaimForm({ claim, onBack, onSave }: Props) {
 
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onBack}>
-          Cancel
+          {t("button_cancel")} {/* Mapped */}
         </Button>
-        <Button onClick={() => onSave(formData)}>Save Changes</Button>
+        <Button onClick={() => onSave(formData)}>
+          {t("button_save_changes")} {/* Mapped */}
+        </Button>
       </div>
     </div>
   );
