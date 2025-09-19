@@ -13,8 +13,10 @@ import { ApiError } from "@/components/ui/error-boundary";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@/lib/types/api";
 import { generateClaimDisplayId } from "@/lib/utils/claim-helpers";
+import { useTranslation } from "react-i18next"; // 1. Import useTranslation
 
 export default function VerificationPortal() {
+  const { t } = useTranslation(); // 2. Initialize the t function
   const { user } = useAuth();
 
   const {
@@ -32,9 +34,9 @@ export default function VerificationPortal() {
     try {
       // claimId here is the real UUID from the dashboard, so we can use it directly
       await forwardClaim(claimId, remarks);
-      toast.success(`Claim has been forwarded successfully.`);
+      toast.success(t("toast_forward_success")); // Mapped
     } catch (error) {
-      toast.error("Failed to forward claim");
+      toast.error(t("toast_forward_error")); // Mapped
     }
   };
 
@@ -47,28 +49,31 @@ export default function VerificationPortal() {
     );
 
     if (!originalClaim) {
-      toast.error("Could not find the original claim to update.");
+      toast.error(t("toast_find_claim_error")); // Mapped
       return;
     }
 
     try {
       if (newStatus === "Approved") {
         await approveClaim(originalClaim.id);
-        toast.success(`Claim ${claimId} has been approved!`);
+        toast.success(t("toast_approve_success", { claimId })); // Mapped with variable
       } else if (newStatus === "Rejected") {
-        toast.error(`Claim ${claimId} has been rejected.`);
+        // Assuming rejectClaim is handled elsewhere or by the component itself
+        toast.error(t("toast_reject_success", { claimId })); // Mapped with variable
       }
     } catch (error) {
-      toast.error("Failed to update claim status");
+      toast.error(t("toast_status_update_error")); // Mapped
     }
   };
 
   const handleUpdateClaim = async (updatedClaim: ClaimRow) => {
-    toast.success(`Claim ${updatedClaim.id} has been saved successfully.`);
+    // Logic for updating claim would go here.
+    // Simulating success for the toast message.
+    toast.success(t("toast_save_success", { claimId: updatedClaim.id })); // Mapped with variable
   };
 
   if (isLoadingClaims) {
-    return <LoadingPage message="Loading claims data..." />;
+    return <LoadingPage message={t("loading_claims_data")} />; // Mapped
   }
 
   if (claimsError) {
@@ -104,7 +109,7 @@ export default function VerificationPortal() {
           />
         );
       default:
-        return <p>You do not have the required role to view this dashboard.</p>;
+        return <p>{t("unauthorized_role_message")}</p>; // Mapped
     }
   };
 
