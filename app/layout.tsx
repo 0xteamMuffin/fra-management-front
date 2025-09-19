@@ -8,6 +8,12 @@ import { SiteFooter } from "@/components/ui/footer/SiteFooter";
 import { AuthProvider } from "@/contexts/auth-context";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
+import { dir } from "i18next";
+import { languages } from "./i18n/settings";
+
+export async function generateStaticParams() {
+  return languages.map((lng) => ({ lng }));
+}
 
 export const metadata: Metadata = {
   title: "DIGI FRA ATLAS",
@@ -17,11 +23,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  params: { lng },
 }: Readonly<{
   children: React.ReactNode;
+  params: { lng: string };
 }>) {
   return (
-    <html lang="en">
+    <html lang={lng} dir={dir(lng)}>
       <body
         className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}
         suppressHydrationWarning
