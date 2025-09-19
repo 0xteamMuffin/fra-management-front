@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/ui/footer/SiteFooter";
 import { AuthProvider } from "@/contexts/auth-context";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
+import I18nProvider from "@/components/i18n-provider";
 
 export const metadata: Metadata = {
   title: "DIGI FRA ATLAS",
@@ -27,14 +28,16 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <div>
-              <SiteHeader />
-              {children}
-            </div>
-          </Suspense>
-          <SiteFooter />
-          <Toaster richColors position="top-center" />
+          <I18nProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <div>
+                <SiteHeader />
+                {children}
+              </div>
+            </Suspense>
+            <SiteFooter />
+            <Toaster richColors position="top-center" />
+          </I18nProvider>
         </AuthProvider>
       </body>
     </html>

@@ -6,9 +6,15 @@ import { MapPin, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { MainNav } from "@/components/ui/header/main-nav";
+import { useTranslation } from "react-i18next";
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -25,6 +31,17 @@ export function SiteHeader() {
         {/* Desktop nav */}
         <div className="hidden md:flex">
           <MainNav />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <select
+            onChange={(e) => changeLanguage(e.target.value)}
+            value={i18n.language}
+            className="bg-transparent"
+          >
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+          </select>
         </div>
 
         {/* Mobile nav */}

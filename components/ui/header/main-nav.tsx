@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { LogOut, User } from "lucide-react";
 import { UserRole } from "@/lib/types/api";
+import { useTranslation } from "react-i18next";
 
 const navLinks = [
   { href: "/atlas", label: "Atlas" },
@@ -26,6 +27,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

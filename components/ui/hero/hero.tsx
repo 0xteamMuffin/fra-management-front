@@ -22,57 +22,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import SpotlightCard from "@/components/react-bits/SpotlightCard";
-
-const features = [
-  {
-    icon: FileCheck,
-    title: "AI-Powered Digitization",
-    description: "For Revenue & Forest Departments",
-  },
-  {
-    icon: Map,
-    title: "Interactive FRA Atlas",
-    description: "For Planning & Development Authorities",
-  },
-  {
-    icon: Layers,
-    title: "Satellite Asset Mapping",
-    description: "For Tribal Welfare Departments",
-  },
-  {
-    icon: BarChart3,
-    title: "Decision Support System",
-    description: "For Ministry-level Monitoring",
-  },
-  {
-    icon: Shield,
-    title: "Centralized Claim Verification",
-    description: "For District & Sub-Divisional Committees",
-  },
-];
-
-const stats = [
-  {
-    icon: Database,
-    value: "100k+",
-    label: "Records Digitized",
-  },
-  {
-    icon: MapPin,
-    value: "5,000+",
-    label: "Villages Mapped",
-  },
-  {
-    icon: Layers,
-    value: "1M+",
-    label: "Assets Identified",
-  },
-  {
-    icon: BarChart3,
-    value: "4+",
-    label: "Schemes Integrated",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const AnimatedSection = ({
   children,
@@ -102,6 +52,8 @@ const AnimatedSection = ({
 };
 
 export function Hero() {
+  const { t } = useTranslation();
+
   const slideInFromTop = {
     hidden: { y: -50, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.6 } },
@@ -131,6 +83,57 @@ export function Hero() {
     },
   };
 
+  const features = [
+    {
+      icon: FileCheck,
+      title: t("ai_powered_digitization"),
+      description: t("for_revenue_forest_depts"),
+    },
+    {
+      icon: Map,
+      title: t("interactive_fra_atlas"),
+      description: t("for_planning_dev_authorities"),
+    },
+    {
+      icon: Layers,
+      title: t("satellite_asset_mapping"),
+      description: t("for_tribal_welfare_depts"),
+    },
+    {
+      icon: BarChart3,
+      title: t("decision_support_system"),
+      description: t("for_ministry_level_monitoring"),
+    },
+    {
+      icon: Shield,
+      title: t("centralized_claim_verification"),
+      description: t("for_district_sub_divisional_committees"),
+    },
+  ];
+
+  const stats = [
+    {
+      icon: Database,
+      value: "100k+",
+      label: t("records_digitized"),
+    },
+    {
+      icon: MapPin,
+      value: "5,000+",
+      label: t("villages_mapped"),
+    },
+    {
+      icon: Layers,
+      value: "1M+",
+      label: t("assets_identified"),
+    },
+    {
+      icon: BarChart3,
+      value: "4+",
+      label: t("schemes_integrated"),
+    },
+  ];
+
   return (
     <>
       <main>
@@ -143,12 +146,12 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <div className="flex justify-center items-center gap-4">
-              <p className="font-black text-6xl text-white">Welcome to</p>
+              <p className="font-black text-6xl text-white">{t("welcome")}</p>
               <p className="font-black text-6xl text-orange-400"> VanFRA </p>
             </div>
             <div>
               <p className="text-xl text-white text-center">
-                EMPOWERING FOREST COMMUNITIES THROUGH TECHNOLOGY
+                {t("empowering")}
               </p>
             </div>
           </motion.div>
@@ -199,7 +202,7 @@ export function Hero() {
                 <div className="bg-gray-50 p-6 rounded-xl shadow-sm">
                   <div className="flex items-center space-x-4 mb-6">
                     <div className="px-4 py-2 bg-primary text-primary-foreground rounded-full font-semibold">
-                      Core Features
+                      {t("core_features")}
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -234,21 +237,14 @@ export function Hero() {
                 className="text-left"
               >
                 <h2 className="text-4xl font-bold text-foreground">
-                  A Unified Platform for <br />{" "}
-                  <span className="text-primary">Forest Rights.</span>
+                  {t("unified_platform")} <br />{" "}
+                  <span className="text-primary">{t("forest_rights")}</span>
                 </h2>
                 <p className="text-muted-foreground mt-4 max-w-xl">
-                  VanFRA serves as a critical data-driven platform
-                  revolutionizing the implementation of the Forest Rights Act.
-                  By integrating legacy records, satellite imagery, and AI, we
-                  bring transparency, efficiency, and accountability to the
-                  entire lifecycle of FRA claims.
+                  {t("vanfra_serves")}
                 </p>
                 <p className="text-muted-foreground mt-4 max-w-xl">
-                  Our tools empower decision-makers to verify claims accurately,
-                  map community resources, and layer developmental schemes
-                  effectively, ensuring that benefits reach the intended
-                  forest-dwelling communities.
+                  {t("our_tools_empower")}
                 </p>
               </AnimatedSection>
             </div>
@@ -270,11 +266,10 @@ export function Hero() {
               className="text-center mb-16"
             >
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Role-Based Access Control
+                {t("role_based_access")}
               </h2>
               <p className="text-lg text-white max-w-2xl mx-auto">
-                Tailored interfaces and permissions for different user types in
-                the FRA ecosystem.
+                {t("tailored_interfaces")}
               </p>
             </AnimatedSection>
 
@@ -292,19 +287,19 @@ export function Hero() {
                       <Users className="w-8 h-8 text-green-700" />
                     </div>
                     <CardTitle className="text-gray-900">
-                      Gram Sabha & Claimants
+                      {t("gram_sabha_claimants")}
                     </CardTitle>
                     <CardDescription className="text-gray-700">
-                      Interface for claim submission and status tracking.
+                      {t("interface_for_claim_submission")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="text-sm text-left space-y-2 text-gray-800">
-                      <li>• Submission of new IFR/CFR claims</li>
-                      <li>• Uploading of supporting documents</li>
-                      <li>• Real-time application status tracking</li>
-                      <li>• Access to digital land titles (pattas)</li>
-                      <li>• Information on eligible schemes</li>
+                      <li>• {t("submission_of_new_claims")}</li>
+                      <li>• {t("uploading_of_documents")}</li>
+                      <li>• {t("real_time_tracking")}</li>
+                      <li>• {t("access_to_digital_titles")}</li>
+                      <li>• {t("information_on_schemes")}</li>
                     </ul>
                   </CardContent>
                 </SpotlightCard>
@@ -320,19 +315,19 @@ export function Hero() {
                       <Shield className="w-8 h-8 text-green-700" />
                     </div>
                     <CardTitle className="text-gray-900">
-                      FRC & Verifying Officials
+                      {t("frc_verifying_officials")}
                     </CardTitle>
                     <CardDescription className="text-gray-700">
-                      Tools for claim verification and processing.
+                      {t("tools_for_verification")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="text-sm text-left space-y-2 text-gray-800">
-                      <li>• Review of submitted claims</li>
-                      <li>• Field verification data upload</li>
-                      <li>• Management of verification workflow</li>
-                      <li>• Generation of verification reports</li>
-                      <li>• Secure communication with claimants</li>
+                      <li>• {t("review_of_claims")}</li>
+                      <li>• {t("field_verification_upload")}</li>
+                      <li>• {t("management_of_workflow")}</li>
+                      <li>• {t("generation_of_reports")}</li>
+                      <li>• {t("secure_communication")}</li>
                     </ul>
                   </CardContent>
                 </SpotlightCard>
@@ -348,19 +343,19 @@ export function Hero() {
                       <BarChart3 className="w-8 h-8 text-green-700" />
                     </div>
                     <CardTitle className="text-gray-900">
-                      SDLC, DLC & State Nodal Agencies
+                      {t("sdlc_dlc_agencies")}
                     </CardTitle>
                     <CardDescription className="text-gray-700">
-                      Dashboards for monitoring and decision-making.
+                      {t("dashboards_for_monitoring")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="text-sm text-left space-y-2 text-gray-800">
-                      <li>• District/State level dashboards</li>
-                      <li>• Geospatial (GIS) data analysis</li>
-                      <li>• Approval and rejection workflows</li>
-                      <li>• Digital signature integration</li>
-                      <li>• Analytics for policy monitoring</li>
+                      <li>• {t("district_state_dashboards")}</li>
+                      <li>• {t("gis_analysis")}</li>
+                      <li>• {t("approval_rejection_workflows")}</li>
+                      <li>• {t("digital_signature_integration")}</li>
+                      <li>• {t("analytics_for_policy")}</li>
                     </ul>
                   </CardContent>
                 </SpotlightCard>
