@@ -112,11 +112,23 @@ export default function VerificationPortal() {
         return <p>{t("unauthorized_role_message")}</p>; // Mapped
     }
   };
-
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-slate-50 min-h-screen">
-      <div className="p-4 md:p-6 border rounded-lg bg-white shadow-sm">
-        {renderDashboardByRole()}
+    <div className="min-h-screen bg-white">
+      {/* Header Section with Gradient */}
+        <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white">
+          <div className="max-w-7xl mx-auto p-6 sm:p-8">
+            <h1 className="text-4xl font-bold mb-2">{t("Government_dashboard")}</h1>
+          </div>
+        </div>
+
+      <div className="max-w-[97rem] mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Custom Card Component */}
+        <div className="bg-white rounded-3xl shadow-xl border border-green-100 overflow-hidden">
+          {/* Content */}
+          <div className="p-8 bg-gradient-to-br from-white to-green-50">
+            {renderDashboardByRole()}
+          </div>
+        </div>
       </div>
     </div>
   );

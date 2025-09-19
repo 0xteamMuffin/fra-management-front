@@ -132,76 +132,77 @@ function AdminPanel() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <LoadingSpinner size="lg" />
-        <span className="ml-2 text-lg">Loading admin panel...</span>
+        <span className="ml-2 text-lg text-green-700">Loading admin panel...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+    <div className="min-h-screen bg-white">
+      {/* Header Section with Gradient */}
+      <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
             <Settings className="w-8 h-8" />
             Admin Panel
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage system data, users, and configuration
+          <p className="text-green-100 text-lg">
+            System administration and configuration management
           </p>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Error Display */}
         {error && (
           <ApiError error={error} onRetry={loadStats} className="mb-6" />
         )}
 
         {/* Quick Actions */}
-        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Play className="w-5 h-5" />
-              Quick Setup
-            </CardTitle>
-            <CardDescription>
-              Get started quickly by seeding essential data for the application
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <Button
-                onClick={handleQuickSetup}
-                disabled={setupLoading}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {setupLoading ? (
-                  <LoadingSpinner size="sm" className="mr-2" />
-                ) : (
-                  <Database className="w-4 h-4 mr-2" />
-                )}
-                Complete Setup
-              </Button>
-              <Button
-                onClick={handleSeedStates}
-                disabled={statesLoading}
-                variant="outline"
-              >
-                {statesLoading ? (
-                  <LoadingSpinner size="sm" className="mr-2" />
-                ) : (
-                  <MapPin className="w-4 h-4 mr-2" />
-                )}
-                Seed States Only
-              </Button>
-              <Button onClick={loadStats} variant="outline">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh Stats
-              </Button>
+        <div className="mb-8 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6 border border-green-200 shadow-lg">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Play className="w-6 h-6 text-green-600" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h2 className="text-2xl font-bold text-green-800">Quick Setup</h2>
+              <p className="text-green-600">Get started quickly by seeding essential data for the application</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <Button
+              onClick={handleQuickSetup}
+              disabled={setupLoading}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              {setupLoading ? (
+                <LoadingSpinner size="sm" className="mr-2" />
+              ) : (
+                <Database className="w-5 h-5 mr-2" />
+              )}
+              Complete Setup
+            </Button>
+            <Button
+              onClick={handleSeedStates}
+              disabled={statesLoading}
+              variant="outline"
+              className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+            >
+              {statesLoading ? (
+                <LoadingSpinner size="sm" className="mr-2" />
+              ) : (
+                <MapPin className="w-5 h-5 mr-2" />
+              )}
+              Seed States Only
+            </Button>
+            <Button onClick={loadStats} variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh Stats
+            </Button>
+          </div>
+        </div>
 
         {/* Statistics Dashboard */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

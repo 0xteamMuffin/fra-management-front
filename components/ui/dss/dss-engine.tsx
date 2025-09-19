@@ -248,29 +248,38 @@ export function DSSEnginePage() {
     { nameKey: "resourceEducation", icon: GraduationCap, score: 65, statusKey: "statusModerate" },
     { nameKey: "resourceHealthcare", icon: Heart, score: 35, statusKey: "statusLow" },
   ];
-
   return (
-    <>
+    <div className="min-h-screen bg-white">
+      {/* Header Section with Gradient */}
+      <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          <h1 className="text-4xl font-bold mb-2">DSS Engine</h1>
+          <p className="text-green-100 text-lg">
+            Decision Support System for Forest Rights Analysis
+          </p>
+        </div>
+      </div>
+
       {isPopupOpen && capturedImage && segmentedImage && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center" onClick={() => setIsPopupOpen(false)}>
-          <Card className="w-full max-w-lg mx-4 animate-in fade-in-50 p-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold text-lg text-green-900">{t("popupTitleAnalysisDetails")}</h3>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPopupOpen(false)}>X</Button>
+          <div className="bg-white rounded-2xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-xl text-green-800">{t("popupTitleAnalysisDetails")}</h3>
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600 rounded-lg" onClick={() => setIsPopupOpen(false)}>X</Button>
             </div>
-            <h4 className="font-semibold text-green-800 mb-2">{t("popupSubtitleOriginalView")}</h4>
-            <div className="mb-4 border rounded-lg overflow-hidden">
+            <h4 className="font-semibold text-green-700 mb-3">{t("popupSubtitleOriginalView")}</h4>
+            <div className="mb-6 border border-green-200 rounded-xl overflow-hidden shadow-md">
               <img src={capturedImage} alt={t("popupSubtitleOriginalView")} className="w-full" />
             </div>
-            <h4 className="font-semibold text-green-800 mb-2 mt-4">{t("popupSubtitleSegmentedAnalysis")}</h4>
-            <div className="mb-4 border rounded-lg overflow-hidden">
+            <h4 className="font-semibold text-green-700 mb-3">{t("popupSubtitleSegmentedAnalysis")}</h4>
+            <div className="mb-4 border border-green-200 rounded-xl overflow-hidden shadow-md">
               <img src={segmentedImage} alt={t("popupSubtitleSegmentedAnalysis")} className="w-full" />
             </div>
-          </Card>
+          </div>
         </div>
       )}
 
-      <div className="container max-w-8xl mx-auto py-8 px-4 space-y-8">
+      <div className="w-auto mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <aside className="lg:col-span-1 border-r rounded-2xl bg-gradient-to-b from-green-50 to-green-100 p-4 space-y-5 shadow-lg flex flex-col h-[85vh] overflow-y-auto">
             <div className="space-y-1">
@@ -397,6 +406,6 @@ export function DSSEnginePage() {
           </Card>
         )}
       </div>
-    </>
+  </div>
   );
 }

@@ -121,85 +121,115 @@ export function GramPanchayatDashboard({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-green-800">
-            {t("gp_dashboard_title")} {/* Mapped */}
-          </h1>
-          <p className="text-slate-600">
-            {t("gp_dashboard_subtitle")} {/* Mapped */}
-          </p>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg">
+        <h1 className="text-3xl font-bold mb-2">
+          {t("gp_dashboard_title")} {/* Mapped */}
+        </h1>
+        <p className="text-green-100 text-lg">
+          {t("gp_dashboard_subtitle")} {/* Mapped */}
+        </p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-6 border border-yellow-200 shadow-md hover:shadow-lg transition-all duration-200">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-yellow-100 rounded-lg">
+              <Clock className="w-8 h-8 text-yellow-600" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-yellow-800">{stats?.pending || 0}</h3>
+              <p className="text-yellow-600 font-medium">{t("stat_awaiting_verification")}</p>
+              <p className="text-yellow-500 text-sm">{t("stat_awaiting_verification_desc")}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200 shadow-md hover:shadow-lg transition-all duration-200">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-amber-100 rounded-lg">
+              <AlertCircle className="w-8 h-8 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-amber-800">{stats?.forwardedToSdlc || 0}</h3>
+              <p className="text-amber-600 font-medium">{t("stat_forwarded_to_sdlc")}</p>
+              <p className="text-amber-500 text-sm">{t("stat_forwarded_to_sdlc_desc")}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title={t("stat_awaiting_verification")} // Mapped
-          value={stats?.pending || 0}
-          description={t("stat_awaiting_verification_desc")} // Mapped
-          Icon={Clock}
-          iconColorClass="text-yellow-500"
-        />
-        <StatCard
-          title={t("stat_forwarded_to_sdlc")} // Mapped
-          value={stats?.forwardedToSdlc || 0}
-          description={t("stat_forwarded_to_sdlc_desc")} // Mapped
-          Icon={AlertCircle}
-          iconColorClass="text-amber-500"
-        />
+      {/* Filter Section */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <Filter className="h-5 w-5 text-green-600" />
+          </div>
+          <Select value={selectedVillage} onValueChange={setSelectedVillage}>
+            <SelectTrigger className="w-[200px] border-green-200 focus:border-green-500 focus:ring-green-200 rounded-lg">
+              <SelectValue placeholder={t("filter_by_village")} /> {/* Mapped */}
+            </SelectTrigger>
+            <SelectContent className="border-green-200">
+              <SelectItem value="all">{t("all_villages")}</SelectItem> {/* Mapped */}
+              {villages.map((v) => (
+                <SelectItem key={v.id} value={v.id}>
+                  {v.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Filter className="h-5 w-5 text-muted-foreground" />
-        <Select value={selectedVillage} onValueChange={setSelectedVillage}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder={t("filter_by_village")} /> {/* Mapped */}
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("all_villages")}</SelectItem> {/* Mapped */}
-            {villages.map((v) => (
-              <SelectItem key={v.id} value={v.id}>
-                {v.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Claims Table */}
+      <div className="bg-white rounded-2xl shadow-xl border border-green-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <FileText className="w-6 h-6" />
+            Claims Overview
+          </h3>
+        </div>
+        <div className="p-6">
+          <ClaimsTable
+            claims={filteredClaims}
+            renderActions={(claim) =>
+              claim.status === "Awaiting FRC Verification" && (
+                <div className="flex items-center flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(claim)}
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 rounded-lg transition-all duration-200"
+                  >
+                    <Pencil size={14} className="mr-1" /> {t("button_edit")}{" "}
+                    {/* Mapped */}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewDocuments(claim)}
+                    className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 rounded-lg transition-all duration-200"
+                  >
+                    <FileText size={14} className="mr-1" /> {t("button_view_docs")}{" "}
+                    {/* Mapped */}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleForwardClick(claim)}
+                    className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 rounded-lg transition-all duration-200"
+                  >
+                    <Send size={14} className="mr-1" /> {t("button_forward")}{" "}
+                    {/* Mapped */}
+                  </Button>
+                </div>
+              )
+            }
+          />
+        </div>
       </div>
-
-      <ClaimsTable
-        claims={filteredClaims}
-        renderActions={(claim) =>
-          claim.status === "Awaiting FRC Verification" && (
-            <div className="flex items-center flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleEdit(claim)}
-              >
-                <Pencil size={14} className="mr-1" /> {t("button_edit")}{" "}
-                {/* Mapped */}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleViewDocuments(claim)}
-              >
-                <FileText size={14} className="mr-1" /> {t("button_view_docs")}{" "}
-                {/* Mapped */}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleForwardClick(claim)}
-              >
-                <Send size={14} className="mr-1" /> {t("button_forward")}{" "}
-                {/* Mapped */}
-              </Button>
-            </div>
-          )
-        }
-      />
 
       <DocumentViewer
         isOpen={isViewerOpen}

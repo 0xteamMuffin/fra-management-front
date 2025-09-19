@@ -157,262 +157,241 @@ export function IoTMonitoringDashboard() {
   };
 
   const statusCounts = getStatusCounts();
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-white">
-        <div className="container mx-auto px-6 pt-8 border-b pb-6">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              IoT Environmental Monitoring
-            </h1>
-            <p className="text-muted-foreground text-balance">
-              Real-time monitoring of environmental sensors across rural
-              villages
-            </p>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Header Section with Gradient */}
+      <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white">
+        <div className="max-w-7xl mx-auto p-6 sm:p-8">
+          <h1 className="text-4xl font-bold mb-2">
+            IoT Environmental Monitoring
+          </h1>
+          <p className="text-green-100 text-lg">
+            Real-time monitoring of environmental sensors across rural villages
+          </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 space-y-8">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Village Filter
-              </label>
-              <Select
-                value={selectedVillage}
-                onValueChange={setSelectedVillage}
-              >
-                <SelectTrigger className="w-48">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Select village" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Villages</SelectItem>
-                  <SelectItem value="Kondagaon">Kondagaon</SelectItem>
-                  <SelectItem value="Bastar">Bastar</SelectItem>
-                  <SelectItem value="Dantewada">Dantewada</SelectItem>
-                  <SelectItem value="Sukma">Sukma</SelectItem>
-                </SelectContent>
-              </Select>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">        {/* Controls Section */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-green-700">
+                  Village Filter
+                </label>
+                <Select
+                  value={selectedVillage}
+                  onValueChange={setSelectedVillage}
+                >
+                  <SelectTrigger className="w-48 border-green-200 focus:border-green-500 focus:ring-green-200 rounded-lg">
+                    <MapPin className="mr-2 h-4 w-4 text-green-600" />
+                    <SelectValue placeholder="Select village" />
+                  </SelectTrigger>
+                  <SelectContent className="border-green-200">
+                    <SelectItem value="all">All Villages</SelectItem>
+                    <SelectItem value="Kondagaon">Kondagaon</SelectItem>
+                    <SelectItem value="Bastar">Bastar</SelectItem>
+                    <SelectItem value="Dantewada">Dantewada</SelectItem>
+                    <SelectItem value="Sukma">Sukma</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-green-700">
+                  Time Range
+                </label>
+                <Select
+                  value={selectedTimeRange}
+                  onValueChange={setSelectedTimeRange}
+                >
+                  <SelectTrigger className="w-36 border-green-200 focus:border-green-500 focus:ring-green-200 rounded-lg">
+                    <SelectValue placeholder="Select range" />
+                  </SelectTrigger>
+                  <SelectContent className="border-green-200">
+                    <SelectItem value="1h">1 Hour</SelectItem>
+                    <SelectItem value="24h">24 Hours</SelectItem>
+                    <SelectItem value="7d">7 Days</SelectItem>
+                    <SelectItem value="30d">30 Days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Time Range
-              </label>
-              <Select
-                value={selectedTimeRange}
-                onValueChange={setSelectedTimeRange}
-              >
-                <SelectTrigger className="w-36">
-                  <SelectValue placeholder="Select range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1h">1 Hour</SelectItem>
-                  <SelectItem value="24h">24 Hours</SelectItem>
-                  <SelectItem value="7d">7 Days</SelectItem>
-                  <SelectItem value="30d">30 Days</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                Last updated: {lastRefresh?.toLocaleTimeString()}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  variant="outline"
+                  size="sm"
+                  className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 rounded-lg transition-all duration-200"
+                >
+                  <RefreshCw
+                    className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                  />
+                  Refresh
+                </Button>
+                <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 rounded-lg transition-all duration-200">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+                <Button variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-lg transition-all duration-200">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
+        </div>        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200 shadow-md hover:shadow-lg transition-all duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-blue-700">Total Sensors</h3>
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Activity className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-blue-800 mb-2">
+              {statusCounts.total}
+            </div>
+            <p className="text-sm text-blue-600">
+              Active monitoring devices
+            </p>
+          </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              Last updated: {lastRefresh?.toLocaleTimeString()}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 shadow-md hover:shadow-lg transition-all duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-green-700">Online</h3>
+              <div className="p-3 bg-green-100 rounded-lg">
+                <div className="w-6 h-6 bg-green-500 rounded-full" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-green-800 mb-2">
+              {statusCounts.online}
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw
-                  className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-                />
-                Refresh
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4" />
-              </Button>
+              <p className="text-sm text-green-600">
+                {statusCounts.total > 0
+                  ? Math.round(
+                      (statusCounts.online / statusCounts.total) * 100,
+                    )
+                  : 0}
+                % operational
+              </p>
+              <Badge className="bg-green-100 text-green-800 border-green-300 rounded-full px-2 py-1 text-xs">
+                Healthy
+              </Badge>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="relative overflow-hidden bg-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Sensors
-              </CardTitle>
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Activity className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground mb-1">
-                {statusCounts.total}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Active monitoring devices
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden bg-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Online
-              </CardTitle>
-              <div className="p-2 bg-green-500/10 rounded-lg">
-                <div className="w-4 h-4 bg-green-500 rounded-full" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600 mb-1">
-                {statusCounts.online}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
-                  {statusCounts.total > 0
-                    ? Math.round(
-                        (statusCounts.online / statusCounts.total) * 100,
-                      )
-                    : 0}
-                  % operational
-                </p>
-                <Badge
-                  variant="secondary"
-                  className="bg-green-500/10 text-green-700 border-green-200"
-                >
-                  Healthy
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden bg-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Warning
-              </CardTitle>
-              <div className="p-2 bg-yellow-500/10 rounded-lg">
-                <div className="w-4 h-4 bg-yellow-500 rounded-full" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-yellow-600 mb-1">
-                {statusCounts.warning}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
-                  Require attention
-                </p>
-                {statusCounts.warning > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-yellow-500/10 text-yellow-700 border-yellow-200"
-                  >
-                    Alert
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="relative overflow-hidden bg-white">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Offline
-              </CardTitle>
-              <div className="p-2 bg-red-500/10 rounded-lg">
-                <div className="w-4 h-4 bg-red-500 rounded-full" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-red-600 mb-1">
-                {statusCounts.offline}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
-                  Need maintenance
-                </p>
-                {statusCounts.offline > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="bg-red-500/10 text-red-700 border-red-200"
-                  >
-                    Critical
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted/50">
-            <TabsTrigger
-              value="overview"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="sensors"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              Sensor Data
-            </TabsTrigger>
-            <TabsTrigger
-              value="map"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              GPS Mapping
-            </TabsTrigger>
-            <TabsTrigger
-              value="alerts"
-              className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              Alerts
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2">
-                <EnvironmentalCharts
-                  sensors={getFilteredSensors()}
-                  timeRange={selectedTimeRange}
-                />
-              </div>
-              <div>
-                <SensorMetrics sensors={getFilteredSensors()} />
+          <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-6 border border-yellow-200 shadow-md hover:shadow-lg transition-all duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-yellow-700">Warning</h3>
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full" />
               </div>
             </div>
-          </TabsContent>
+            <div className="text-3xl font-bold text-yellow-800 mb-2">
+              {statusCounts.warning}
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-yellow-600">
+                Require attention
+              </p>
+              {statusCounts.warning > 0 && (
+                <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 rounded-full px-2 py-1 text-xs">
+                  Alert
+                </Badge>
+              )}
+            </div>
+          </div>
 
-          <TabsContent value="sensors" className="space-y-6">
-            <DeviceStatus sensors={getFilteredSensors()} />
-          </TabsContent>
+          <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 border border-red-200 shadow-md hover:shadow-lg transition-all duration-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-red-700">Offline</h3>
+              <div className="p-3 bg-red-100 rounded-lg">
+                <div className="w-6 h-6 bg-red-500 rounded-full" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-red-800 mb-2">
+              {statusCounts.offline}
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-red-600">
+                Need maintenance
+              </p>
+              {statusCounts.offline > 0 && (
+                <Badge className="bg-red-100 text-red-800 border-red-300 rounded-full px-2 py-1 text-xs">
+                  Critical
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>        {/* Tabs Section */}
+        <div className="bg-white rounded-2xl shadow-xl border border-green-100 overflow-hidden">
+          <Tabs defaultValue="overview" className="space-y-0">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4">
+              <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-white/20 rounded-lg">
+                <TabsTrigger
+                  value="overview"
+                  className="data-[state=active]:bg-white data-[state=active]:text-green-600 data-[state=active]:shadow-sm text-white font-medium rounded-md transition-all duration-200"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="sensors"
+                  className="data-[state=active]:bg-white data-[state=active]:text-green-600 data-[state=active]:shadow-sm text-white font-medium rounded-md transition-all duration-200"
+                >
+                  Sensor Data
+                </TabsTrigger>
+                <TabsTrigger
+                  value="map"
+                  className="data-[state=active]:bg-white data-[state=active]:text-green-600 data-[state=active]:shadow-sm text-white font-medium rounded-md transition-all duration-200"
+                >
+                  GPS Mapping
+                </TabsTrigger>
+                <TabsTrigger
+                  value="alerts"
+                  className="data-[state=active]:bg-white data-[state=active]:text-green-600 data-[state=active]:shadow-sm text-white font-medium rounded-md transition-all duration-200"
+                >
+                  Alerts
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContent value="map" className="space-y-6">
-            <SensorMap sensors={getFilteredSensors()} />
-          </TabsContent>
+            <div className="p-6 bg-gradient-to-br from-white to-green-50">
+              <TabsContent value="overview" className="space-y-6 mt-0">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  <div className="xl:col-span-2">
+                    <EnvironmentalCharts
+                      sensors={getFilteredSensors()}
+                      timeRange={selectedTimeRange}
+                    />
+                  </div>
+                  <div>
+                    <SensorMetrics sensors={getFilteredSensors()} />
+                  </div>
+                </div>
+              </TabsContent>
 
-          <TabsContent value="alerts" className="space-y-6">
-            <AlertsPanel sensors={getFilteredSensors()} />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="sensors" className="space-y-6 mt-0">
+                <DeviceStatus sensors={getFilteredSensors()} />
+              </TabsContent>
+
+              <TabsContent value="map" className="space-y-6 mt-0">
+                <SensorMap sensors={getFilteredSensors()} />
+              </TabsContent>
+
+              <TabsContent value="alerts" className="space-y-6 mt-0">
+                <AlertsPanel sensors={getFilteredSensors()} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

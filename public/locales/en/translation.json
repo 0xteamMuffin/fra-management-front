@@ -369,5 +369,7 @@
   "th_gram_panchayat": "Gram Panchayat",
   "th_applicant": "Applicant",
   "th_status": "Status",
-  "th_actions": "Actions"
+  "th_actions": "Actions",
+  "Government_dashboard": "Government Dashboard",
+  "sdlc_review": "SDLC Review System"
 }

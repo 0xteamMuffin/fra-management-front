@@ -369,5 +369,7 @@
   "th_gram_panchayat": "ग्राम पंचायत",
   "th_applicant": "आवेदक",
   "th_status": "स्थिति",
-  "th_actions": "कार्रवाइयां"
+  "th_actions": "कार्रवाइयां",
+  "Government_dashboard": "सरकारी डैशबोर्ड",
+  "sdlc_review": "SDLC समीक्षा कतार"
 }

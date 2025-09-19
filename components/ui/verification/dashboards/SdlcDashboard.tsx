@@ -87,70 +87,103 @@ export function SdlcDashboard({ claims, rawClaims, onForward }: Props) {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-blue-800">
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg">
+        <h1 className="text-3xl font-bold mb-2">
           {t("sdlc_dashboard_title")}
         </h1>
-        <p className="text-slate-600">{t("sdlc_dashboard_subtitle")}</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title={t("stat_claims_to_review")}
-          value={stats?.toReviewSdlc || 0}
-          description={t("stat_claims_to_review_desc")}
-          Icon={Clock}
-          iconColorClass="text-blue-500"
-        />
-        <StatCard
-          title={t("stat_forwarded_to_dlc")}
-          value={stats?.forwardedToDlc || 0}
-          description={t("stat_forwarded_to_dlc_desc")}
-          Icon={Check}
-          iconColorClass="text-green-500"
-        />
+        <p className="text-green-100 text-lg">{t("sdlc_dashboard_subtitle")}</p>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Filter className="h-5 w-5 text-muted-foreground" />
-        <Select value={selectedVillage} onValueChange={setSelectedVillage}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder={t("filter_by_village")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("all_villages")}</SelectItem>
-            {villages.map((v) => (
-              <SelectItem key={v.id} value={v.id}>
-                {v.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <ClaimsTable
-        claims={filteredClaims}
-        renderActions={(claim) =>
-          claim.status === "Under SDLC Review" && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleViewDocuments(claim)}
-              >
-                <FileText size={14} className="mr-1" /> {t("button_view_docs")}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleForwardClick(claim)}
-              >
-                <Send size={14} className="mr-1" /> {t("button_forward_to_dlc")}
-              </Button>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 shadow-md hover:shadow-lg transition-all duration-200">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Clock className="w-8 h-8 text-green-600" />
             </div>
-          )
-        }
-      />
+            <div>
+              <h3 className="text-2xl font-bold text-green-800">{stats?.toReviewSdlc || 0}</h3>
+              <p className="text-green-600 font-medium">{t("stat_claims_to_review")}</p>
+              <p className="text-green-500 text-sm">{t("stat_claims_to_review_desc")}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 shadow-md hover:shadow-lg transition-all duration-200">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Check className="w-8 h-8 text-green-600" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-green-800">{stats?.forwardedToDlc || 0}</h3>
+              <p className="text-green-600 font-medium">{t("stat_forwarded_to_dlc")}</p>
+              <p className="text-green-500 text-sm">{t("stat_forwarded_to_dlc_desc")}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Section */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <Filter className="h-5 w-5 text-green-600" />
+          </div>
+          <Select value={selectedVillage} onValueChange={setSelectedVillage}>
+            <SelectTrigger className="w-[200px] border-green-200 focus:border-green-500 focus:ring-green-200 rounded-lg">
+              <SelectValue placeholder={t("filter_by_village")} />
+            </SelectTrigger>
+            <SelectContent className="border-green-200">
+              <SelectItem value="all">{t("all_villages")}</SelectItem>
+              {villages.map((v) => (
+                <SelectItem key={v.id} value={v.id}>
+                  {v.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Claims Table */}
+      <div className="bg-white rounded-2xl shadow-xl border border-green-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <FileText className="w-6 h-6" />
+            {t("sdlc_review")}
+          </h3>
+        </div>
+        <div className="p-6">
+          <ClaimsTable
+            claims={filteredClaims}
+            renderActions={(claim) =>
+              claim.status === "Under SDLC Review" && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewDocuments(claim)}
+                    className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 rounded-lg transition-all duration-200"
+                  >
+                    <FileText size={14} className="mr-1" /> {t("button_view_docs")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleForwardClick(claim)}
+                    className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 rounded-lg transition-all duration-200"
+                  >
+                    <Send size={14} className="mr-1" /> {t("button_forward_to_dlc")}
+                  </Button>
+                </div>
+              )
+            }
+          />
+        </div>
+      </div>
+
       <DocumentViewer
         isOpen={isViewerOpen}
         onOpenChange={setIsViewerOpen}

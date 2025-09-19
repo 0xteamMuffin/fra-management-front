@@ -365,5 +365,7 @@
   "th_gram_panchayat": "গ্রাম পঞ্চায়েত",
   "th_applicant": "আবেদনকারী",
   "th_status": "স্থিতি",
-  "th_actions": "কার্যকলাপ"
+  "th_actions": "কার্যকলাপ",
+  "Government_dashboard": "সরকারি ড্যাশবোর্ড",
+  "sdlc_review": "SDLC পর্যালোচনা কিউ"
 }

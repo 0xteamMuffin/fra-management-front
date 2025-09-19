@@ -97,107 +97,130 @@ const UserDashboardPage = () => {
   if (error) {
     return <ApiError error={error} onRetry={refreshClaims} />;
   }
-
   return (
     <ProtectedRoute>
-      <div className="bg-slate-50 min-h-screen">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-          <header className="mb-8 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                {t("welcomeBack", { name: user?.name.split(" ")[0] })}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {t("claimsSummaryDescription")}
-              </p>
+      <div className="min-h-screen bg-white">
+        {/* Header Section with Gradient */}
+        <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white">
+          <div className="max-w-7xl mx-auto p-6 sm:p-8">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">
+                  {t("welcomeBack", { name: user?.name.split(" ")[0] })}
+                </h1>
+                <p className="text-green-100 text-lg">
+                  {t("claimsSummaryDescription")}
+                </p>
+              </div>
+              <Button 
+                onClick={() => (window.location.href = "/claims/new")}
+                className="bg-white text-green-600 hover:bg-green-50 hover:text-green-700 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <PlusCircle className="mr-2 h-5 w-5" />
+                {t("submitNewClaim")}
+              </Button>
             </div>
-            <Button onClick={() => (window.location.href = "/claims/new")}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {t("submitNewClaim")}
-            </Button>
-          </header>
+          </div>
+        </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg">
-                <FileStack className="mr-2 h-5 w-5" />
-                {t("yourClaimsCount", { count: rawClaims.length })}
-              </CardTitle>
-              <CardDescription>{t("claimsListDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent>
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">          {/* Custom Card Component */}
+          <div className="bg-white rounded-3xl shadow-xl border border-green-100 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6">
+              <div className="flex items-center gap-3 text-white">
+                <FileStack className="w-7 h-7" />
+                <div>
+                  <h2 className="text-2xl font-bold">
+                    {t("yourClaimsCount", { count: rawClaims.length })}
+                  </h2>
+                  <p className="text-green-100 mt-1">{t("claimsListDescription")}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Content */}
+            <div className="p-8 bg-gradient-to-br from-white to-green-50">
               {rawClaims.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("tableHeaderClaimId")}</TableHead>
-                      <TableHead>{t("tableHeaderType")}</TableHead>
-                      <TableHead>{t("tableHeaderSubmittedOn")}</TableHead>
-                      <TableHead>{t("tableHeaderStatus")}</TableHead>
-                      <TableHead className="text-right">
-                        {t("tableHeaderActions")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rawClaims.map((claim) => {
-                      const uiStatus = mapBackendStatusToUI(claim.status);
-                      const status = statusConfig[uiStatus];
-                      const statusI18nKey = statusKeyMap[uiStatus] || uiStatus;
-                      return (
-                        <TableRow key={claim.id}>
-                          <TableCell className="font-medium">
-                            {generateClaimDisplayId(claim)}
-                          </TableCell>
-                          <TableCell>{mapFRATypeToUI(claim.type)}</TableCell>
-                          <TableCell>
-                            {new Date(claim.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant="outline"
-                              className={cn("text-xs py-0.5", status.className)}
-                            >
-                              {status.icon && (
-                                <status.icon
-                                  className={cn(
-                                    "h-3 w-3 mr-1",
-                                    status.textColor,
-                                    uiStatus.includes("Review") &&
-                                      "animate-spin",
-                                  )}
-                                />
-                              )}
-                              {t(statusI18nKey)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button asChild variant="outline" size="sm">
-                              <Link href={`/claims/${claim.id}`}>
-                                <Eye className="h-3 w-3 mr-1" />
-                                {t("viewDetailsButton")}
-                              </Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-green-200">
+                        <TableHead className="text-green-700 font-semibold">{t("tableHeaderClaimId")}</TableHead>
+                        <TableHead className="text-green-700 font-semibold">{t("tableHeaderType")}</TableHead>
+                        <TableHead className="text-green-700 font-semibold">{t("tableHeaderSubmittedOn")}</TableHead>
+                        <TableHead className="text-green-700 font-semibold">{t("tableHeaderStatus")}</TableHead>
+                        <TableHead className="text-right text-green-700 font-semibold">
+                          {t("tableHeaderActions")}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rawClaims.map((claim) => {
+                        const uiStatus = mapBackendStatusToUI(claim.status);
+                        const status = statusConfig[uiStatus];
+                        const statusI18nKey = statusKeyMap[uiStatus] || uiStatus;
+                        return (
+                          <TableRow key={claim.id} className="hover:bg-green-50/50 border-green-100">
+                            <TableCell className="font-medium text-green-800">
+                              {generateClaimDisplayId(claim)}
+                            </TableCell>
+                            <TableCell className="text-gray-700">{mapFRATypeToUI(claim.type)}</TableCell>
+                            <TableCell className="text-gray-700">
+                              {new Date(claim.createdAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant="outline"
+                                className={cn("text-xs py-1 px-2 rounded-full font-medium", status.className)}
+                              >
+                                {status.icon && (
+                                  <status.icon
+                                    className={cn(
+                                      "h-3 w-3 mr-1",
+                                      status.textColor,
+                                      uiStatus.includes("Review") &&
+                                        "animate-spin",
+                                    )}
+                                  />
+                                )}
+                                {t(statusI18nKey)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button asChild variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 rounded-lg transition-all duration-200">
+                                <Link href={`/claims/${claim.id}`}>
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  {t("viewDetailsButton")}
+                                </Link>
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  {t("noClaimsSubmitted")}
-                  <Button
-                    size="sm"
-                    className="w-full mt-4"
-                    onClick={() => (window.location.href = "/claims/new")}
-                  >
-                    {t("fileNewClaim")}
-                  </Button>
+                <div className="text-center py-12">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
+                    <FileStack className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                    <div className="text-lg font-medium text-green-700 mb-2">
+                      {t("noClaimsSubmitted")}
+                    </div>
+                    <p className="text-green-600 mb-4">Start your forest rights claim journey today!</p>
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      onClick={() => (window.location.href = "/claims/new")}
+                    >
+                      <PlusCircle className="mr-2 h-5 w-5" />
+                      {t("fileNewClaim")}
+                    </Button>
+                  </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </ProtectedRoute>
