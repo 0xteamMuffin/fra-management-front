@@ -34,7 +34,11 @@ interface SetupStatus {
   adminUsers: number;
 }
 
-export default function SetupPage() {
+export default function SetupPage({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) {
   const [setupStatus, setSetupStatus] = useState<SetupStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);

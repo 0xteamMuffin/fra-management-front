@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { dir } from "i18next";
 import { languages } from "./i18n/settings";
+import Providers from "./providers";
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }));
@@ -34,16 +35,18 @@ export default function RootLayout({
         className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <div>
-              <SiteHeader />
-              {children}
-            </div>
-          </Suspense>
-          <SiteFooter />
-          <Toaster richColors position="top-center" />
-        </AuthProvider>
+        <Providers>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <div>
+                <SiteHeader lng={lng} />
+                {children}
+              </div>
+            </Suspense>
+            <SiteFooter />
+            <Toaster richColors position="top-center" />
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

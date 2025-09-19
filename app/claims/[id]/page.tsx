@@ -68,7 +68,11 @@ const DetailItem = ({
   </div>
 );
 
-const ClaimDetailsPage = () => {
+const ClaimDetailsPage = ({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) => {
   const params = useParams();
   const { rawClaims, isLoading, error, refreshClaims } = useClaims({
     autoFetch: true,

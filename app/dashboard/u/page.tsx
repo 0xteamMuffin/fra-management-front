@@ -38,6 +38,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from "next/link";
+import { useTranslation } from "@/app/i18n/client";
 
 const statusConfig: {
   [key: string]: {
@@ -72,14 +73,15 @@ const statusConfig: {
   },
 };
 
-const UserDashboardPage = () => {
+const UserDashboardPage = ({ params: { lng } }: { params: { lng: string } }) => {
+  const { t } = useTranslation(lng, "common");
   const { user } = useAuth();
   const { rawClaims, isLoading, error, refreshClaims } = useClaims({
     autoFetch: true,
   });
 
   if (isLoading) {
-    return <LoadingPage message="Fetching your claims..." />;
+    return <LoadingPage message={t("fetchingClaims")} />;
   }
 
   if (error) {
@@ -93,15 +95,15 @@ const UserDashboardPage = () => {
           <header className="mb-8 flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
-                Welcome back, {user?.name.split(" ")[0]}!
+                {t("welcomeBack", { name: user?.name.split(" ")[0] })}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Here is a summary of your submitted FRA claims.
+                {t("claimsSummary")}
               </p>
             </div>
             <Button onClick={() => (window.location.href = "/claims/new")}>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Submit a New Claim
+              {t("submitNewClaim")}
             </Button>
           </header>
 
@@ -109,22 +111,20 @@ const UserDashboardPage = () => {
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
                 <FileStack className="mr-2 h-5 w-5" />
-                Your Claims ({rawClaims.length})
+                {t("yourClaims", { count: rawClaims.length })}
               </CardTitle>
-              <CardDescription>
-                A list of all the claims you have submitted.
-              </CardDescription>
+              <CardDescription>{t("claimsListDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               {rawClaims.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Claim ID</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Submitted On</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>{t("claimId")}</TableHead>
+                      <TableHead>{t("type")}</TableHead>
+                      <TableHead>{t("submittedOn")}</TableHead>
+                      <TableHead>{t("status")}</TableHead>
+                      <TableHead className="text-right">{t("actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -150,8 +150,7 @@ const UserDashboardPage = () => {
                                   className={cn(
                                     "h-3 w-3 mr-1",
                                     status.textColor,
-                                    uiStatus.includes("Review") &&
-                                      "animate-spin",
+                                    uiStatus.includes("Review") && "animate-spin"
                                   )}
                                 />
                               )}
@@ -162,7 +161,7 @@ const UserDashboardPage = () => {
                             <Button asChild variant="outline" size="sm">
                               <Link href={`/claims/${claim.id}`}>
                                 <Eye className="h-3 w-3 mr-1" />
-                                View Details
+                                {t("viewDetails")}
                               </Link>
                             </Button>
                           </TableCell>
@@ -173,13 +172,13 @@ const UserDashboardPage = () => {
                 </Table>
               ) : (
                 <div className="p-4 text-center text-sm text-muted-foreground">
-                  You haven't submitted any claims yet.
+                  {t("noClaimsSubmitted")}
                   <Button
                     size="sm"
                     className="w-full mt-4"
                     onClick={() => (window.location.href = "/claims/new")}
                   >
-                    File a New Claim
+                    {t("fileNewClaim")}
                   </Button>
                 </div>
               )}

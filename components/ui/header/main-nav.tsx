@@ -8,24 +8,27 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { LogOut, User } from "lucide-react";
 import { UserRole } from "@/lib/types/api";
+import { useTranslation } from "@/app/i18n/client";
 
 const navLinks = [
-  { href: "/atlas", label: "Atlas" },
-  { href: "/dss", label: "DSS" },
-  { href: "/iot", label: "IoT" },
-  { href: "/track", label: "Track Claim" },
+  { href: "/atlas", label: "atlas" },
+  { href: "/dss", label: "dss" },
+  { href: "/iot", label: "iot" },
+  { href: "/track", label: "trackClaim" },
 ];
 
 interface MainNavProps {
   variant?: "desktop" | "mobile";
   onClick?: () => void;
+  lng: string;
 }
 
-export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
+export function MainNav({ variant = "desktop", onClick, lng }: MainNavProps) {
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
+  const { t } = useTranslation(lng, "common");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -84,7 +87,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                   variant === "desktop" && "w-auto",
                 )}
               >
-                {l.label}
+                {t(l.label)}
                 {active && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-green-500 rounded-full"></span>
                 )}
@@ -150,7 +153,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                   onClick={() => setIsDropdownOpen(false)}
                 >
-                  My Dashboard
+                  {t("myDashboard")}
                 </Link>
                 {user?.role === "DistrictCommittee" && (
                   <Link
@@ -158,7 +161,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                     className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    Admin Panel
+                    {t("adminPanel")}
                   </Link>
                 )}
                 <button
@@ -169,7 +172,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
                 >
                   <LogOut className="h-4 w-4 mr-2 inline" />
-                  Logout
+                  {t("logout")}
                 </button>
               </div>
             </div>
@@ -183,7 +186,7 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
               aria-expanded={isDropdownOpen}
               aria-haspopup="true"
             >
-              Login
+              {t("login")}
               <svg
                 className={`ml-2 h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
                 fill="none"
@@ -216,14 +219,14 @@ export function MainNav({ variant = "desktop", onClick }: MainNavProps) {
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                   onClick={() => setIsDropdownOpen(false)}
                 >
-                  Citizen
+                  {t("citizen")}
                 </Link>
                 <Link
                   href="/login/govt"
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                   onClick={() => setIsDropdownOpen(false)}
                 >
-                  Govt Official
+                  {t("govtOfficial")}
                 </Link>
               </div>
             </div>

@@ -9,7 +9,11 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { ApiError } from "@/components/ui/error-boundary";
 import { UserRole } from "@/lib/types/api";
 
-const CitizenSignupPage = () => {
+const CitizenSignupPage = ({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -6,8 +6,9 @@ import { MapPin, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { MainNav } from "@/components/ui/header/main-nav";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-export function SiteHeader() {
+export function SiteHeader({ lng }: { lng: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -23,8 +24,9 @@ export function SiteHeader() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex">
-          <MainNav />
+        <div className="hidden md:flex items-center gap-4">
+          <MainNav lng={lng} />
+          <LanguageSwitcher lng={lng} />
         </div>
 
         {/* Mobile nav */}
@@ -48,7 +50,8 @@ export function SiteHeader() {
                     </p>
                   </div>
                 </div>
-                <MainNav variant="mobile" onClick={() => setIsOpen(false)} />
+                <MainNav variant="mobile" onClick={() => setIsOpen(false)} lng={lng} />
+                <LanguageSwitcher lng={lng} />
               </div>
             </SheetContent>
           </Sheet>

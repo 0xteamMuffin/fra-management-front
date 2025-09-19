@@ -43,7 +43,11 @@ import {
   AddVillageModal,
 } from "@/components/admin/modals";
 
-export default function AdminPanelPage() {
+export default function AdminPanelPage({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) {
   return (
     <AdminRoute>
       <AdminPanel />

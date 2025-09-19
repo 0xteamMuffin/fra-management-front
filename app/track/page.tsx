@@ -16,7 +16,11 @@ import { toast } from "sonner";
 import { mapBackendStatusToUI } from "@/lib/utils/claim-helpers";
 import { Badge } from "@/components/ui/badge";
 
-const TrackClaimPage = () => {
+const TrackClaimPage = ({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) => {
   const [claimId, setClaimId] = useState("");
   const [claimDetails, setClaimDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);

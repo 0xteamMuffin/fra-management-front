@@ -7,6 +7,10 @@ const DSSEnginePage = dynamic(
   { ssr: false },
 );
 
-export default function DashboardsPage() {
+export default function DashboardsPage({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) {
   return <DSSEnginePage />;
 }

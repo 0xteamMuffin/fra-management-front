@@ -8,7 +8,11 @@ import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { ApiError } from "@/components/ui/error-boundary";
 
-const GovernmentLoginPage = () => {
+const GovernmentLoginPage = ({
+  params: { lng },
+}: {
+  params: { lng: string };
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
