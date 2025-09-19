@@ -33,17 +33,6 @@ export function SiteHeader() {
           <MainNav />
         </div>
 
-        <div className="flex items-center gap-4">
-          <select
-            onChange={(e) => changeLanguage(e.target.value)}
-            value={i18n.language}
-            className="bg-transparent"
-          >
-            <option value="en">English</option>
-            <option value="hi">Hindi</option>
-          </select>
-        </div>
-
         {/* Mobile nav */}
         <div className="md:hidden">
           <Sheet>
