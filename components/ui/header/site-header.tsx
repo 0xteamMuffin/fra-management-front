@@ -24,7 +24,7 @@ export function SiteHeader() {
           <div className="flex h-8 w-8 items-center justify-center rounded-md gradient-green text-white">
             <MapPin className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-wide">FRA Atlas</span>
+          <span className="text-lg font-semibold tracking-wide">VanFRA</span>
           <span className="sr-only">Home</span>
         </Link>
 
