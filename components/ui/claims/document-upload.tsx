@@ -1,81 +1,52 @@
 "use client";
 
-import React from "react";
-
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, File, X, CheckCircle, Eye, Loader2 } from "lucide-react";
 import { s3Service } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next"; // Import the hook
 
 interface DocumentUploadProps {
-  onDocumentsChange: (documents: { [key: string]: string }) => void; // Changed to object with document type as key and S3 key as value
+  onDocumentsChange: (documents: { [key: string]: string }) => void;
   uploadedDocuments: { [key: string]: string };
 }
 
-interface DocumentType {
+// Define a type for the state that includes translation keys
+interface DocumentTypeState {
   id: string;
-  name: string;
-  description: string;
+  nameKey: string;
+  descKey: string;
   required: boolean;
   uploaded: boolean;
   s3Key?: string;
   uploading?: boolean;
 }
 
+// Configuration array with stable keys
+const DOCUMENT_CONFIG = [
+  { id: "identity-proof", nameKey: "docNameIdentity", descKey: "docDescIdentity", required: true },
+  { id: "address-proof", nameKey: "docNameAddress", descKey: "docDescAddress", required: true },
+  { id: "occupation-proof", nameKey: "docNameOccupation", descKey: "docDescOccupation", required: true },
+  { id: "survey-settlement", nameKey: "docNameSurvey", descKey: "docDescSurvey", required: false },
+  { id: "genealogy", nameKey: "docNameGenealogy", descKey: "docDescGenealogy", required: false },
+  { id: "community-certificate", nameKey: "docNameCommunity", descKey: "docDescCommunity", required: true },
+];
+
 export function DocumentUpload({
   onDocumentsChange,
   uploadedDocuments,
 }: DocumentUploadProps) {
-  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([
-    {
-      id: "identity-proof",
-      name: "Identity Proof",
-      description: "Aadhar Card, Voter ID, or Passport",
-      required: true,
-      uploaded: false,
-    },
-    {
-      id: "address-proof",
-      name: "Address Proof",
-      description: "Utility bill, Bank statement, or Ration card",
-      required: true,
-      uploaded: false,
-    },
-    {
-      id: "occupation-proof",
-      name: "Occupation Proof",
-      description: "Evidence of land occupation (photos, witness statements)",
-      required: true,
-      uploaded: false,
-    },
-    {
-      id: "survey-settlement",
-      name: "Survey Settlement Records",
-      description: "Revenue records, Survey documents",
-      required: false,
-      uploaded: false,
-    },
-    {
-      id: "genealogy",
-      name: "Genealogy Documents",
-      description: "Family tree, Birth certificates",
-      required: false,
-      uploaded: false,
-    },
-    {
-      id: "community-certificate",
-      name: "Community Certificate",
-      description: "Tribal/Caste certificate",
-      required: true,
-      uploaded: false,
-    },
-  ]);
+  const { t } = useTranslation(); // Initialize the translation hook
 
+  // Initialize state with keys, uploaded status will be added
+  const [documentTypes, setDocumentTypes] = useState<DocumentTypeState[]>(
+    DOCUMENT_CONFIG.map(doc => ({ ...doc, uploaded: false }))
+  );
+  
   const [dragActive, setDragActive] = useState<string | null>(null);
 
-  // Update document types with uploaded status
   React.useEffect(() => {
     setDocumentTypes((prev) =>
       prev.map((doc) => ({
@@ -100,83 +71,68 @@ export function DocumentUpload({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(null);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFile(e.dataTransfer.files[0], docId);
     }
   }, []);
 
-  const handleFile = async (file: File, documentType: string) => {
-    // Validate file size (10MB limit)
+  const handleFile = async (file: File, documentTypeId: string) => {
     if (file.size > 10 * 1024 * 1024) {
-      toast.error(`File ${file.name} exceeds the 10MB size limit.`);
+      toast.error(t("toastErrorFileSize", { fileName: file.name }));
       return;
     }
 
-    // Validate file type
-    const allowedTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error(`File type for ${file.name} is not supported.`);
+      toast.error(t("toastErrorFileType", { fileName: file.name }));
       return;
     }
 
     try {
-      // Set uploading state
       setDocumentTypes((prev) =>
-        prev.map((doc) =>
-          doc.id === documentType ? { ...doc, uploading: true } : doc,
-        ),
+        prev.map((doc) => doc.id === documentTypeId ? { ...doc, uploading: true } : doc),
       );
 
-      // Upload to S3
       const s3Key = await s3Service.uploadFileComplete(file);
 
       if (s3Key) {
-        // Update uploaded documents
-        const newDocuments = { ...uploadedDocuments, [documentType]: s3Key };
+        const newDocuments = { ...uploadedDocuments, [documentTypeId]: s3Key };
         onDocumentsChange(newDocuments);
 
-        toast.success(`${file.name} uploaded successfully as ${documentType}`);
+        const docConfig = documentTypes.find(d => d.id === documentTypeId);
+        const docName = docConfig ? t(docConfig.nameKey) : documentTypeId;
+        toast.success(t("toastSuccessUpload", { fileName: file.name, docName }));
       } else {
-        throw new Error("Upload failed to return S3 key");
+        throw new Error(t("toastErrorS3Key"));
       }
     } catch (error) {
       console.error("Upload error for file:", file.name, error);
-      toast.error(`Failed to upload ${file.name}`);
+      toast.error(t("toastErrorUploadFailed", { fileName: file.name }));
     } finally {
-      // Reset uploading state
       setDocumentTypes((prev) =>
-        prev.map((doc) =>
-          doc.id === documentType ? { ...doc, uploading: false } : doc,
-        ),
+        prev.map((doc) => doc.id === documentTypeId ? { ...doc, uploading: false } : doc),
       );
     }
   };
 
   const removeDocument = (documentType: string) => {
-    // Remove from uploaded documents object
     const newDocuments = { ...uploadedDocuments };
     delete newDocuments[documentType];
     onDocumentsChange(newDocuments);
   };
 
   const viewDocument = async (s3Key: string) => {
-    const toastId = toast.loading("Generating secure link...");
+    const toastId = toast.loading(t("toastLoadingLink"));
     try {
       const url = await s3Service.getViewUrl(s3Key);
       if (url) {
-        toast.success("Link generated!", { id: toastId });
+        toast.success(t("toastSuccessLink"), { id: toastId });
         window.open(url, "_blank");
       } else {
-        toast.error("Could not generate link.", { id: toastId });
+        toast.error(t("toastErrorLink"), { id: toastId });
       }
     } catch (error) {
-      toast.error("Failed to generate link.", { id: toastId });
+      toast.error(t("toastErrorLinkFailed"), { id: toastId });
     }
   };
 
@@ -187,33 +143,25 @@ export function DocumentUpload({
           <div className="flex justify-between items-start">
             <div>
               <h4 className="font-semibold text-foreground flex items-center">
-                {doc.name}
+                {t(doc.nameKey)}
                 {doc.required && (
-                  <span className="text-xs text-red-500 ml-2">(Required)</span>
+                  <span className="text-xs text-red-500 ml-2">{t("requiredLabel")}</span>
                 )}
               </h4>
-              <p className="text-sm text-muted-foreground">{doc.description}</p>
+              <p className="text-sm text-muted-foreground">{t(doc.descKey)}</p>
             </div>
             {doc.uploaded && doc.s3Key ? (
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => viewDocument(doc.s3Key!)}
-                >
-                  <Eye className="h-4 w-4 mr-1" /> View
+                <Button variant="outline" size="sm" onClick={() => viewDocument(doc.s3Key!)}>
+                  <Eye className="h-4 w-4 mr-1" /> {t("viewButton")}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeDocument(doc.id)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => removeDocument(doc.id)}>
                   <X className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
             ) : doc.uploading ? (
               <Button variant="outline" size="sm" disabled>
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Uploading...
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" /> {t("uploadingButton")}
               </Button>
             ) : null}
           </div>
@@ -233,26 +181,22 @@ export function DocumentUpload({
             >
               <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground mb-2">
-                Drag and drop a file here, or
+                {t("dragAndDropPrompt")}
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() =>
-                  document.getElementById(`file-upload-${doc.id}`)?.click()
-                }
+                onClick={() => document.getElementById(`file-upload-${doc.id}`)?.click()}
               >
                 <File className="mr-2 h-4 w-4" />
-                Choose File
+                {t("chooseFileButton")}
               </Button>
               <input
                 id={`file-upload-${doc.id}`}
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) =>
-                  e.target.files && handleFile(e.target.files[0], doc.id)
-                }
+                onChange={(e) => e.target.files && handleFile(e.target.files[0], doc.id)}
                 className="hidden"
               />
             </div>
@@ -261,11 +205,9 @@ export function DocumentUpload({
             <div className="flex items-center p-3 bg-green-50 text-green-800 rounded-md">
               <CheckCircle className="h-5 w-5 mr-3" />
               <div>
-                <p className="text-sm font-medium">
-                  Document uploaded successfully.
-                </p>
+                <p className="text-sm font-medium">{t("uploadSuccessMessage")}</p>
                 <p className="text-xs">
-                  S3 Key: {doc.s3Key?.substring(0, 40)}...
+                  {t("s3KeyLabel")} {doc.s3Key?.substring(0, 40)}...
                 </p>
               </div>
             </div>

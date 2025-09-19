@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { ApiError } from "@/components/ui/error-boundary";
+import { useTranslation } from "react-i18next"; // Import the hook
 
 const CitizenLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +15,7 @@ const CitizenLoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  const { t } = useTranslation(); // Initialize the translation function
   const { login, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -33,7 +35,7 @@ const CitizenLoginPage = () => {
     setError(null);
 
     if (!email || !password) {
-      setError("Please fill in all fields");
+      setError(t("errorAllFieldsRequired")); // Use translation key for error
       return;
     }
 
@@ -61,17 +63,15 @@ const CitizenLoginPage = () => {
 
           <div className="relative z-10">
             <h1 className="text-3xl font-bold tracking-tight">
-              Forest Rights Act Portal
+              {t("forestRightsActPortal")}
             </h1>
             <p className="mt-2 text-green-200">
-              Empowering tribal communities and forest dwellers.
+              {t("empoweringCommunities")}
             </p>
           </div>
 
           <div className="relative z-10 text-sm">
-            <p className="text-green-300">
-              © 2025 Ministry of Tribal Affairs, Government of India
-            </p>
+            <p className="text-green-300">{t("copyrightNotice")}</p>
           </div>
         </div>
 
@@ -80,11 +80,9 @@ const CitizenLoginPage = () => {
           <div className="w-full max-w-md">
             <div className="text-center lg:text-left mb-10">
               <h2 className="text-3xl font-bold text-gray-900">
-                Citizen Login
+                {t("citizenLogin")}
               </h2>
-              <p className="mt-2 text-gray-500">
-                Sign in to file a new claim or check your claim status.
-              </p>
+              <p className="mt-2 text-gray-500">{t("signInToContinue")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -97,14 +95,14 @@ const CitizenLoginPage = () => {
                   htmlFor="email"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Email Address
+                  {t("emailAddressLabel")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="email"
                     type="email"
-                    placeholder="user@email.com"
+                    placeholder={t("emailPlaceholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -121,13 +119,13 @@ const CitizenLoginPage = () => {
                     htmlFor="password"
                     className="text-sm font-medium text-gray-700"
                   >
-                    Password
+                    {t("passwordLabel")}
                   </label>
                   <a
                     href="#"
                     className="text-sm text-green-600 hover:underline"
                   >
-                    Forgot Password?
+                    {t("forgotPasswordLink")}
                   </a>
                 </div>
                 <div className="relative">
@@ -156,19 +154,21 @@ const CitizenLoginPage = () => {
                 ) : (
                   <LogIn className="mr-2 h-4 w-4" />
                 )}
-                {isLoading && isMounted ? "Signing In..." : "Login"}
+                {isLoading && isMounted
+                  ? t("signingInButtonText")
+                  : t("loginButtonText")}
               </button>
             </form>
 
             {/* Sign Up Option */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                {t("dontHaveAccount")}{" "}
                 <button
                   onClick={handleSignUpClick}
                   className="font-medium text-green-600 hover:underline inline-flex items-center"
                 >
-                  Sign Up Now <UserPlus className="ml-1 h-4 w-4" />
+                  {t("signUpNowButton")} <UserPlus className="ml-1 h-4 w-4" />
                 </button>
               </p>
             </div>
